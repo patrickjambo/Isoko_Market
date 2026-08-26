@@ -14,10 +14,24 @@ describe('localizeError', () => {
     expect(localizeError('Job not found.', 'en')).toBe('Job not found.');
   });
 
-  it('falls back to the original text for unmapped/dynamic messages', () => {
-    expect(localizeError('Missing permission: analytics.export', 'fr')).toBe(
-      'Missing permission: analytics.export'
+  it('translates Zod field messages too', () => {
+    expect(localizeError('Add a job title.', 'rw')).toBe('Andika umutwe w’akazi.');
+    expect(localizeError('Enter a valid Rwandan phone number.', 'fr')).toBe(
+      'Saisissez un numéro de téléphone rwandais valide.'
     );
+  });
+
+  it('translates the dynamic "Missing permission:" prefix, keeping the key', () => {
+    expect(localizeError('Missing permission: analytics.export', 'fr')).toBe(
+      'Autorisation manquante : analytics.export'
+    );
+    expect(localizeError('Missing permission: users.ban', 'rw')).toBe('Nta ruhushya: users.ban');
+    // English is unchanged.
+    expect(localizeError('Missing permission: users.ban', 'en')).toBe('Missing permission: users.ban');
+  });
+
+  it('falls back to the original text for unmapped messages and unknown locales', () => {
+    expect(localizeError('Totally novel error.', 'fr')).toBe('Totally novel error.');
     expect(localizeError('Job not found.', 'sw')).toBe('Job not found.'); // unknown locale
   });
 });

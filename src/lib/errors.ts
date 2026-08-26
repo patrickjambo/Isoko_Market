@@ -74,16 +74,40 @@ const ERROR_TRANSLATIONS: Record<string, LocalizedError> = {
   // ── UNAUTHORIZED ──
   "Please log in to continue.": { rw: "Injira kugira ngo ukomeze.", fr: "Connectez-vous pour continuer." },
 
+  // ── form validation (Zod field messages) ──
+  "Add a job title.": { rw: "Andika umutwe w’akazi.", fr: "Ajoutez un intitulé de poste." },
+  "Add a location.": { rw: "Andika aho biherereye.", fr: "Ajoutez un lieu." },
+  "Add a partner name.": { rw: "Andika izina ry’umufatanyabikorwa.", fr: "Ajoutez un nom de partenaire." },
+  "Add a short, clear title.": { rw: "Andika umutwe mugufi kandi usobanutse.", fr: "Ajoutez un titre court et clair." },
+  "Describe the item.": { rw: "Sobanura igicuruzwa.", fr: "Décrivez l’article." },
+  "Describe the role.": { rw: "Sobanura akazi.", fr: "Décrivez le poste." },
+  "Enter a valid price.": { rw: "Andika igiciro cyemewe.", fr: "Saisissez un prix valide." },
+  "Enter a valid Rwandan phone number.": { rw: "Andika nimero ya telefoni y’u Rwanda yemewe.", fr: "Saisissez un numéro de téléphone rwandais valide." },
+  "Enter the 6-digit code.": { rw: "Andika kode y’imibare 6.", fr: "Saisissez le code à 6 chiffres." },
+  "Maximum pay must be at least the minimum.": { rw: "Umushahara ntarengwa ugomba kuba nibura ungana n’uto.", fr: "Le salaire maximum doit être au moins égal au minimum." },
+  "Upload your ID first.": { rw: "Banza wohereze indangamuntu yawe.", fr: "Téléversez d’abord votre pièce d’identité." },
+  "Use a hex colour like #0F766E.": { rw: "Koresha ibara rya hex nka #0F766E.", fr: "Utilisez une couleur hexadécimale comme #0F766E." },
+  "Write a message.": { rw: "Andika ubutumwa.", fr: "Écrivez un message." },
+
   // ── generic wrapper messages (VALIDATION / INTERNAL) ──
   "Please check the highlighted fields.": { rw: "Reba ibisabwa byagaragajwe.", fr: "Veuillez vérifier les champs indiqués." },
   "Something went wrong. Please try again.": { rw: "Habaye ikibazo. Ongera ugerageze.", fr: "Une erreur s’est produite. Réessayez." },
 };
 
+// Dynamic permission-denied messages carry the permission key, e.g.
+// "Missing permission: analytics.export" — translate the prefix, keep the key.
+const MISSING_PERMISSION = "Missing permission: ";
+
 /** Translate a known API error message into `locale`; unknown/dynamic messages
  *  and `en` pass through unchanged (English is the source of truth). */
 export function localizeError(message: string, locale: string): string {
   if (locale === "en") return message;
+  if (locale !== "rw" && locale !== "fr") return message; // unknown locale → source
+  if (message.startsWith(MISSING_PERMISSION)) {
+    const perm = message.slice(MISSING_PERMISSION.length);
+    return locale === "fr" ? `Autorisation manquante : ${perm}` : `Nta ruhushya: ${perm}`;
+  }
   const entry = ERROR_TRANSLATIONS[message];
   if (!entry) return message;
-  return locale === "fr" ? entry.fr : locale === "rw" ? entry.rw : message;
+  return entry[locale];
 }

@@ -87,7 +87,7 @@ export function route<Args extends unknown[]>(
         const fields: Record<string, string> = {};
         for (const issue of err.issues) {
           const path = issue.path.join('.');
-          if (path && !fields[path]) fields[path] = issue.message;
+          if (path && !fields[path]) fields[path] = t(issue.message);
         }
         return jsonError('VALIDATION', t('Please check the highlighted fields.'), fields);
       }
