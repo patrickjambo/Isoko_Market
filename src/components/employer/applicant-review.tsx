@@ -68,6 +68,9 @@ export function ApplicantReview({
   }, [applicants, sort, verifiedOnly, overrides]);
 
   async function setStatus(a: ApplicantItem, status: string) {
+    // Hiring is significant and hard to reverse (closes the job, fills the rest) —
+    // confirm first. Other transitions (shortlist/reject) are cheap and instant.
+    if (status === 'HIRED' && !window.confirm(t('hireConfirm', { name: a.name }))) return;
     setBusy(a.id);
     try {
       const res = await fetch(`/api/applications/${a.id}`, {

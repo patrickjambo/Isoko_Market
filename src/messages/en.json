@@ -904,6 +904,7 @@
     "message": "Message",
     "shortlist": "Shortlist",
     "hire": "Hire",
+    "hireConfirm": "Hire {name}? This closes the job and notifies the other applicants.",
     "reject": "Reject",
     "noCvSnapshot": "No CV was attached to this application.",
     "messageStarter": "Hi, thanks for applying — I'd like to know more.",

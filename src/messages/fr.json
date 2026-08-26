@@ -904,6 +904,7 @@
     "message": "Message",
     "shortlist": "Présélectionner",
     "hire": "Recruter",
+    "hireConfirm": "Recruter {name} ? Cela ferme l’offre et avertit les autres candidats.",
     "reject": "Refuser",
     "noCvSnapshot": "Aucun CV n'était joint à cette candidature.",
     "messageStarter": "Bonjour, merci pour votre candidature — j'aimerais en savoir plus.",

@@ -64,6 +64,7 @@ export function ChatHiringActions({
   }
 
   async function confirmHire() {
+    if (!window.confirm(t('hireConfirm', { name: applicantName }))) return;
     setBusy(true);
     try {
       if (!(await setAppStatus('HIRED'))) throw new Error();

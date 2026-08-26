@@ -904,6 +904,7 @@
     "message": "Ohereza ubutumwa",
     "shortlist": "Toranya",
     "hire": "Muhe akazi",
+    "hireConfirm": "Guha akazi {name}? Ibi bifunga aka kazi kandi bikamenyesha abandi basabye.",
     "reject": "Anga",
     "noCvSnapshot": "Nta CV yashyizwe kuri ubu busabe.",
     "messageStarter": "Muraho, murakoze gusaba — nifuza kumenya byinshi.",
