@@ -149,7 +149,7 @@ export function MarketplaceFilters({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="f-cond">{t('condition')}</Label>
+              <Label htmlFor="f-cond">{t('form.conditionLabel')}</Label>
               <Select
                 id="f-cond"
                 value={state.condition}
