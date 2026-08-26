@@ -1,0 +1,138 @@
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { ChevronLeft, ShieldCheck, Lock, Info, ImageOff, AlertTriangle } from 'lucide-react';
+import { Link, redirect } from '@/i18n/routing';
+import { StarRating } from '@/components/trust/star-rating';
+import { VerifiedBadge } from '@/components/trust/verified-badge';
+import { OrderStatusBadge, OrderTimeline } from '@/components/orders/order-status';
+import { OrderActions } from '@/components/orders/order-actions';
+import { OrderReview } from '@/components/orders/order-review';
+import { LiveItemStatus } from '@/components/shared/live-item-status';
+import { getCurrentUser } from '@/lib/auth';
+import { can } from '@/lib/authz';
+import { prisma } from '@/lib/prisma';
+import { formatRWF } from '@/lib/utils';
+
+export const dynamic = 'force-dynamic';
+
+export default async function OrderDetailPage({
+  params,
+}: {
+  params: { locale: string; id: string };
+}) {
+  setRequestLocale(params.locale);
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect({ href: '/login', locale: params.locale });
+    return null;
+  }
+
+  const t = await getTranslations('orders');
+  const tt = await getTranslations('trust');
+
+  const order = await prisma.order.findUnique({
+    where: { id: params.id },
+    include: {
+      listing: { select: { id: true, title: true, images: { take: 1, orderBy: { position: 'asc' }, select: { url: true } } } },
+      buyer: { select: { id: true, fullName: true } },
+      seller: { select: { id: true, fullName: true, isVerified: true, verificationStatus: true } },
+    },
+  });
+  if (!order) notFound();
+  // Access gate via the shared authorizer (rule 5). Non-participants get a 404.
+  if (!(await can(user, 'order:view', order))) notFound();
+  const role = order.buyerId === user.id ? 'buyer' : 'seller';
+
+  const [ratingAgg, completedSales] = await Promise.all([
+    prisma.review.aggregate({ where: { revieweeId: order.sellerId }, _avg: { rating: true }, _count: true }),
+    prisma.order.count({ where: { sellerId: order.sellerId, status: 'COMPLETED' } }),
+  ]);
+
+  const canReview = role === 'buyer' && order.status === 'COMPLETED' && !order.reviewed;
+
+  return (
+    <div className="container max-w-2xl space-y-5 py-6">
+      <LiveItemStatus topic={`order:${order.id}`} />
+      <Link href="/orders" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <ChevronLeft className="h-4 w-4" /> {t('title')}
+      </Link>
+
+      {/* Item + status */}
+      <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
+          {order.listing.images[0] ? (
+            <Image src={order.listing.images[0].url} alt="" fill sizes="64px" className="object-cover" />
+          ) : (
+            <div className="flex h-full items-center justify-center text-muted-foreground">
+              <ImageOff className="h-5 w-5" />
+            </div>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <Link href={`/marketplace/${order.listing.id}`} className="truncate font-semibold hover:text-primary">
+            {order.listing.title}
+          </Link>
+          <p className="text-lg font-extrabold text-primary">{formatRWF(order.amount, params.locale)}</p>
+        </div>
+        <OrderStatusBadge status={order.status} />
+      </div>
+
+      {/* Timeline */}
+      {order.status !== 'CANCELLED' && (
+        <div className="rounded-xl border border-border bg-card p-4">
+          <OrderTimeline status={order.status} />
+        </div>
+      )}
+
+      {order.status === 'DISPUTED' && (
+        <div className="flex items-start gap-2 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+          <p>{t('disputedNote')}</p>
+        </div>
+      )}
+
+      {/* Escrow + safety */}
+      <div className="space-y-2">
+        {order.escrow && order.status !== 'COMPLETED' && (
+          <div className="flex items-start gap-2 rounded-xl border border-primary/30 bg-secondary/40 p-3 text-sm">
+            <Lock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <p>{t('escrowNote')}</p>
+          </div>
+        )}
+        <div className="flex items-start gap-2 rounded-xl border border-border bg-card p-3 text-xs text-muted-foreground">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <p>{t('safetyTip')}</p>
+        </div>
+      </div>
+
+      {/* Counterpart trust (buyer sees seller trust prominently) */}
+      {role === 'buyer' && (
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-primary" />
+            <span className="font-semibold">{order.seller.fullName}</span>
+            {order.seller.isVerified && <VerifiedBadge status="VERIFIED" label={tt('verifiedBadge')} />}
+          </div>
+          <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
+            {ratingAgg._count > 0 ? (
+              <StarRating value={ratingAgg._avg.rating ?? 0} count={ratingAgg._count} />
+            ) : (
+              <span>{t('noRatingYet')}</span>
+            )}
+            <span>{t('completedSales', { count: completedSales })}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Actions */}
+      <OrderActions orderId={order.id} status={order.status} role={role} />
+
+      {/* Review */}
+      {canReview && <OrderReview orderId={order.id} />}
+      {role === 'buyer' && order.reviewed && (
+        <p className="text-sm text-muted-foreground">{t('reviewDone')}</p>
+      )}
+    </div>
+  );
+}

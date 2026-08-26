@@ -1,0 +1,704 @@
+// Isoko Market — Prisma data model.
+// Derived from Section 7 (Database Schema Guidance) of the development brief.
+// Trust-sensitive relations use explicit enums + indexes so invalid states are
+// rejected at the database level, not just in application code.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pg_trgm]
+}
+
+// ─────────────────────────── Enums ───────────────────────────
+
+enum Role {
+  BUYER
+  SELLER
+  EMPLOYER
+  ADMIN
+}
+
+enum Locale {
+  rw
+  en
+  fr
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  REMOVED
+  DRAFT
+  PAUSED
+}
+
+enum ListingCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+  FOR_PARTS
+}
+
+enum JobType {
+  JOB
+  GIG
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  VIEWED
+  SHORTLISTED
+  INTERVIEW
+  REJECTED
+  HIRED
+  POSITION_FILLED // set by the job-filled cascade when another candidate is hired
+}
+
+enum TransactionType {
+  SUBSCRIPTION
+  FEATURED_LISTING
+  JOB_POST
+  ESCROW
+  TOPUP
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProviderName {
+  MTN_MOMO
+  AIRTEL_MONEY
+  MOCK
+}
+
+enum NotificationType {
+  MESSAGE
+  APPLICATION_UPDATE
+  LISTING_SOLD
+  VERIFICATION_APPROVED
+  VERIFICATION_REJECTED
+  REVIEW_RECEIVED
+  PAYMENT
+  FAVORITE
+  SYSTEM
+}
+
+enum ReportTargetType {
+  LISTING
+  JOB
+  USER
+  MESSAGE
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+enum PartnerType {
+  COOPERATIVE
+  NGO
+  MSME
+  GOVERNMENT
+}
+
+enum PartnerStatus {
+  ACTIVE
+  PROSPECT
+  INACTIVE
+}
+
+// Admin sub-roles carry default permission sets (see src/lib/permissions.ts).
+enum AdminRole {
+  SUPER_ADMIN
+  MODERATOR
+  SUPPORT
+  FINANCE_ADMIN
+  READONLY_ANALYST
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+// Buyer order lifecycle (escrow-style): funds are held until the buyer confirms
+// receipt, then released to the seller (Section 6/7).
+enum OrderStatus {
+  PAYMENT_SENT // buyer paid into escrow, awaiting seller
+  SELLER_CONFIRMED // seller acknowledged / handed over
+  COMPLETED // buyer confirmed receipt, escrow released
+  DISPUTED // routed to admin moderation
+  CANCELLED
+}
+
+// ─────────────────────────── Core ───────────────────────────
+
+model User {
+  id                 String             @id @default(cuid())
+  phone              String             @unique
+  email              String?            @unique
+  passwordHash       String?
+  fullName           String
+  bio                String?
+  avatarUrl          String?
+  location           String?
+  locale             Locale             @default(rw)
+  role               Role               @default(BUYER)
+  // Onboarding intent (buy_sell | find_work | hire | browse). Records the path a
+  // visitor chose so we can show the right first screen — but NEVER restricts API
+  // access; every account can use marketplace and jobs (Visitor spec §8).
+  preferredRole      String?
+  isVerified         Boolean            @default(false)
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  idDocumentUrl      String? // encrypted-at-rest object key; served via signed URL
+  walletBalance      Int                @default(0) // stored in RWF minor units (centimes)
+  referralCode       String?            @unique // this user's shareable invite code
+  referredById       String? // who invited this user (Phase 5 referral system)
+  // Admin RBAC + account lifecycle
+  adminRole          AdminRole? // set only for platform staff (role == ADMIN)
+  accountStatus      AccountStatus      @default(ACTIVE)
+  statusReason       String? // reason for suspend/ban (audit trail)
+  sessionVersion     Int                @default(0) // bump to revoke all existing sessions
+  lastActiveAt       DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  listings            Listing[]
+  jobs                Job[]
+  applications        Application[]
+  cv                  CV?
+  messages            Message[]
+  conversationLinks   ConversationParticipant[]
+  transactions        Transaction[]
+  reviewsWritten      Review[]                  @relation("ReviewAuthor")
+  reviewsReceived     Review[]                  @relation("ReviewSubject")
+  notifications       Notification[]
+  reportsFiled        Report[]                  @relation("Reporter")
+  verificationReviews VerificationRequest[]     @relation("VerificationReviewer")
+  verificationRequest VerificationRequest?
+  referredBy          User?                     @relation("Referrals", fields: [referredById], references: [id])
+  referrals           User[]                    @relation("Referrals")
+  permissionOverrides UserPermissionOverride[]
+  auditLogs           AuditLog[]                @relation("AuditActor")
+  listingDraft        ListingDraft?
+  favorites           Favorite[]
+  ordersBought        Order[]                   @relation("Buyer")
+  ordersSold          Order[]                   @relation("Seller")
+  listingViews        ListingView[]
+  savedSearches       SavedSearch[]
+
+  @@index([role])
+  @@index([location])
+  @@index([verificationStatus])
+  @@index([referredById])
+  @@index([accountStatus])
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String
+  codeHash  String // OTP is hashed — never stored or logged in plaintext (Section 10)
+  purpose   String   @default("login") // login | verify_phone
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([phone, purpose])
+  @@index([expiresAt])
+}
+
+model VerificationRequest {
+  id            String             @id @default(cuid())
+  userId        String             @unique
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idDocumentUrl String
+  status        VerificationStatus @default(PENDING)
+  reviewNote    String?
+  reviewedById  String?
+  reviewedBy    User?              @relation("VerificationReviewer", fields: [reviewedById], references: [id])
+  reviewedAt    DateTime?
+  createdAt     DateTime           @default(now())
+
+  @@index([status])
+}
+
+// ─────────────────────── Marketplace ───────────────────────
+
+model Category {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  nameRw   String
+  nameEn   String
+  nameFr   String
+  icon     String? // lucide icon name
+  listings Listing[]
+}
+
+model Listing {
+  id          String           @id @default(cuid())
+  sellerId    String
+  seller      User             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  price       Int // RWF minor units
+  categoryId  String?
+  category    Category?        @relation(fields: [categoryId], references: [id])
+  condition   ListingCondition @default(GOOD)
+  location    String
+  status      ListingStatus    @default(ACTIVE)
+  isFeatured  Boolean          @default(false)
+  featuredUntil DateTime?
+  viewCount   Int              @default(0)
+  tags        String[]         @default([])
+  showPhone   Boolean          @default(false) // seller's contact preference (Section 8)
+  staleNudgedAt DateTime? // when the "still available?" nudge was sent (Section 5)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  images        ListingImage[]
+  conversations Conversation[]
+  favorites     Favorite[]
+  orders        Order[]
+  views         ListingView[]
+
+  @@index([status, createdAt])
+  @@index([categoryId])
+  @@index([location])
+  @@index([sellerId])
+  @@index([isFeatured, status])
+}
+
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String
+  width     Int?
+  height    Int?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+}
+
+// Autosaved in-progress "Add Product" draft — one per seller (Section 3).
+model ListingDraft {
+  id        String   @id @default(cuid())
+  sellerId  String   @unique
+  seller    User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  data      Json // partial listing fields collected across the wizard steps
+  step      Int      @default(1)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+// Buyer favourites — powers "Interest" insights and favourite notifications.
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([listingId])
+}
+
+// One order per deal — the single source of truth shared by buyer and seller
+// (Section 10). Escrow holds funds until the buyer confirms receipt.
+model Order {
+  id              String      @id @default(cuid())
+  listingId       String
+  listing         Listing     @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerId         String
+  buyer           User        @relation("Buyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId        String
+  seller          User        @relation("Seller", fields: [sellerId], references: [id], onDelete: Cascade)
+  amount          Int // RWF minor units
+  status          OrderStatus @default(PAYMENT_SENT)
+  escrow          Boolean     @default(true)
+  deliveryMethod  String? // pickup | delivery
+  transactionId   String? // links to the Transaction ledger row
+  disputeReportId String?
+  reviewed        Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([buyerId, createdAt])
+  @@index([sellerId, createdAt])
+  @@index([status])
+}
+
+// Per-user recently-viewed history — powers "Continue where you left off" and
+// the personalized "For You" feed (Section 2/9), no manual preferences needed.
+model ListingView {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  viewedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([userId, viewedAt])
+}
+
+// ─────────────────────────── Jobs ───────────────────────────
+
+model Job {
+  id          String    @id @default(cuid())
+  employerId  String
+  employer    User      @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  type        JobType   @default(JOB)
+  payMin      Int? // RWF minor units
+  payMax      Int?
+  payPeriod   String?   @default("month") // hour | day | month | fixed
+  location    String
+  skills      String[]  @default([]) // required skills — canonical keys from the shared taxonomy (src/lib/skills.ts)
+  viewCount   Int       @default(0) // powers the employer performance rule engine (§2)
+  status      JobStatus @default(OPEN)
+  partnerId   String? // optional: posted under a partner's white-label board
+  partner     Partner?  @relation(fields: [partnerId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  applications  Application[]
+  conversations Conversation[]
+
+  @@index([status, createdAt])
+  @@index([type])
+  @@index([location])
+  @@index([employerId])
+  @@index([partnerId])
+}
+
+model CV {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // { headline, summary, contact, education[], experience[], skills[],
+  //   languages[{code,level}], certifications[], references[], … } — education
+  //   entries hold selected reference-table ids + raw "add new" fallbacks.
+  structuredData Json
+  // Most-specific administrative division the seeker is in (cell-level); the full
+  // Province→Cell path is reconstructed by walking AdminDivision.parentId (Rule 1
+  // — no duplication across levels).
+  locationId       String?
+  location         AdminDivision? @relation(fields: [locationId], references: [id])
+  submissionStatus String         @default("live") // live | submitting | submitted
+  submittedAt      DateTime?
+  pdfUrl           String?
+  updatedAt        DateTime @updatedAt
+  createdAt        DateTime @default(now())
+
+  applications Application[]
+}
+
+// ─────────────── CV reference data (seeded, autocomplete-backed) ───────────────
+
+// Schools / universities / TVET institutions. `isVerifiedSource=false` marks a
+// user-submitted "add my school" row awaiting admin review, so the list grows
+// without ever blocking a CV (CV Builder spec Part 1/2).
+model Institution {
+  id               String    @id @default(cuid())
+  name             String
+  type             String // secondary_school | university | tvet
+  province         String?
+  district         String?
+  isVerifiedSource Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  faculties        Faculty[]
+
+  @@index([type])
+  @@index([name])
+}
+
+// A university's faculties/colleges (only for type=university). Trilingual name.
+model Faculty {
+  id            String      @id @default(cuid())
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  name          Json // { rw, en, fr }
+
+  @@index([institutionId])
+}
+
+// REB A-level combinations (MPC, PCB, …) and TVET trades — one table, `kind`
+// distinguishes them (spec Part 4.3: reuse rather than a fifth taxonomy).
+model Combination {
+  id   String @id @default(cuid())
+  code String @unique // e.g. MPC, PCB, HEG (A-level) or a TVET trade code
+  kind String @default("alevel") // alevel | tvet
+  name Json // { rw, en, fr } full subject/trade names
+}
+
+// Rwanda administrative hierarchy: Province → District → Sector → Cell.
+model AdminDivision {
+  id       String          @id @default(cuid())
+  level    String // province | district | sector | cell
+  name     String
+  parentId String?
+  parent   AdminDivision?  @relation("DivisionHierarchy", fields: [parentId], references: [id])
+  children AdminDivision[] @relation("DivisionHierarchy")
+  cvs      CV[]
+
+  @@index([level, parentId])
+  @@index([name])
+}
+
+model Application {
+  id          String            @id @default(cuid())
+  jobId       String
+  job         Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicantId String
+  applicant   User              @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  cvId        String?
+  cv          CV?               @relation(fields: [cvId], references: [id])
+  // Immutable copy of the CV as it was at apply time (Section 10). Editing the
+  // live CV later never retroactively changes what the employer reviewed.
+  cvSnapshot  Json?
+  coverNote   String?
+  status      ApplicationStatus @default(APPLIED)
+  appliedAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([jobId, applicantId]) // one application per job per applicant
+  @@index([applicantId])
+  @@index([jobId, status])
+}
+
+// A seeker's stored "notify me" search (Section 8). Evaluated against every new
+// job/gig as it's created — not on a batch schedule — so urgent gigs reach
+// seekers while still relevant.
+model SavedSearch {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String
+  q         String? // free-text term to match against title/description
+  type      JobType? // JOB | GIG | null (either)
+  location  String? // district / place substring
+  skills    String[] @default([]) // canonical taxonomy keys to match against job.skills
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ─────────────────── Messaging & Notifications ───────────────
+
+model Conversation {
+  id            String   @id @default(cuid())
+  listingId     String?
+  listing       Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  jobId         String?
+  job           Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([lastMessageAt])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastReadAt     DateTime?
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  body           String
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String?
+  payload   Json? // e.g. { listingId, conversationId, applicationId }
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}
+
+// ─────────────────── Payments, Reviews, Reports ──────────────
+
+model Transaction {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      TransactionType
+  amount    Int // RWF minor units
+  currency  String              @default("RWF")
+  provider  PaymentProviderName @default(MOCK)
+  status    TransactionStatus   @default(PENDING)
+  momoRef   String? // provider reference / external transaction id
+  metadata  Json?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@index([momoRef])
+}
+
+model Review {
+  id            String   @id @default(cuid())
+  reviewerId    String
+  reviewer      User     @relation("ReviewAuthor", fields: [reviewerId], references: [id], onDelete: Cascade)
+  revieweeId    String
+  reviewee      User     @relation("ReviewSubject", fields: [revieweeId], references: [id], onDelete: Cascade)
+  rating        Int // 1..5
+  comment       String?
+  transactionId String?
+  createdAt     DateTime @default(now())
+
+  @@unique([reviewerId, revieweeId, transactionId])
+  @@index([revieweeId])
+}
+
+model Report {
+  id           String           @id @default(cuid())
+  reportedById String
+  reportedBy   User             @relation("Reporter", fields: [reportedById], references: [id], onDelete: Cascade)
+  targetType   ReportTargetType
+  targetId     String
+  reason       String
+  details      String?
+  status       ReportStatus     @default(OPEN)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([status])
+  @@index([targetType, targetId])
+}
+
+// Cooperatives, NGOs and MSMEs the platform partners with (Section 6.7 / 17).
+model Partner {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique // white-label board URL: /boards/<slug>
+  type        PartnerType   @default(MSME)
+  status      PartnerStatus @default(ACTIVE)
+  contactName String?
+  phone       String?
+  location    String?
+  notes       String?
+  tagline     String? // shown on the white-label board header
+  logoUrl     String?
+  brandColor  String? // hex accent for the board (e.g. #0F766E)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  jobs Job[]
+
+  @@index([status])
+  @@index([type])
+}
+
+// ─────────────────── Admin RBAC & Audit ───────────────────
+
+// Explicit per-admin permission override. `granted=false` force-denies a
+// permission the role would normally allow (deny wins). Optional expiry powers
+// time-bound grants for contractors.
+model UserPermissionOverride {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permissionKey String
+  granted       Boolean
+  reason        String?
+  expiresAt     DateTime?
+  createdById   String?
+  createdAt     DateTime  @default(now())
+
+  @@unique([userId, permissionKey])
+  @@index([userId])
+}
+
+// Immutable record of every admin action (who, what, when, before/after).
+// Rows are only ever inserted — never updated or deleted.
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actor      User     @relation("AuditActor", fields: [actorId], references: [id])
+  action     String // e.g. "users.suspend", "verification.approve", "permission.grant"
+  targetType String? // USER | LISTING | JOB | TRANSACTION | REPORT | PERMISSION | LOCALE
+  targetId   String?
+  reason     String?
+  before     Json?
+  after      Json?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([targetType, targetId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// DB-backed i18n overrides so admins can edit strings without a code deploy.
+// Merged over the static catalogs at request time (src/i18n/request.ts).
+model LocaleString {
+  id          String   @id @default(cuid())
+  locale      String // rw | en | fr
+  key         String // dot path, e.g. "nav.home"
+  value       String
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@unique([locale, key])
+  @@index([locale])
+}

@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Isoko Market brand system.
+ * Deep teal/green = trust & growth. Warm orange = energy & commerce.
+ * High-contrast, generous tap targets and readable type for small, older
+ * phone screens (Section 8.1 / 8.4 — WCAG 2.1 AA).
+ */
+@layer base {
+  :root {
+    /* System font stack — zero download, fast first paint on slow networks. */
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+      'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+
+    --background: 40 33% 98%;
+    --foreground: 185 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 185 30% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 185 30% 12%;
+
+    /* Deep teal/green */
+    --primary: 176 84% 22%;
+    --primary-foreground: 40 33% 98%;
+
+    /* Soft teal surface */
+    --secondary: 175 30% 94%;
+    --secondary-foreground: 176 60% 18%;
+
+    /* Warm orange — darkened to 40% L so it meets WCAG AA (4.5:1) both as
+       `.text-accent` on light surfaces and as white text on `bg-accent`
+       (was 52% L / #f56e14 → only 2.83:1). */
+    --accent: 24 90% 38%;
+    --accent-foreground: 0 0% 100%;
+
+    --muted: 180 12% 95%;
+    --muted-foreground: 185 12% 40%;
+
+    /* Darkened to 31% L so white text on `bg-success` meets WCAG AA
+       (was 34% L / #218c48 → 4.27:1). */
+    --success: 142 62% 31%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 180 14% 88%;
+    --input: 180 14% 86%;
+    --ring: 176 84% 22%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 185 40% 7%;
+    --foreground: 40 20% 96%;
+    --card: 185 36% 10%;
+    --card-foreground: 40 20% 96%;
+    --popover: 185 36% 10%;
+    --popover-foreground: 40 20% 96%;
+    --primary: 173 70% 42%;
+    --primary-foreground: 185 40% 7%;
+    --secondary: 185 24% 16%;
+    --secondary-foreground: 40 20% 96%;
+    --accent: 24 92% 55%;
+    --accent-foreground: 185 40% 7%;
+    --muted: 185 20% 16%;
+    --muted-foreground: 180 10% 65%;
+    --success: 142 55% 45%;
+    --success-foreground: 185 40% 7%;
+    --destructive: 0 62% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 185 20% 20%;
+    --input: 185 20% 22%;
+    --ring: 173 70% 42%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+  /* Respect prefers-reduced-motion (Section 8.4) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  /* Visible keyboard focus everywhere (Section 8.4) */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer components {
+  /* Low-bandwidth-friendly skeleton shimmer for feed loading states */
+  .skeleton {
+    @apply relative overflow-hidden bg-muted;
+  }
+  .skeleton::after {
+    @apply absolute inset-0 -translate-x-full;
+    content: '';
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      hsl(0 0% 100% / 0.35),
+      transparent
+    );
+    animation: shimmer 1.4s infinite;
+  }
+  .brand-gradient {
+    background-image: linear-gradient(
+      135deg,
+      hsl(176 84% 22%) 0%,
+      hsl(173 72% 30%) 55%,
+      hsl(24 92% 52%) 140%
+    );
+  }
+}

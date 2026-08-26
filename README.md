@@ -146,19 +146,34 @@ tests/                   # vitest: phone, money, otp, payments, validators
 ## Testing & quality
 
 ```bash
-npm run typecheck   # strict TypeScript, no implicit any
-npm run test        # vitest — phone, money, OTP, payments, validators
-npm run build       # full production build
-npm run test:e2e    # Playwright — real-browser end-to-end journeys
+npm run typecheck    # strict TypeScript, no implicit any
+npm run test         # vitest — phone, money, OTP, payments, validators, authz, skills, onboarding
+npm run build        # full production build
+npm run test:e2e     # Playwright — real-browser journeys + accessibility
+npm run perf:budget  # Rule 7 — production JS-weight budget (3G / low-bandwidth)
 ```
 
 **Unit** (Vitest) cover the pure business logic (phone normalization, money math,
-OTP crypto, payment adapter, validation schemas).
+OTP crypto, payment adapter, validation schemas, the unified `can()` authorizer,
+the skills/match engine, and onboarding/role routing).
 
 **E2E** (Playwright, Section 13) drive the real UI in a browser:
 - `auth.spec.ts` — register via phone OTP → land on the home feed
 - `buyer-journey.spec.ts` — seller lists → buyer registers → **Buy Now (escrow)
   → Confirm Receipt → review** (the full buyer↔seller↔escrow↔review path)
+- `employer-journey.spec.ts` — employer posts a job → two seekers apply → **hire
+  → the job-filled cascade** moves the rest to "Position filled"
+- `role-landing.spec.ts` — each role **lands on its own home** on login
+- `a11y.spec.ts` — **axe-core WCAG 2 A/AA** scan of the key screens in **all three
+  locales** (fails on any serious/critical violation)
+
+**Accessibility (Rule 7).** `a11y.spec.ts` enforces WCAG A/AA on every public
+screen in rw/en/fr. The brand accent and success colors are tuned to meet the
+4.5:1 contrast minimum.
+
+**Performance (Rule 7).** `npm run perf:budget` runs the production build and
+fails if the **shared First-Load JS** exceeds 110 kB or any route exceeds 260 kB
+— keeping the app usable on a throttled 3G connection.
 
 Notes for running E2E:
 - It uses the **system Chromium** (`/usr/bin/chromium`, override with
@@ -168,10 +183,6 @@ Notes for running E2E:
   `E2E_TESTING=1 npm run dev` (that flag makes `/api/auth/request-otp` return the
   OTP to the client so the flow is deterministic — **never enabled in
   production**), then `npm run test:e2e`.
-
-axe-core accessibility checks and a Lighthouse CI budget remain the recommended
-additions — the code is structured to accept them (typed API contracts,
-server-side validation, semantic HTML).
 
 ---
 
