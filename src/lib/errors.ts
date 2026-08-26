@@ -33,6 +33,7 @@ const ERROR_TRANSLATIONS: Record<string, LocalizedError> = {
   "Too late to cancel.": { rw: "Byatinze kugira ngo bihagarikwe.", fr: "Trop tard pour annuler." },
   "You already applied to this job.": { rw: "Wamaze gusaba aka kazi.", fr: "Vous avez déjà postulé à cette offre." },
   "You already reviewed this order.": { rw: "Wamaze gutanga isuzuma kuri ubu buguzi.", fr: "Vous avez déjà évalué cette commande." },
+  "You can't withdraw after being hired.": { rw: "Ntushobora guhagarika ubusabe nyuma yo guhabwa akazi.", fr: "Vous ne pouvez pas retirer votre candidature après avoir été embauché." },
   "You can review after completing the order.": { rw: "Ushobora gutanga isuzuma nyuma yo kurangiza ubuguzi.", fr: "Vous pourrez évaluer après avoir terminé la commande." },
   "You have reached the saved-search limit.": { rw: "Wageze ku mubare ntarengwa w’amashakisha yabitswe.", fr: "Vous avez atteint la limite de recherches enregistrées." },
 
@@ -44,6 +45,7 @@ const ERROR_TRANSLATIONS: Record<string, LocalizedError> = {
   "This conversation is not under an active report.": { rw: "Iki kiganiro nticyari muri raporo ikora.", fr: "Cette conversation ne fait pas l’objet d’un signalement actif." },
   "You are not part of this conversation.": { rw: "Ntabwo uri mu kiganiro.", fr: "Vous ne faites pas partie de cette conversation." },
   "You are not allowed to do that.": { rw: "Nta burenganzira ufite bwo kubikora.", fr: "Vous n’êtes pas autorisé à faire cela." },
+  "You can only withdraw your own application.": { rw: "Ushobora guhagarika ubusabe bwawe gusa.", fr: "Vous ne pouvez retirer que votre propre candidature." },
   "You don't have permission to do that.": { rw: "Nta ruhushya ufite rwo kubikora.", fr: "Vous n’avez pas la permission de faire cela." },
 
   // ── BAD_REQUEST ──

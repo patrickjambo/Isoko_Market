@@ -32,6 +32,13 @@ describe('can() — unified ownership authorization (rule 5)', () => {
     expect(await can(other, 'application:viewCv', application)).toBe(false);
   });
 
+  it('lets only the applicant withdraw their own application', async () => {
+    const application = { applicantId: seller.id, job: { employerId: employer.id } };
+    expect(await can(seller, 'application:withdraw', application)).toBe(true);
+    expect(await can(employer, 'application:withdraw', application)).toBe(false); // employer decides, not withdraws
+    expect(await can(other, 'application:withdraw', application)).toBe(false);
+  });
+
   it('allows either party for shared resources (order:view)', async () => {
     const order = { buyerId: other.id, sellerId: seller.id };
     expect(await can(other, 'order:view', order)).toBe(true);

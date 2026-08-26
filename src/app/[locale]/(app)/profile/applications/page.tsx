@@ -6,6 +6,7 @@ import { Link, redirect } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/shared/empty-state';
 import { LiveApplications } from '@/components/jobs/live-applications';
+import { WithdrawApplicationButton } from '@/components/jobs/withdraw-application-button';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { timeAgo } from '@/lib/utils';
@@ -67,14 +68,24 @@ export default async function MyApplicationsPage({ params }: { params: { locale:
             const Icon = statusIcon[app.status];
             const stageIdx = STAGES.indexOf(app.status);
             const shortlisted = app.status === 'SHORTLISTED' || app.status === 'INTERVIEW';
+            // A seeker can withdraw while the application is still active (not
+            // after being hired, rejected, or moved to position-filled).
+            const canWithdraw =
+              app.status === 'APPLIED' ||
+              app.status === 'VIEWED' ||
+              app.status === 'SHORTLISTED' ||
+              app.status === 'INTERVIEW';
             return (
-              <li key={app.id}>
+              <li
+                key={app.id}
+                className={
+                  'overflow-hidden rounded-xl border bg-card ' +
+                  (shortlisted ? 'border-accent/50 ring-1 ring-accent/30' : 'border-border')
+                }
+              >
                 <Link
                   href={`/jobs/${app.job.id}`}
-                  className={
-                    'flex items-center gap-3 rounded-xl border bg-card p-4 transition-colors hover:bg-secondary/50 ' +
-                    (shortlisted ? 'border-accent/50 ring-1 ring-accent/30' : 'border-border')
-                  }
+                  className="flex items-center gap-3 p-4 transition-colors hover:bg-secondary/50"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold">{app.job.title}</p>
@@ -101,6 +112,11 @@ export default async function MyApplicationsPage({ params }: { params: { locale:
                     <Icon className="h-3.5 w-3.5" /> {ts(app.status)}
                   </Badge>
                 </Link>
+                {canWithdraw && (
+                  <div className="flex justify-end border-t border-border px-4 py-1.5">
+                    <WithdrawApplicationButton applicationId={app.id} />
+                  </div>
+                )}
               </li>
             );
           })}

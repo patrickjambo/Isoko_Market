@@ -52,3 +52,37 @@ export const PATCH = route(async (req: NextRequest, ctx: { params: { id: string 
 
   return jsonOk({ ok: true, status, filledOthers });
 });
+
+/**
+ * DELETE /api/applications/[id] — the applicant withdraws their own application
+ * (Section 6.3). Allowed while the application is still active; not after a hire.
+ * The employer is notified so their applicant list stays truthful.
+ */
+export const DELETE = route(async (_req: NextRequest, ctx: { params: { id: string } }) => {
+  const user = await requireUser();
+
+  const application = await prisma.application.findUnique({
+    where: { id: ctx.params.id },
+    select: { id: true, applicantId: true, status: true, job: { select: { id: true, title: true, employerId: true } } },
+  });
+  if (!application) throw new ApiError('NOT_FOUND', 'Application not found.');
+  await authorize(user, 'application:withdraw', application, {
+    message: 'You can only withdraw your own application.',
+  });
+  if (application.status === 'HIRED') {
+    throw new ApiError('CONFLICT', "You can't withdraw after being hired.");
+  }
+
+  await prisma.application.delete({ where: { id: application.id } });
+
+  await notify({
+    userId: application.job.employerId,
+    type: 'APPLICATION_UPDATE',
+    title: 'Application withdrawn',
+    body: `${user.fullName} withdrew from "${application.job.title}"`,
+    href: `/jobs/${application.job.id}/applicants`,
+    payload: { jobId: application.job.id, applicationId: application.id },
+  });
+
+  return jsonOk({ ok: true });
+});
