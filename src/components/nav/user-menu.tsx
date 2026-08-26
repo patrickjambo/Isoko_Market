@@ -1,6 +1,7 @@
 'use client';
 
 import { User, Wallet, ShieldCheck, LayoutDashboard, LogOut, FileText, Gift, Store, Heart, Package, Briefcase } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { useSession } from '@/components/providers';
-import { primaryWorkspace } from '@/lib/onboarding';
+import { adoptedWorkspaces, type Workspace } from '@/lib/onboarding';
 import { initials } from '@/lib/utils';
 
 export function UserMenu() {
@@ -29,22 +30,14 @@ export function UserMenu() {
     router.refresh();
   }
 
-  // Role-aware ordering (mirrors landingFor) so the user's own workspace is
-  // ranked first and "Seller dashboard" is never prioritized for non-sellers.
-  // Every workspace stays reachable ("not locked in") — the non-primary ones
-  // move below a separator as discovery entries.
-  const ws = primaryWorkspace(user);
-  const sellerLink = { href: '/dashboard', icon: Store, label: t('seller.dashboard') };
-  const employerLink = { href: '/employer', icon: Briefcase, label: t('employer.dashboard') };
-  const cvLink = { href: '/cv', icon: FileText, label: t('cv.title') };
-
-  // Primary workspace shown at the very top (buyers have none).
-  const primary =
-    ws === 'seller' ? [sellerLink] : ws === 'employer' ? [employerLink] : ws === 'seeker' ? [cvLink] : [];
-  // The remaining workspaces (still reachable, just de-prioritized below).
-  const secondary = [sellerLink, employerLink, cvLink].filter(
-    (l) => !primary.some((p) => p.href === l.href)
-  );
+  // Only the workspaces the user has actually ADOPTED appear here — a buyer sees
+  // none and starts selling/hiring from the "+ Post" button (see adoptedWorkspaces).
+  const wsLink: Record<Exclude<Workspace, 'buyer'>, { href: string; icon: LucideIcon; label: string }> = {
+    employer: { href: '/employer', icon: Briefcase, label: t('employer.dashboard') },
+    seller: { href: '/dashboard', icon: Store, label: t('seller.dashboard') },
+    seeker: { href: '/cv', icon: FileText, label: t('cv.title') },
+  };
+  const workspaces = adoptedWorkspaces(user).map((w) => wsLink[w]);
 
   return (
     <DropdownMenu>
@@ -66,8 +59,8 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {/* Primary workspace (role-aware, top) */}
-        {primary.map((l) => {
+        {/* Adopted workspaces only (role-aware) — a buyer sees none */}
+        {workspaces.map((l) => {
           const Icon = l.icon;
           return (
             <DropdownMenuItem key={l.href} asChild>
@@ -104,19 +97,6 @@ export function UserMenu() {
             <Gift className="text-accent" /> {t('referrals.title')}
           </Link>
         </DropdownMenuItem>
-
-        {/* Other workspaces — reachable ("not locked in") but de-prioritized */}
-        <DropdownMenuSeparator />
-        {secondary.map((l) => {
-          const Icon = l.icon;
-          return (
-            <DropdownMenuItem key={l.href} asChild>
-              <Link href={l.href}>
-                <Icon /> {l.label}
-              </Link>
-            </DropdownMenuItem>
-          );
-        })}
 
         {!user.isVerified && (
           <DropdownMenuItem asChild>

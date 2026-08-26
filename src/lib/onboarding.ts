@@ -71,3 +71,20 @@ export function primaryWorkspace(user: { role: string; preferredRole?: string | 
   if (user.preferredRole === 'find_work') return 'seeker';
   return 'buyer';
 }
+
+/**
+ * The role-workspaces a user has ADOPTED — the only ones the account menu shows
+ * (a buyer sees none and starts selling/hiring from the "+ Post" button, which
+ * upgrades their role). Same signals & priority as {@link primaryWorkspace}: role
+ * evolves with use (seller/employer), job-seeking keeps BUYER-role so its signal
+ * is the signup intent. A user can hold several (e.g. a seller who also seeks work).
+ */
+export function adoptedWorkspaces(
+  user: { role: string; preferredRole?: string | null }
+): Exclude<Workspace, 'buyer'>[] {
+  const out: Exclude<Workspace, 'buyer'>[] = [];
+  if (user.role === 'EMPLOYER' || user.preferredRole === 'hire') out.push('employer');
+  if (user.role === 'SELLER') out.push('seller');
+  if (user.preferredRole === 'find_work') out.push('seeker');
+  return out;
+}

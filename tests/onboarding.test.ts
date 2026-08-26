@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { intentToRole, intentHome, landingFor, primaryWorkspace, isIntent, INTENTS } from '@/lib/onboarding';
+import { intentToRole, intentHome, landingFor, primaryWorkspace, adoptedWorkspaces, isIntent, INTENTS } from '@/lib/onboarding';
 
 describe('onboarding intent mapping', () => {
   it('writes EMPLOYER only for the hire intent, BUYER otherwise', () => {
@@ -69,5 +69,26 @@ describe('tie-break priority when multiple role signals coexist', () => {
     expect(primaryWorkspace({ role: 'BUYER', preferredRole: 'buy_sell' })).toBe('buyer');
     // hire intent maps to employer even before the role has evolved.
     expect(primaryWorkspace({ role: 'BUYER', preferredRole: 'hire' })).toBe('employer');
+  });
+});
+
+describe('adoptedWorkspaces — the account menu only shows what you have adopted', () => {
+  it('shows nothing for a plain buyer/browser (they start via "+ Post")', () => {
+    expect(adoptedWorkspaces({ role: 'BUYER', preferredRole: 'buy_sell' })).toEqual([]);
+    expect(adoptedWorkspaces({ role: 'BUYER', preferredRole: 'browse' })).toEqual([]);
+    expect(adoptedWorkspaces({ role: 'BUYER' })).toEqual([]);
+  });
+
+  it('shows the workspace matching an evolved role or signup intent', () => {
+    expect(adoptedWorkspaces({ role: 'SELLER', preferredRole: 'buy_sell' })).toEqual(['seller']);
+    expect(adoptedWorkspaces({ role: 'EMPLOYER', preferredRole: 'hire' })).toEqual(['employer']);
+    expect(adoptedWorkspaces({ role: 'BUYER', preferredRole: 'hire' })).toEqual(['employer']);
+    expect(adoptedWorkspaces({ role: 'BUYER', preferredRole: 'find_work' })).toEqual(['seeker']);
+  });
+
+  it('lists several (priority order) when a user holds multiple roles', () => {
+    // Became a seller AND signed up to find work → both, employer-priority order.
+    expect(adoptedWorkspaces({ role: 'SELLER', preferredRole: 'find_work' })).toEqual(['seller', 'seeker']);
+    expect(adoptedWorkspaces({ role: 'EMPLOYER', preferredRole: 'find_work' })).toEqual(['employer', 'seeker']);
   });
 });
