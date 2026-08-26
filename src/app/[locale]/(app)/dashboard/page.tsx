@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { getCurrentUser } from '@/lib/auth';
+import { requireWorkspace } from '@/lib/workspace-guard';
 import { prisma } from '@/lib/prisma';
 import { getSellerInsights } from '@/lib/seller-insights';
 import { formatRWF } from '@/lib/utils';
@@ -24,7 +24,8 @@ export default async function SellerHome({ params }: { params: { locale: string 
   const t = await getTranslations('seller');
   const tt = await getTranslations('trust');
 
-  const user = (await getCurrentUser())!;
+  // Seller-only workspace — non-sellers are sent to their own home.
+  const user = await requireWorkspace('seller', params.locale);
   const [insights, unread] = await Promise.all([
     getSellerInsights(user.id),
     prisma.message.count({

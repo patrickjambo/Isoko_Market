@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/shared/empty-state';
 import { SellerListingActions } from '@/components/seller/seller-listing-actions';
-import { getCurrentUser } from '@/lib/auth';
+import { requireWorkspace } from '@/lib/workspace-guard';
 import { prisma } from '@/lib/prisma';
 import { formatRWF } from '@/lib/utils';
 
@@ -26,7 +26,7 @@ export default async function MyListingsPage({ params }: { params: { locale: str
   const t = await getTranslations('seller');
   const tm = await getTranslations('marketplace');
 
-  const user = (await getCurrentUser())!;
+  const user = await requireWorkspace('seller', params.locale);
   const listings = await prisma.listing.findMany({
     where: { sellerId: user.id, status: { not: 'REMOVED' } },
     orderBy: { createdAt: 'desc' },

@@ -2,7 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Briefcase, Users, Wallet, ShieldCheck, Lightbulb, ArrowRight } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { getCurrentUser } from '@/lib/auth';
+import { requireWorkspace } from '@/lib/workspace-guard';
 import { prisma } from '@/lib/prisma';
 import { getEmployerInsights } from '@/lib/employer-insights';
 import { formatRWF } from '@/lib/utils';
@@ -16,7 +16,8 @@ export default async function EmployerHome({ params }: { params: { locale: strin
   const t = await getTranslations('employer');
   const tt = await getTranslations('trust');
 
-  const user = (await getCurrentUser())!;
+  // Employer-only workspace — non-employers are sent to their own home.
+  const user = await requireWorkspace('employer', params.locale);
   const [insights, rating] = await Promise.all([
     getEmployerInsights(user.id, user.isVerified),
     prisma.review.aggregate({ where: { revieweeId: user.id }, _avg: { rating: true }, _count: true }),

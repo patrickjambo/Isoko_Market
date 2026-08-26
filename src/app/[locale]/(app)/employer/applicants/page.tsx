@@ -2,7 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Users } from 'lucide-react';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ApplicantReview } from '@/components/employer/applicant-review';
-import { getCurrentUser } from '@/lib/auth';
+import { requireWorkspace } from '@/lib/workspace-guard';
 import { getEmployerApplicants } from '@/lib/employer-applicants';
 
 export const dynamic = 'force-dynamic';
@@ -11,7 +11,7 @@ export default async function EmployerApplicantsPage({ params }: { params: { loc
   setRequestLocale(params.locale);
   const t = await getTranslations('employer');
 
-  const user = (await getCurrentUser())!;
+  const user = await requireWorkspace('employer', params.locale);
   const applicants = await getEmployerApplicants(user.id, params.locale);
 
   return (

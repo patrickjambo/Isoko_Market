@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/shared/empty-state';
 import { HiringFunnel } from '@/components/employer/hiring-funnel';
 import { EmployerJobActions } from '@/components/employer/employer-job-actions';
-import { getCurrentUser } from '@/lib/auth';
+import { requireWorkspace } from '@/lib/workspace-guard';
 import { getEmployerInsights } from '@/lib/employer-insights';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +22,7 @@ export default async function MyJobsPage({ params }: { params: { locale: string 
   setRequestLocale(params.locale);
   const t = await getTranslations('employer');
 
-  const user = (await getCurrentUser())!;
+  const user = await requireWorkspace('employer', params.locale);
   const { funnels } = await getEmployerInsights(user.id, user.isVerified);
 
   return (
