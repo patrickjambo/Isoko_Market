@@ -50,7 +50,9 @@ export const POST = route(async (req: NextRequest) => {
     select: { id: true, title: true, description: true, type: true, location: true, skills: true },
   });
 
-  // Promote a first-time poster to EMPLOYER (never downgrade an existing role).
+  // Adopt BUYER→EMPLOYER on first job (never downgrade an existing role). Fires
+  // only for BUYER, so an ADMIN who posts a job keeps ADMIN — `role === 'EMPLOYER'`
+  // is not "has posted a job" (see the note in /api/listings).
   if (user.role === 'BUYER') {
     await prisma.user.update({ where: { id: user.id }, data: { role: 'EMPLOYER' } });
   }

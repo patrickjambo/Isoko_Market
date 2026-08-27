@@ -36,7 +36,11 @@ export const POST = route(async (req: NextRequest) => {
     select: { id: true },
   });
 
-  // Posting sellers graduate from BUYER to SELLER so their role reflects usage.
+  // Adopt BUYER→SELLER on first listing so the role reflects usage. This fires
+  // ONLY for BUYER: an ADMIN who sells keeps ADMIN, because for admins `role` is
+  // a staff-permission level, not a marketplace identity (see role-visibility).
+  // So never read `role === 'SELLER'` as "has sold something" — it would miss
+  // admin-initiated sales; query the user's listings for that.
   if (user.role === 'BUYER') {
     await prisma.user.update({ where: { id: user.id }, data: { role: 'SELLER' } });
   }

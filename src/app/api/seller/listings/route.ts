@@ -39,6 +39,8 @@ export const POST = route(async (req: NextRequest) => {
   });
 
   await prisma.listingDraft.deleteMany({ where: { sellerId: user.id } });
+  // Adopt BUYER→SELLER (see /api/listings): fires only for BUYER, so an ADMIN who
+  // sells keeps ADMIN — `role === 'SELLER'` is not "has sold". Query listings.
   if (user.role === 'BUYER') {
     await prisma.user.update({ where: { id: user.id }, data: { role: 'SELLER' } });
   }
