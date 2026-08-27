@@ -78,10 +78,15 @@ export function primaryWorkspace(user: { role: string; preferredRole?: string | 
  * upgrades their role). Same signals & priority as {@link primaryWorkspace}: role
  * evolves with use (seller/employer), job-seeking keeps BUYER-role so its signal
  * is the signup intent. A user can hold several (e.g. a seller who also seeks work).
+ *
+ * Admins are STAFF, not marketplace participants: they only get the Admin
+ * dashboard (a separate menu entry), never Seller/Hiring/CV — even if they once
+ * registered with a buyer/seeker/hire intent before being promoted.
  */
 export function adoptedWorkspaces(
   user: { role: string; preferredRole?: string | null }
 ): Exclude<Workspace, 'buyer'>[] {
+  if (user.role === 'ADMIN') return [];
   const out: Exclude<Workspace, 'buyer'>[] = [];
   if (user.role === 'EMPLOYER' || user.preferredRole === 'hire') out.push('employer');
   if (user.role === 'SELLER') out.push('seller');

@@ -91,4 +91,15 @@ describe('adoptedWorkspaces — the account menu only shows what you have adopte
     expect(adoptedWorkspaces({ role: 'SELLER', preferredRole: 'find_work' })).toEqual(['seller', 'seeker']);
     expect(adoptedWorkspaces({ role: 'EMPLOYER', preferredRole: 'find_work' })).toEqual(['employer', 'seeker']);
   });
+
+  it('shows a job seeker ONLY their CV workspace (never seller/hiring)', () => {
+    expect(adoptedWorkspaces({ role: 'BUYER', preferredRole: 'find_work' })).toEqual(['seeker']);
+  });
+
+  it('shows admins NO marketplace workspaces (staff → only the Admin dashboard)', () => {
+    expect(adoptedWorkspaces({ role: 'ADMIN', preferredRole: null })).toEqual([]);
+    // Even if they registered with an intent before being promoted, nothing leaks.
+    expect(adoptedWorkspaces({ role: 'ADMIN', preferredRole: 'hire' })).toEqual([]);
+    expect(adoptedWorkspaces({ role: 'ADMIN', preferredRole: 'find_work' })).toEqual([]);
+  });
 });
