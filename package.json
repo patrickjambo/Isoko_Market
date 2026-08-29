@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "description": "Isoko Market — a trust-first, multilingual marketplace & job board for Rwandan youth.",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "predev": "./scripts/db.sh start",
     "dev": "next dev",

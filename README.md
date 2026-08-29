@@ -194,7 +194,19 @@ Notes for running E2E:
 
 ## Production notes
 
-This runs fully locally with no paid services. To go live (per Sections 4 & 14):
+This runs fully locally with no paid services.
+
+**Deploys clean on the two essential secrets.** With only `DATABASE_URL` (managed
+Postgres) and `AUTH_SECRET` set, `npm run build` succeeds and the app boots in
+production — the payment, SMS, storage and realtime layers fall back to safe
+defaults (`mock` / `console` / `local` / `sse`), so nothing crashes on deploy.
+Those layers stay **inert until you wire the real providers below**: until then
+OTP codes aren't delivered (SMS is console-only), payments are simulated, and
+uploads use local disk (read-only on serverless — set `STORAGE_DRIVER` before
+relying on uploads in prod). The schema is applied with `prisma migrate deploy`
+(a baseline migration is committed under `prisma/migrations/`).
+
+To go live (per Sections 4 & 14):
 
 1. Point `DATABASE_URL` at managed Postgres (Neon/Supabase/RDS); run
    `prisma migrate deploy`.
