@@ -160,6 +160,8 @@
       "locationLabel": "Aho biherereye",
       "photosLabel": "Amafoto",
       "photosHint": "Amafoto agera kuri 6. Iryambere ni ryo shusho nkuru. Amafoto agabanywa mu buryo bwikoresha.",
+      "urlPlaceholder": "…cyangwa wandike aderesi (URL) y'ifoto",
+      "addUrl": "Ongeraho",
       "publish": "Tangaza igicuruzwa",
       "publishing": "Biratangazwa…"
     },

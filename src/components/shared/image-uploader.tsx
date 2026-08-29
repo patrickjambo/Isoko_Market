@@ -2,10 +2,12 @@
 
 import { useRef, useState } from 'react';
 import Image from 'next/image';
-import { ImagePlus, Loader2, X, GripVertical } from 'lucide-react';
+import { ImagePlus, Loader2, X, GripVertical, Link as LinkIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 /**
  * Multi-image uploader with client-side compression before upload (Section 9.2 —
@@ -44,6 +46,8 @@ export function ImageUploader({
   const { toast } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [url, setUrl] = useState('');
+  const [linking, setLinking] = useState(false);
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -68,6 +72,29 @@ export function ImageUploader({
     } finally {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = '';
+    }
+  }
+
+  // Add a photo by URL: the server fetches + stores it (SSRF-guarded), returning
+  // a local URL — identical to an upload, so it renders through next/image.
+  async function addByUrl() {
+    const link = url.trim();
+    if (!link || value.length >= max) return;
+    setLinking(true);
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: link, private: privateUpload }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message ?? 'Could not add that image URL');
+      onChange([...value, data.url]);
+      setUrl('');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Could not add that image URL', 'error');
+    } finally {
+      setLinking(false);
     }
   }
 
@@ -120,6 +147,28 @@ export function ImageUploader({
           </button>
         )}
       </div>
+      {value.length < max && (
+        <div className="flex gap-2">
+          <Input
+            type="url"
+            inputMode="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                void addByUrl();
+              }
+            }}
+            placeholder={t('urlPlaceholder')}
+            className="flex-1"
+          />
+          <Button type="button" variant="outline" onClick={() => void addByUrl()} disabled={linking || !url.trim()}>
+            {linking ? <Loader2 className="h-4 w-4 animate-spin" /> : <LinkIcon className="h-4 w-4" />}
+            {t('addUrl')}
+          </Button>
+        </div>
+      )}
       <p className="text-xs text-muted-foreground">{t('photosHint')}</p>
       <input
         ref={inputRef}

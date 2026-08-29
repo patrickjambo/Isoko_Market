@@ -160,6 +160,8 @@
       "locationLabel": "Localisation",
       "photosLabel": "Photos",
       "photosHint": "Jusqu'à 6 photos. La première est la couverture. Les images sont compressées automatiquement.",
+      "urlPlaceholder": "…ou collez l'URL d'une image",
+      "addUrl": "Ajouter",
       "publish": "Publier l'annonce",
       "publishing": "Publication…"
     },
