@@ -9,7 +9,8 @@ import { PrismaClient, type Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 const rwf = (francs: number) => francs * 100;
-const img = (seed: string) => `https://picsum.photos/seed/${seed}/800/800`;
+// Demo listing photos are committed under public/seed/ — category-matched and
+// self-contained, so the demo never depends on a third-party image host.
 
 const CATEGORIES = [
   { slug: 'phones', nameEn: 'Phones & Tablets', nameRw: 'Telefoni & Tablet', nameFr: 'Téléphones & tablettes', icon: 'Smartphone' },
@@ -165,7 +166,7 @@ async function main() {
       tags: ['128GB', 'dual SIM', 'with charger'],
       seller: { connect: { id: aline.id } },
       category: { connect: { id: cat('phones') } },
-      _images: [img('galaxy1'), img('galaxy2')],
+      _images: ['/seed/phone-1.jpg', '/seed/phone-2.jpg'],
     },
     {
       title: 'HP laptop 8GB RAM, SSD',
@@ -176,7 +177,7 @@ async function main() {
       isFeatured: true,
       seller: { connect: { id: aline.id } },
       category: { connect: { id: cat('electronics') } },
-      _images: [img('laptop1')],
+      _images: ['/seed/laptop-1.jpg'],
     },
     {
       title: 'Wooden dining table + 4 chairs',
@@ -186,7 +187,7 @@ async function main() {
       location: 'Musanze',
       seller: { connect: { id: eric.id } },
       category: { connect: { id: cat('home') } },
-      _images: [img('table1'), img('table2')],
+      _images: ['/seed/table-1.jpg', '/seed/table-2.jpg'],
     },
     {
       title: 'Fresh Irish potatoes — 50kg bag',
@@ -196,7 +197,7 @@ async function main() {
       location: 'Musanze',
       seller: { connect: { id: eric.id } },
       category: { connect: { id: cat('agriculture') } },
-      _images: [img('potato1')],
+      _images: ['/seed/potato-1.jpg'],
     },
     {
       title: 'Ladies handbag — genuine leather',
@@ -206,7 +207,7 @@ async function main() {
       location: 'Kigali, Kicukiro',
       seller: { connect: { id: aline.id } },
       category: { connect: { id: cat('fashion') } },
-      _images: [img('bag1')],
+      _images: ['/seed/handbag-1.jpg'],
     },
     {
       title: 'Phone repair service — screens & batteries',
@@ -216,7 +217,7 @@ async function main() {
       location: 'Kigali, Nyarugenge',
       seller: { connect: { id: aline.id } },
       category: { connect: { id: cat('services') } },
-      _images: [img('repair1')],
+      _images: ['/seed/repair-1.jpg'],
     },
   ];
 
