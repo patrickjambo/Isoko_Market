@@ -90,7 +90,7 @@ export async function searchListings(filter: ListingFilter) {
 }
 
 export async function getListing(id: string) {
-  return prisma.listing.findUnique({
+  const listing = await prisma.listing.findUnique({
     where: { id },
     include: {
       images: { orderBy: { position: 'asc' } },
@@ -111,6 +111,12 @@ export async function getListing(id: string) {
       },
     },
   });
+  // Defense-in-depth: the seller's phone is needed only when they've opted in
+  // (showPhone). The detail page already gates *rendering* on showPhone; nulling
+  // it here means the number never rides along in the returned object for a
+  // non-opted-in seller, so a future client-prop change can't leak it.
+  if (listing && !listing.showPhone) listing.seller.phone = '';
+  return listing;
 }
 
 /** Similar active listings in the same category (for the buyer "Similar" carousel). */
