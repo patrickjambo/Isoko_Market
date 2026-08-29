@@ -37,6 +37,7 @@ const listingCardSelect = {
   status: true,
   isFeatured: true,
   images: { orderBy: { position: 'asc' }, take: 1, select: { url: true } },
+  category: { select: { slug: true } },
   seller: { select: { fullName: true, isVerified: true, verificationStatus: true } },
 } satisfies Prisma.ListingSelect;
 

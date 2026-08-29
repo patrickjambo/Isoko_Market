@@ -1,11 +1,12 @@
 import Image from 'next/image';
-import { MapPin, ImageOff } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { TrustBadge } from '@/components/trust/trust-badge';
 import { FavoriteHeart } from '@/components/marketplace/favorite-heart';
 import { formatRWF, cn } from '@/lib/utils';
+import { listingCover } from '@/lib/listing-image';
 
 export type ListingCardData = {
   id: string;
@@ -15,6 +16,7 @@ export type ListingCardData = {
   status: string;
   isFeatured: boolean;
   images: { url: string }[];
+  category?: { slug: string } | null;
   seller: { fullName: string; isVerified: boolean; verificationStatus: string };
   favorited?: boolean;
 };
@@ -31,7 +33,8 @@ export function ListingCard({
   const t = useTranslations('marketplace');
   const tt = useTranslations('trust');
   const locale = useLocale();
-  const cover = listing.images[0]?.url;
+  // First uploaded photo, else a category-representative fallback (never broken).
+  const cover = listingCover(listing.images, listing.category?.slug);
 
   // Compact horizontal row for the list view (Section 8.3).
   if (variant === 'list') {
@@ -41,19 +44,13 @@ export function ListingCard({
         className="group flex gap-3 overflow-hidden rounded-xl border border-border bg-card p-2 transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
       >
         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-muted">
-          {cover ? (
-            <Image
-              src={cover}
-              alt={listing.title}
-              fill
-              sizes="96px"
-              className={cn('object-cover', listing.status === 'SOLD' && 'opacity-60 grayscale')}
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-muted-foreground">
-              <ImageOff className="h-6 w-6" />
-            </div>
-          )}
+          <Image
+            src={cover}
+            alt={listing.title}
+            fill
+            sizes="96px"
+            className={cn('object-cover', listing.status === 'SOLD' && 'opacity-60 grayscale')}
+          />
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1 py-1">
           <div className="flex items-center gap-2">
@@ -86,22 +83,16 @@ export function ListingCard({
         {showFavorite && (
           <FavoriteHeart listingId={listing.id} initialFavorited={Boolean(listing.favorited)} />
         )}
-        {cover ? (
-          <Image
-            src={cover}
-            alt={listing.title}
-            fill
-            sizes="(max-width: 768px) 50vw, 25vw"
-            className={cn(
-              'object-cover transition-transform group-hover:scale-105',
-              listing.status === 'SOLD' && 'opacity-60 grayscale'
-            )}
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-muted-foreground">
-            <ImageOff className="h-8 w-8" />
-          </div>
-        )}
+        <Image
+          src={cover}
+          alt={listing.title}
+          fill
+          sizes="(max-width: 768px) 50vw, 25vw"
+          className={cn(
+            'object-cover transition-transform group-hover:scale-105',
+            listing.status === 'SOLD' && 'opacity-60 grayscale'
+          )}
+        />
         {listing.isFeatured && listing.status === 'ACTIVE' && (
           <Badge variant="accent" className="absolute left-2 top-2 shadow">
             {t('featured')}

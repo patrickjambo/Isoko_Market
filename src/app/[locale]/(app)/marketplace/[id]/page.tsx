@@ -19,6 +19,7 @@ import { suggestPrice } from '@/lib/suggestions';
 import { formatRWF, timeAgo, cn } from '@/lib/utils';
 import { formatPhoneDisplay } from '@/lib/phone';
 import { categoryName } from '@/lib/i18n-helpers';
+import { categoryFallbackImage } from '@/lib/listing-image';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,7 +91,14 @@ export default async function ListingDetailPage({
       </Link>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <ImageGallery images={listing.images} alt={listing.title} />
+        <ImageGallery
+          images={
+            listing.images.length
+              ? listing.images
+              : [{ url: categoryFallbackImage(listing.category?.slug) }]
+          }
+          alt={listing.title}
+        />
 
         <div className="space-y-5">
           <div className="space-y-2">
