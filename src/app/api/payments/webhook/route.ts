@@ -1,14 +1,23 @@
 import type { NextRequest } from 'next/server';
-import { route, jsonOk } from '@/lib/api';
+import { route, jsonOk, jsonError } from '@/lib/api';
+import { env } from '@/lib/env';
 import { prisma } from '@/lib/prisma';
 import { notify } from '@/lib/notifications';
 import { publish, publishTopic } from '@/lib/realtime';
 import { emitAdmin } from '@/lib/admin-realtime';
 
+const TERMINAL_STATUSES = ['SUCCESS', 'FAILED', 'REFUNDED'];
+
 /**
  * POST /api/payments/webhook — provider callback endpoint (Section 11 / buyer
  * Section 10). MTN/Airtel post the final status of an async request-to-pay here.
- * In production this must verify the provider signature before trusting the body.
+ *
+ * SECURITY: the body is untrusted, so the caller must present the shared
+ * PAYMENTS_WEBHOOK_SECRET (falls back to AUTH_SECRET) — a floor that real
+ * MTN/Airtel HMAC-signature verification will layer on/replace when a live
+ * provider is wired. Processing is idempotent: a replay with the SAME status is
+ * a no-op; a CONFLICTING terminal status (e.g. SUCCESS after FAILED) is logged
+ * as an anomaly (replay attack or confused provider) and never applied.
  *
  * We reconcile by our transaction id (passed as the provider reference) and, if
  * the transaction backs an order, update BOTH sides atomically — never one
@@ -18,6 +27,15 @@ import { emitAdmin } from '@/lib/admin-realtime';
  *   FAILED  → cancel the order, relist the item, notify both.
  */
 export const POST = route(async (req: NextRequest) => {
+  // ── Authenticate the caller before trusting anything in the body ──
+  const secret = process.env.PAYMENTS_WEBHOOK_SECRET || env.AUTH_SECRET;
+  const provided =
+    req.headers.get('x-webhook-secret') ??
+    req.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (provided !== secret) {
+    return jsonError('UNAUTHORIZED', 'Invalid webhook secret.');
+  }
+
   const body = await req.json().catch(() => ({}));
   const providerRef: string | undefined = body?.referenceId ?? body?.reference;
   const rawStatus: string | undefined = body?.status;
@@ -32,9 +50,28 @@ export const POST = route(async (req: NextRequest) => {
 
   const tx = await prisma.transaction.findFirst({
     where: { OR: [{ momoRef: providerRef }, { id: providerRef }] },
-    select: { id: true },
+    select: { id: true, status: true },
   });
   if (!tx) return jsonOk({ ok: true, ignored: true });
+
+  // ── Idempotency + anomaly guard ──
+  // Same status again → safe no-op (provider retry / at-least-once delivery).
+  if (tx.status === status) {
+    return jsonOk({ ok: true, status, idempotent: true });
+  }
+  // Already in a terminal state but the webhook claims a DIFFERENT one → this is
+  // a replay attack or genuinely confused provider state. Never silently apply
+  // it; surface it (admin ticker + server log) so it's visible once real money
+  // is involved, and acknowledge without mutating.
+  if (TERMINAL_STATUSES.includes(tx.status)) {
+    await emitAdmin(
+      'transaction.anomaly',
+      `Webhook status conflict on ${tx.id}: stored ${tx.status}, webhook claims ${status}`
+    );
+    // eslint-disable-next-line no-console
+    console.warn(`[payments/webhook] conflicting status for tx ${tx.id}: stored=${tx.status} incoming=${status}`);
+    return jsonOk({ ok: true, ignored: true, anomaly: true });
+  }
 
   await prisma.transaction.update({ where: { id: tx.id }, data: { status } });
 

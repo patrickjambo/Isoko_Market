@@ -10,6 +10,9 @@ const schema = z.object({
   AUTH_SECRET: z.string().min(16, 'AUTH_SECRET must be at least 16 chars'),
   // Shared secret for scheduled jobs (Vercel Cron). Falls back to AUTH_SECRET.
   CRON_SECRET: z.string().optional(),
+  // Shared secret a payment-provider webhook must present. Falls back to
+  // AUTH_SECRET; superseded by real provider HMAC verification when MoMo lands.
+  PAYMENTS_WEBHOOK_SECRET: z.string().optional(),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 
   SMS_PROVIDER: z.enum(['console', 'pindo', 'africastalking']).default('console'),
