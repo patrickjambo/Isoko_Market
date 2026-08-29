@@ -147,7 +147,7 @@ tests/                   # vitest: phone, money, otp, payments, validators
 
 ```bash
 npm run typecheck    # strict TypeScript, no implicit any
-npm run test         # vitest — phone, money, OTP, payments, validators, authz, skills, onboarding
+npm run test         # vitest — phone, money, OTP, payments, validators, authz, skills, onboarding, cv-format, rate-limit, serialize, utils, i18n, error localization
 npm run build        # full production build
 npm run test:e2e     # Playwright — real-browser journeys + accessibility
 npm run perf:budget  # Rule 7 — production JS-weight budget (3G / low-bandwidth)
@@ -174,6 +174,12 @@ screen in rw/en/fr. The brand accent and success colors are tuned to meet the
 **Performance (Rule 7).** `npm run perf:budget` runs the production build and
 fails if the **shared First-Load JS** exceeds 110 kB or any route exceeds 260 kB
 — keeping the app usable on a throttled 3G connection.
+
+**Continuous integration (Section 14).** [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+runs `install → prisma generate → lint → typecheck → unit tests → build + 3G
+budget` on every push to `main` and every pull request. No live database is
+required — the build degrades gracefully without one — so CI stays fast and
+self-contained.
 
 Notes for running E2E:
 - It uses the **system Chromium** (`/usr/bin/chromium`, override with
