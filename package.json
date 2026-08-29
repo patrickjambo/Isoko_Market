@@ -28,6 +28,9 @@
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
+  "overrides": {
+    "postcss": "$postcss"
+  },
   "dependencies": {
     "@prisma/client": "^5.20.0",
     "@radix-ui/react-avatar": "^1.1.1",
