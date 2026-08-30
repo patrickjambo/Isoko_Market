@@ -194,32 +194,42 @@ Notes for running E2E:
 
 ## Production notes
 
-This runs fully locally with no paid services.
+This runs fully locally with no paid services. Auth is **email OTP** and
+buyer↔seller payments are **manual peer-to-peer** (money moves off-platform,
+both sides confirm in-app); the MoMo/webhook + SMS layers are retained but
+**dormant**.
 
-**Deploys clean on the two essential secrets.** With only `DATABASE_URL` (managed
-Postgres) and `AUTH_SECRET` set, `npm run build` succeeds and the app boots in
-production — the payment, SMS, storage and realtime layers fall back to safe
-defaults (`mock` / `console` / `local` / `sse`), so nothing crashes on deploy.
-Those layers stay **inert until you wire the real providers below**: until then
-OTP codes aren't delivered (SMS is console-only), payments are simulated, and
-uploads use local disk (read-only on serverless — set `STORAGE_DRIVER` before
-relying on uploads in prod). The schema is applied with `prisma migrate deploy`
-(a baseline migration is committed under `prisma/migrations/`).
+**Deploys clean on the essential secrets.** With `DATABASE_URL`/`DIRECT_URL`
+(managed Postgres) and `AUTH_SECRET` set, the build succeeds and the app boots —
+email, storage and realtime fall back to safe defaults (`console` / `local` /
+`sse`), so nothing crashes on deploy. But until you wire the real providers below,
+login codes aren't delivered (email is console-only) and uploads use local disk,
+which is **read-only/ephemeral on serverless** — so set `EMAIL_PROVIDER` and
+`STORAGE_DRIVER` before real use. On Vercel the `vercel-build` script runs
+`prisma migrate deploy` automatically (baseline under `prisma/migrations/`).
 
-To go live (per Sections 4 & 14):
+### Deploy to Neon + Vercel
 
-1. Point `DATABASE_URL` at managed Postgres (Neon/Supabase/RDS); run
-   `prisma migrate deploy`.
-2. Set `SMS_PROVIDER` + credentials for real OTP delivery.
-3. Set `PAYMENTS_PROVIDER=mtn_momo` (and Airtel) with credentials, and register
-   the webhook at `/api/payments/webhook`.
-4. Set `STORAGE_DRIVER=r2|s3` with bucket credentials for photos/CVs/ID docs.
-5. Optionally set `REALTIME_DRIVER=pusher|ably` for multi-instance real-time.
-6. Rotate `AUTH_SECRET`, set `CRON_SECRET`. Enable HSTS at the edge. Wire Sentry + analytics.
-7. The daily stale-listing sweep is pre-wired in `vercel.json`
-   (`/api/cron/sweep`, 03:00 UTC). On Vercel, set `CRON_SECRET` and it's sent
-   automatically; elsewhere, POST to the endpoint with
-   `Authorization: Bearer $CRON_SECRET` from your scheduler.
+1. **Neon** — create a project, copy two connection strings into Vercel:
+   - `DATABASE_URL` = the **pooled** string (host contains `-pooler`) — app runtime.
+   - `DIRECT_URL` = the **unpooled** string (host without `-pooler`) — migrations.
+2. **Vercel** — import the GitHub repo. It auto-detects Next.js; `vercel-build`
+   applies migrations on each deploy. Set the env vars in step 4.
+3. **Vercel Blob** — Storage tab → create a Blob store. It injects
+   `BLOB_READ_WRITE_TOKEN`; set `STORAGE_DRIVER=vercel_blob`.
+4. **Env vars** (Project → Settings → Environment Variables):
+   - `DATABASE_URL`, `DIRECT_URL` (Neon, step 1)
+   - `AUTH_SECRET` — fresh: `openssl rand -hex 32`
+   - `NEXT_PUBLIC_APP_URL` — your deployed URL (e.g. `https://isoko.vercel.app`)
+   - `EMAIL_PROVIDER=resend`, `RESEND_API_KEY`, `EMAIL_FROM` (verify a domain at
+     resend.com/domains to email anyone but the account owner)
+   - `STORAGE_DRIVER=vercel_blob`
+   - `CRON_SECRET` — `openssl rand -hex 32`
+5. **Deploy.** First build runs `prisma migrate deploy` against Neon, then serves.
+6. The daily stale-listing sweep is pre-wired in `vercel.json` (`/api/cron/sweep`,
+   03:00 UTC); Vercel sends `CRON_SECRET` automatically. (Hobby plan runs crons
+   once/day.) Dormant, reactivate later: `SMS_PROVIDER`, `PAYMENTS_PROVIDER`,
+   `REALTIME_DRIVER=pusher|ably` for multi-instance realtime.
 
 _Derived from the Isoko Market business proposal (Joseph Rudakubana, African
 Leadership University)._
