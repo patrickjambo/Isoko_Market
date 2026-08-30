@@ -1,21 +1,21 @@
 import { type Page, type APIRequestContext, expect } from '@playwright/test';
 
-/** A unique valid Rwandan mobile number for isolated test users. */
-export function uniquePhone(): string {
-  return '078' + String(Math.floor(1_000_000 + Math.random() * 8_999_999));
+/** A unique, valid email for isolated test users (auth is now email-based). */
+export function uniqueEmail(prefix = 'e2e'): string {
+  return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.rw`;
 }
 
 /**
- * Register (or log in) through the real OTP UI. Under E2E_TESTING=1 the
+ * Register (or log in) through the real email-OTP UI. Under E2E_TESTING=1 the
  * request-otp response returns the code, so we can drive the whole flow.
  */
 export async function otpRegisterUI(
   page: Page,
-  opts: { phone: string; name: string; role?: 'BUYER' | 'SELLER' | 'EMPLOYER' }
+  opts: { email: string; name: string; role?: 'BUYER' | 'SELLER' | 'EMPLOYER' }
 ) {
   await page.goto('/en/register');
   await page.getByLabel('Full name').fill(opts.name);
-  await page.getByLabel('Phone number').fill(opts.phone);
+  await page.getByLabel('Email address').fill(opts.email);
   if (opts.role) await page.getByLabel('I mainly want to').selectOption(opts.role);
 
   const codePromise = page.waitForResponse(
@@ -33,13 +33,27 @@ export async function otpRegisterUI(
 /** Log a user in via the API (sets cookies on the request context). */
 export async function apiLogin(
   request: APIRequestContext,
-  phone: string,
+  email: string,
   extra: Record<string, unknown> = {}
 ) {
-  const r1 = await request.post('/api/auth/request-otp', { data: { phone } });
+  const r1 = await request.post('/api/auth/request-otp', { data: { email } });
   const { code } = await r1.json();
-  const r2 = await request.post('/api/auth/verify-otp', { data: { phone, code, ...extra } });
+  const r2 = await request.post('/api/auth/verify-otp', { data: { email, code, ...extra } });
   expect(r2.ok()).toBeTruthy();
+}
+
+/**
+ * Set the current user's payout number + provider (via API). A seller must have
+ * one before their listings can be ordered (manual-P2P Buy Now gate).
+ */
+export async function apiSetPayment(
+  request: APIRequestContext,
+  opts: { number: string; provider?: 'mtn_momo' | 'airtel_money' } = { number: '+250788111111' }
+): Promise<void> {
+  const res = await request.patch('/api/profile', {
+    data: { paymentNumber: opts.number, paymentProvider: opts.provider ?? 'mtn_momo' },
+  });
+  expect(res.ok(), 'setting the seller payout number should succeed').toBeTruthy();
 }
 
 /** Create an active listing via the API; returns its id. */
@@ -85,16 +99,16 @@ export async function apiApply(
 }
 
 /**
- * Register through the real OTP UI carrying an onboarding intent (?intent=…),
+ * Register through the real email-OTP UI carrying an onboarding intent (?intent=…),
  * e.g. hire / find_work. Lands on that intent's onboarding screen.
  */
 export async function registerWithIntentUI(
   page: Page,
-  opts: { phone: string; name: string; intent: 'buy_sell' | 'find_work' | 'hire' | 'browse' }
+  opts: { email: string; name: string; intent: 'buy_sell' | 'find_work' | 'hire' | 'browse' }
 ) {
   await page.goto(`/en/register?intent=${opts.intent}`);
   await page.getByLabel('Full name').fill(opts.name);
-  await page.getByLabel('Phone number').fill(opts.phone);
+  await page.getByLabel('Email address').fill(opts.email);
 
   const codePromise = page.waitForResponse(
     (r) => r.url().includes('/api/auth/request-otp') && r.request().method() === 'POST'
@@ -108,10 +122,10 @@ export async function registerWithIntentUI(
   await page.waitForURL((url) => !url.pathname.includes('/register'));
 }
 
-/** Log an existing user in through the OTP UI. Waits until off the login page. */
-export async function otpLoginUI(page: Page, phone: string) {
+/** Log an existing user in through the email-OTP UI. Waits until off the login page. */
+export async function otpLoginUI(page: Page, email: string) {
   await page.goto('/en/login');
-  await page.getByLabel('Phone number').fill(phone);
+  await page.getByLabel('Email address').fill(email);
 
   const codePromise = page.waitForResponse(
     (r) => r.url().includes('/api/auth/request-otp') && r.request().method() === 'POST'

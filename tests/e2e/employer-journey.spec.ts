@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { apiLogin, apiCreateJob, apiSetCv, apiApply, otpLoginUI, uniquePhone } from './helpers';
+import { apiLogin, apiCreateJob, apiSetCv, apiApply, otpLoginUI, uniqueEmail } from './helpers';
 
 const BASE = 'http://localhost:3000';
 
@@ -15,8 +15,8 @@ test('employer posts a job, seekers apply, hiring one cascades the rest to Posit
   playwright,
 }) => {
   // Employer (shared `request` context) posts a gig requiring "tailoring".
-  const empPhone = uniquePhone();
-  await apiLogin(request, empPhone, { fullName: 'E2E Employer', intent: 'hire' });
+  const empEmail = uniqueEmail('employer');
+  await apiLogin(request, empEmail, { fullName: 'E2E Employer', intent: 'hire' });
   const title = `E2E Tailor Gig ${Date.now()}`;
   const jobId = await apiCreateJob(request, {
     title,
@@ -28,15 +28,15 @@ test('employer posts a job, seekers apply, hiring one cascades the rest to Posit
 
   // Seeker A — own API context + CV — applies.
   const seekerA = await playwright.request.newContext({ baseURL: BASE });
-  const aPhone = uniquePhone();
-  await apiLogin(seekerA, aPhone, { fullName: 'E2E Seeker A', intent: 'find_work' });
+  const aEmail = uniqueEmail('seeker-a');
+  await apiLogin(seekerA, aEmail, { fullName: 'E2E Seeker A', intent: 'find_work' });
   await apiSetCv(seekerA, ['tailoring', 'sales']);
   const appA = await apiApply(seekerA, jobId);
 
   // Seeker B — applies too; used for the cascade UI assertion below.
   const seekerB = await playwright.request.newContext({ baseURL: BASE });
-  const bPhone = uniquePhone();
-  await apiLogin(seekerB, bPhone, { fullName: 'E2E Seeker B', intent: 'find_work' });
+  const bEmail = uniqueEmail('seeker-b');
+  await apiLogin(seekerB, bEmail, { fullName: 'E2E Seeker B', intent: 'find_work' });
   await apiSetCv(seekerB, ['tailoring']);
   await apiApply(seekerB, jobId);
 
@@ -61,7 +61,7 @@ test('employer posts a job, seekers apply, hiring one cascades the rest to Posit
 
   // Seeker B sees "Position filled" on their Applications panel — the cascade
   // status reaching the other side through the real UI (§7/§10).
-  await otpLoginUI(page, bPhone);
+  await otpLoginUI(page, bEmail);
   await page.goto('/en/profile/applications');
   await expect(page.getByText(/position filled/i)).toBeVisible();
 });
