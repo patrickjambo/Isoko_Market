@@ -29,6 +29,8 @@ export default async function SettingsPage({ params }: { params: { locale: strin
           bio: user.bio ?? '',
           location: user.location ?? '',
           avatarUrl: user.avatarUrl,
+          paymentNumber: user.paymentNumber,
+          paymentProvider: user.paymentProvider,
         }}
       />
     </div>

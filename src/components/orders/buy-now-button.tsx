@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ShoppingBag, Lock, ShieldAlert, Loader2, Smartphone } from 'lucide-react';
+import { ShoppingBag, ShieldAlert, Loader2, Smartphone } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
@@ -20,17 +20,22 @@ import { apiFetch } from '@/lib/admin-client';
 import { formatRWF } from '@/lib/utils';
 
 /**
- * One-tap escrow checkout (Section 6). One clear order-summary screen — item,
- * price, escrow protection, off-app warning — then Mobile Money.
+ * "Buy Now" for the MANUAL peer-to-peer flow (Section 6). One order-summary
+ * screen, then the buyer lands on the order page where they see the seller's
+ * MoMo/Airtel number to pay and confirm. Gated: a seller must have set a payout
+ * number before their listings can be ordered (mirrors "verification unlocks
+ * reach").
  */
 export function BuyNowButton({
   listingId,
   price,
   locale,
+  sellerHasPayment = true,
 }: {
   listingId: string;
   price: number;
   locale: string;
+  sellerHasPayment?: boolean;
 }) {
   const t = useTranslations('orders');
   const router = useRouter();
@@ -49,6 +54,14 @@ export function BuyNowButton({
         onClick={() => router.push(`/register?returnTo=${encodeURIComponent(pathname)}`)}
       >
         <ShoppingBag className="h-4 w-4" /> {t('buyNow')}
+      </Button>
+    );
+  }
+
+  if (!sellerHasPayment) {
+    return (
+      <Button variant="outline" disabled title={t('sellerNoPayment')}>
+        <ShoppingBag className="h-4 w-4" /> {t('sellerNoPayment')}
       </Button>
     );
   }
@@ -95,17 +108,17 @@ export function BuyNowButton({
           </div>
 
           <div className="flex items-start gap-2 rounded-lg border border-primary/30 bg-secondary/40 p-3 text-sm">
-            <Lock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <p>{t('escrowNote')}</p>
+            <Smartphone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <p>{t('manualPayNote')}</p>
           </div>
           <div className="flex items-start gap-2 rounded-lg border border-accent/30 bg-accent/5 p-3 text-xs text-muted-foreground">
             <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-            <p>{t('offAppWarning')}</p>
+            <p>{t('manualSafety')}</p>
           </div>
 
           <Button onClick={buy} disabled={busy} size="lg" className="w-full">
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Smartphone className="h-4 w-4" />}
-            {t('payWithMomo', { amount: formatRWF(price, locale) })}
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingBag className="h-4 w-4" />}
+            {t('placeOrder')}
           </Button>
         </div>
       </DialogContent>

@@ -436,7 +436,11 @@
     "itemsSold": "Ibyagurishijwe",
     "store": "Iduka",
     "visitStore": "Sura iduka",
-    "noApplicationsHint": "Nta busabe uragira — saba akazi ka mbere ku rubuga rw’imirimo."
+    "noApplicationsHint": "Nta busabe uragira — saba akazi ka mbere ku rubuga rw’imirimo.",
+    "paymentSectionTitle": "Ubwishyu (kugira ngo wakire ibyaguzwe)",
+    "paymentSectionHint": "Abaguzi bohereza amafaranga kuri iyi nimero. Birakenewe mbere y'uko 'Gura' ikora ku bicuruzwa byawe.",
+    "paymentNumberLabel": "Nimero yo kwishyurirwaho",
+    "paymentProviderLabel": "Uwatanga serivisi"
   },
   "verification": {
     "title": "Wemezwe",
@@ -834,7 +838,24 @@
     "rateSeller": "Gutanga amanota ku mucuruzi",
     "reviewPlaceholder": "Ongeraho igitekerezo (si itegeko)",
     "submitReview": "Ohereza igitekerezo",
-    "reviewThanks": "Murakoze ku bitekerezo byawe!"
+    "reviewThanks": "Murakoze ku bitekerezo byawe!",
+    "markPaid": "Nishyuye",
+    "proofLabel": "Icyemezo cy'ubwishyu (si itegeko)",
+    "proofHint": "Fata ifoto y'icyemezo cya MoMo/Airtel — kigufasha mu gihe habaye impaka.",
+    "confirmPaymentReceived": "Emeza ko wakiriye ubwishyu",
+    "payInstructionsTitle": "Ohereza ubwishyu",
+    "payInstructions": "Ohereza {amount} kuri iyi nimero ya {provider}, hanyuma ukande “Nishyuye” hepfo.",
+    "copy": "Koporora",
+    "copied": "Byakoporowe",
+    "sellerCheckApp": "Umuguzi avuga ko yohereje {amount}. Reba muri MoMo/Airtel yawe, hanyuma wemeze igihe byageze.",
+    "status_PENDING_PAYMENT": "Bitegereje ubwishyu",
+    "status_BUYER_MARKED_PAID": "Ubwishyu bwoherejwe",
+    "step_PENDING_PAYMENT": "Ubwishyu",
+    "step_BUYER_MARKED_PAID": "Byishyuwe",
+    "manualPayNote": "Nyuma yo gutumiza, uzabona nimero ya MoMo/Airtel y'umucuruzi. Muyishyure mu buryo butaziguye, hanyuma mwembi mwemeze hano.",
+    "manualSafety": "Emeza ubwishyu ari uko wamaze kubwohereza koko. Bika icyemezo cya MoMo/Airtel.",
+    "placeOrder": "Tumiza",
+    "sellerNoPayment": "Umucuruzi ntiyashyizeho uburyo bwo kwishyurwa"
   },
   "saved": {
     "title": "Ibyabitswe",

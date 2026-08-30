@@ -436,7 +436,11 @@
     "itemsSold": "Items sold",
     "store": "Store",
     "visitStore": "Visit store",
-    "noApplicationsHint": "No applications yet — apply to your first job from the Jobs board."
+    "noApplicationsHint": "No applications yet — apply to your first job from the Jobs board.",
+    "paymentSectionTitle": "Payment (to receive orders)",
+    "paymentSectionHint": "Buyers send money to this number. Required before Buy Now works on your listings.",
+    "paymentNumberLabel": "Payment number",
+    "paymentProviderLabel": "Provider"
   },
   "verification": {
     "title": "Get verified",
@@ -834,7 +838,24 @@
     "rateSeller": "Rate the seller",
     "reviewPlaceholder": "Add a comment (optional)",
     "submitReview": "Submit review",
-    "reviewThanks": "Thanks for your feedback!"
+    "reviewThanks": "Thanks for your feedback!",
+    "markPaid": "I've sent the payment",
+    "proofLabel": "Proof of payment (optional)",
+    "proofHint": "Screenshot your MoMo/Airtel confirmation — it helps if there's ever a dispute.",
+    "confirmPaymentReceived": "Confirm payment received",
+    "payInstructionsTitle": "Send the payment",
+    "payInstructions": "Send {amount} to this {provider} number, then tap “I've sent the payment” below.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "sellerCheckApp": "The buyer says they sent {amount}. Check your MoMo/Airtel app, then confirm below once it arrives.",
+    "status_PENDING_PAYMENT": "Awaiting payment",
+    "status_BUYER_MARKED_PAID": "Payment sent",
+    "step_PENDING_PAYMENT": "Payment",
+    "step_BUYER_MARKED_PAID": "Paid",
+    "manualPayNote": "After placing the order you'll see the seller's MoMo/Airtel number. Pay them directly, then you both confirm here.",
+    "manualSafety": "Only confirm payment after you've actually sent it. Keep the confirmation from your MoMo/Airtel app.",
+    "placeOrder": "Place order",
+    "sellerNoPayment": "Seller hasn't set up payments"
   },
   "saved": {
     "title": "Saved",

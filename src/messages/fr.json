@@ -436,7 +436,11 @@
     "itemsSold": "Articles vendus",
     "store": "Boutique",
     "visitStore": "Voir la boutique",
-    "noApplicationsHint": "Aucune candidature — postulez à votre premier emploi depuis la page Emplois."
+    "noApplicationsHint": "Aucune candidature — postulez à votre premier emploi depuis la page Emplois.",
+    "paymentSectionTitle": "Paiement (pour recevoir des commandes)",
+    "paymentSectionHint": "Les acheteurs envoient l'argent à ce numéro. Requis avant que « Acheter » fonctionne sur vos annonces.",
+    "paymentNumberLabel": "Numéro de paiement",
+    "paymentProviderLabel": "Opérateur"
   },
   "verification": {
     "title": "Se faire vérifier",
@@ -834,7 +838,24 @@
     "rateSeller": "Évaluer le vendeur",
     "reviewPlaceholder": "Ajouter un commentaire (facultatif)",
     "submitReview": "Envoyer l'avis",
-    "reviewThanks": "Merci pour votre retour !"
+    "reviewThanks": "Merci pour votre retour !",
+    "markPaid": "J'ai envoyé le paiement",
+    "proofLabel": "Preuve de paiement (facultatif)",
+    "proofHint": "Capturez la confirmation MoMo/Airtel — utile en cas de litige.",
+    "confirmPaymentReceived": "Confirmer le paiement reçu",
+    "payInstructionsTitle": "Envoyez le paiement",
+    "payInstructions": "Envoyez {amount} à ce numéro {provider}, puis appuyez sur « J'ai envoyé le paiement » ci-dessous.",
+    "copy": "Copier",
+    "copied": "Copié",
+    "sellerCheckApp": "L'acheteur dit avoir envoyé {amount}. Vérifiez votre application MoMo/Airtel, puis confirmez ci-dessous.",
+    "status_PENDING_PAYMENT": "En attente de paiement",
+    "status_BUYER_MARKED_PAID": "Paiement envoyé",
+    "step_PENDING_PAYMENT": "Paiement",
+    "step_BUYER_MARKED_PAID": "Payé",
+    "manualPayNote": "Après la commande, vous verrez le numéro MoMo/Airtel du vendeur. Payez-le directement, puis confirmez tous les deux ici.",
+    "manualSafety": "Ne confirmez le paiement qu'après l'avoir réellement envoyé. Conservez la confirmation de votre application MoMo/Airtel.",
+    "placeOrder": "Commander",
+    "sellerNoPayment": "Le vendeur n'a pas configuré les paiements"
   },
   "saved": {
     "title": "Enregistrés",

@@ -8,6 +8,9 @@ import { emitAdmin } from '@/lib/admin-realtime';
 
 const TERMINAL_STATUSES = ['SUCCESS', 'FAILED', 'REFUNDED'];
 
+// ⚠️ DORMANT for buyer↔seller orders (manual-P2P migration) — those settle
+// off-platform now. This route is RETAINED (its auth + idempotency fix stay
+// correct) for platform fees and any future real merchant-API / escrow model.
 /**
  * POST /api/payments/webhook — provider callback endpoint (Section 11 / buyer
  * Section 10). MTN/Airtel post the final status of an async request-to-pay here.

@@ -154,6 +154,7 @@ export default async function ListingDetailPage({
                     listingId={listing.id}
                     price={listing.price}
                     locale={params.locale}
+                    sellerHasPayment={Boolean(listing.seller.paymentNumber)}
                   />
                 )}
                 <MessageSellerButton

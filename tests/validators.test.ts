@@ -64,9 +64,11 @@ describe('applyJobSchema', () => {
 });
 
 describe('verifyOtpSchema', () => {
-  it('requires a valid phone and 6-digit code', () => {
-    expect(() => verifyOtpSchema.parse({ phone: '0788123456', code: '12345' })).toThrow();
-    const ok = verifyOtpSchema.parse({ phone: '0788123456', code: '123456' });
+  it('requires a valid email and 6-digit code (auth is now email-based)', () => {
+    expect(() => verifyOtpSchema.parse({ email: 'aline@example.rw', code: '12345' })).toThrow();
+    expect(() => verifyOtpSchema.parse({ email: 'not-an-email', code: '123456' })).toThrow();
+    const ok = verifyOtpSchema.parse({ email: 'Aline@Example.rw', code: '123456' });
     expect(ok.code).toBe('123456');
+    expect(ok.email).toBe('aline@example.rw'); // normalized to lowercase
   });
 });

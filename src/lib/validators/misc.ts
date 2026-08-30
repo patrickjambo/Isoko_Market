@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isValidRwandaPhone } from '../phone';
 
 export const sendMessageSchema = z.object({
   conversationId: z.string().cuid().optional(),
@@ -59,6 +60,13 @@ export const updateProfileSchema = z.object({
   location: z.string().trim().max(80).optional(),
   locale: z.enum(['rw', 'en', 'fr']).optional(),
   avatarUrl: z.string().url().optional(),
+  // Seller payout details for the manual peer-to-peer payment flow.
+  paymentNumber: z
+    .string()
+    .trim()
+    .refine(isValidRwandaPhone, { message: 'Enter a valid Rwandan phone number.' })
+    .optional(),
+  paymentProvider: z.enum(['mtn_momo', 'airtel_money']).optional(),
 });
 
 export type SendMessageInput = z.infer<typeof sendMessageSchema>;

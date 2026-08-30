@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { ChevronLeft, ShieldCheck, Lock, Info, ImageOff, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, ShieldCheck, Info, ImageOff, AlertTriangle, Clock } from 'lucide-react';
 import { Link, redirect } from '@/i18n/routing';
 import { StarRating } from '@/components/trust/star-rating';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { OrderStatusBadge, OrderTimeline } from '@/components/orders/order-status';
 import { OrderActions } from '@/components/orders/order-actions';
+import { PaymentInstructions } from '@/components/orders/payment-instructions';
 import { OrderReview } from '@/components/orders/order-review';
 import { LiveItemStatus } from '@/components/shared/live-item-status';
 import { getCurrentUser } from '@/lib/auth';
@@ -92,12 +93,19 @@ export default async function OrderDetailPage({
         </div>
       )}
 
-      {/* Escrow + safety */}
+      {/* Manual payment: buyer sees the seller's number to pay; seller is prompted to check their app */}
       <div className="space-y-2">
-        {order.escrow && order.status !== 'COMPLETED' && (
-          <div className="flex items-start gap-2 rounded-xl border border-primary/30 bg-secondary/40 p-3 text-sm">
-            <Lock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <p>{t('escrowNote')}</p>
+        {role === 'buyer' && order.status === 'PENDING_PAYMENT' && order.sellerPayoutNumber && (
+          <PaymentInstructions
+            payoutNumber={order.sellerPayoutNumber}
+            method={order.paymentMethod}
+            amountLabel={formatRWF(order.amount, params.locale)}
+          />
+        )}
+        {role === 'seller' && order.status === 'BUYER_MARKED_PAID' && (
+          <div className="flex items-start gap-2 rounded-xl border border-accent/40 bg-accent/5 p-3 text-sm">
+            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+            <p>{t('sellerCheckApp', { amount: formatRWF(order.amount, params.locale) })}</p>
           </div>
         )}
         <div className="flex items-start gap-2 rounded-xl border border-border bg-card p-3 text-xs text-muted-foreground">

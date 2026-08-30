@@ -4,11 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 const VARIANT: Record<string, 'secondary' | 'accent' | 'success' | 'destructive' | 'muted'> = {
-  PAYMENT_SENT: 'secondary',
+  PENDING_PAYMENT: 'secondary',
+  BUYER_MARKED_PAID: 'accent',
   SELLER_CONFIRMED: 'accent',
   COMPLETED: 'success',
   DISPUTED: 'destructive',
   CANCELLED: 'muted',
+  PAYMENT_SENT: 'secondary', // dormant legacy status
 };
 
 export function OrderStatusBadge({ status }: { status: string }) {
@@ -16,10 +18,10 @@ export function OrderStatusBadge({ status }: { status: string }) {
   return <Badge variant={VARIANT[status] ?? 'muted'}>{t(`status_${status}`)}</Badge>;
 }
 
-/** Visual 3-step escrow timeline: Payment Sent → Seller Confirmed → Completed. */
+/** Visual manual-P2P timeline: Pending payment → Buyer paid → Seller confirmed → Completed. */
 export function OrderTimeline({ status }: { status: string }) {
   const t = useTranslations('orders');
-  const steps = ['PAYMENT_SENT', 'SELLER_CONFIRMED', 'COMPLETED'];
+  const steps = ['PENDING_PAYMENT', 'BUYER_MARKED_PAID', 'SELLER_CONFIRMED', 'COMPLETED'];
   const currentIndex = steps.indexOf(status);
   const failed = status === 'DISPUTED' || status === 'CANCELLED';
 

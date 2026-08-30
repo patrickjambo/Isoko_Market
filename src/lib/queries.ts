@@ -101,6 +101,7 @@ export async function getListing(id: string) {
           id: true,
           fullName: true,
           phone: true,
+          paymentNumber: true, // gates "Buy Now" (seller must have a payout number)
           avatarUrl: true,
           location: true,
           isVerified: true,
