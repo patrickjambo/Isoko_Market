@@ -37,7 +37,7 @@ export const GET = route(async (_req, ctx: { params: { id: string } }) => {
 
   const pdf = await generateCvPdf({
     fullName: application.applicant.fullName,
-    phone: formatPhoneDisplay(application.applicant.phone),
+    phone: application.applicant.phone ? formatPhoneDisplay(application.applicant.phone) : undefined,
     // Prefer the CV's structured location path over the coarse profile field.
     location: data.location?.label ?? application.applicant.location ?? undefined,
     locale,

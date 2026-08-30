@@ -32,7 +32,10 @@ export function toPublicUser(user: User): PublicUser {
 
 /** The current user, plus the private-ish fields the owner is allowed to see. */
 export type SessionUser = PublicUser & {
-  phone: string;
+  email: string | null;
+  phone: string | null; // optional contact now (no longer the auth channel)
+  paymentNumber: string | null; // seller MoMo/Airtel payout number
+  paymentProvider: string | null; // mtn_momo | airtel_money
   locale: User['locale'];
   walletBalance: number;
   hasIdDocument: boolean;
@@ -42,7 +45,10 @@ export type SessionUser = PublicUser & {
 export function toSessionUser(user: User): SessionUser {
   return {
     ...toPublicUser(user),
+    email: user.email,
     phone: user.phone,
+    paymentNumber: user.paymentNumber,
+    paymentProvider: user.paymentProvider,
     locale: user.locale,
     walletBalance: user.walletBalance,
     hasIdDocument: Boolean(user.idDocumentUrl),

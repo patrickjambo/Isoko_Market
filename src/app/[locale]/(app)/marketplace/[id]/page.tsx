@@ -173,8 +173,8 @@ export default async function ListingDetailPage({
             )}
           </div>
 
-          {/* Seller contact — phone only if the seller opted in (Section 8) */}
-          {!isOwner && listing.showPhone && (
+          {/* Seller contact — phone only if the seller opted in AND provided one */}
+          {!isOwner && listing.showPhone && listing.seller.phone && (
             <a
               href={`tel:${listing.seller.phone}`}
               className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium"

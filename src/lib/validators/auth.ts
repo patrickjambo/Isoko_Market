@@ -1,17 +1,27 @@
 import { z } from 'zod';
 import { isValidRwandaPhone } from '../phone';
 
+/** Rwandan phone — no longer used for auth; kept for the optional contact field
+ *  and the seller's MoMo/Airtel payout number. */
 export const phoneSchema = z
   .string()
   .trim()
   .refine(isValidRwandaPhone, { message: 'Enter a valid Rwandan phone number.' });
 
+/** Email is the authentication channel (OTP is delivered here). */
+export const emailSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .email('Enter a valid email address.')
+  .max(160);
+
 export const requestOtpSchema = z.object({
-  phone: phoneSchema,
+  email: emailSchema,
 });
 
 export const verifyOtpSchema = z.object({
-  phone: phoneSchema,
+  email: emailSchema,
   code: z
     .string()
     .trim()

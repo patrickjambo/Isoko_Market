@@ -15,6 +15,14 @@ const schema = z.object({
   PAYMENTS_WEBHOOK_SECRET: z.string().optional(),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 
+  // Email is the auth/OTP + notification channel (replaces SMS). `console` prints
+  // to the server log for local dev; `resend` sends real email once a key is set.
+  EMAIL_PROVIDER: z.enum(['console', 'resend']).default('console'),
+  RESEND_API_KEY: z.string().optional().default(''),
+  EMAIL_FROM: z.string().default('Isoko Market <onboarding@resend.dev>'),
+
+  // SMS is now DORMANT (phone is no longer the auth channel). Retained so the
+  // adapter can be reactivated if transactional SMS is ever added.
   SMS_PROVIDER: z.enum(['console', 'pindo', 'africastalking']).default('console'),
   SMS_API_KEY: z.string().optional().default(''),
   SMS_SENDER_ID: z.string().default('ISOKO'),

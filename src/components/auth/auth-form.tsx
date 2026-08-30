@@ -9,11 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
-import { formatPhoneDisplay, normalizeRwandaPhone } from '@/lib/phone';
 import { intentHome, type Intent } from '@/lib/onboarding';
 
 type Mode = 'login' | 'register';
-type Step = 'phone' | 'otp';
+type Step = 'email' | 'otp';
 
 export function AuthForm({
   mode,
@@ -32,8 +31,8 @@ export function AuthForm({
   const router = useRouter();
   const { toast } = useToast();
 
-  const [step, setStep] = useState<Step>('phone');
-  const [phone, setPhone] = useState('');
+  const [step, setStep] = useState<Step>('email');
+  const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState<'BUYER' | 'SELLER' | 'EMPLOYER'>('BUYER');
   const [code, setCode] = useState('');
@@ -51,8 +50,8 @@ export function AuthForm({
   async function requestOtp(e?: React.FormEvent) {
     e?.preventDefault();
     setError(null);
-    if (!normalizeRwandaPhone(phone)) {
-      setError(t('phoneLabel'));
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      setError(t('emailLabel'));
       return;
     }
     if (mode === 'register' && fullName.trim().length < 2) {
@@ -64,7 +63,7 @@ export function AuthForm({
       const res = await fetch('/api/auth/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ email }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message ?? 'error');
@@ -87,7 +86,7 @@ export function AuthForm({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          phone,
+          email,
           code,
           ...(mode === 'register'
             ? {
@@ -123,11 +122,11 @@ export function AuthForm({
           {mode === 'login' ? t('loginTitle') : t('registerTitle')}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {step === 'phone'
+          {step === 'email'
             ? mode === 'login'
               ? t('loginSubtitle')
               : t('registerSubtitle')
-            : t('otpSubtitle', { phone: formatPhoneDisplay(normalizeRwandaPhone(phone) ?? phone) })}
+            : t('otpSubtitle', { email })}
         </p>
       </div>
 
@@ -143,7 +142,7 @@ export function AuthForm({
         </p>
       )}
 
-      {step === 'phone' ? (
+      {step === 'email' ? (
         <form onSubmit={requestOtp} className="space-y-4" noValidate>
           {mode === 'register' && (
             <div className="space-y-1.5">
@@ -159,15 +158,15 @@ export function AuthForm({
             </div>
           )}
           <div className="space-y-1.5">
-            <Label htmlFor="phone">{t('phoneLabel')}</Label>
+            <Label htmlFor="email">{t('emailLabel')}</Label>
             <Input
-              id="phone"
-              type="tel"
-              inputMode="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder={t('phonePlaceholder')}
-              autoComplete="tel"
+              id="email"
+              type="email"
+              inputMode="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t('emailPlaceholder')}
+              autoComplete="email"
               required
             />
           </div>
@@ -222,13 +221,13 @@ export function AuthForm({
             <button
               type="button"
               onClick={() => {
-                setStep('phone');
+                setStep('email');
                 setCode('');
                 setError(null);
               }}
               className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
             >
-              <ArrowLeft className="h-4 w-4" /> {t('changeNumber')}
+              <ArrowLeft className="h-4 w-4" /> {t('changeEmail')}
             </button>
             <button
               type="button"

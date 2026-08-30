@@ -150,19 +150,26 @@ enum AccountStatus {
 // Buyer order lifecycle (escrow-style): funds are held until the buyer confirms
 // receipt, then released to the seller (Section 6/7).
 enum OrderStatus {
-  PAYMENT_SENT // buyer paid into escrow, awaiting seller
-  SELLER_CONFIRMED // seller acknowledged / handed over
-  COMPLETED // buyer confirmed receipt, escrow released
+  PENDING_PAYMENT // order placed; buyer must send money to the seller's MoMo/Airtel number
+  BUYER_MARKED_PAID // buyer says they've sent it (optionally with proof); awaiting seller
+  SELLER_CONFIRMED // seller confirms the money arrived; arrange handover
+  COMPLETED // buyer confirmed receipt of the item; unlocks review
   DISPUTED // routed to admin moderation
   CANCELLED
+  PAYMENT_SENT // DORMANT — legacy escrow status, retained for the dormant MoMo/webhook path
 }
 
 // ─────────────────────────── Core ───────────────────────────
 
 model User {
   id                 String             @id @default(cuid())
-  phone              String             @unique
+  // Email is the auth/OTP channel (required at registration). Phone is NO LONGER
+  // for auth — it's an optional contact (showPhone-gated). A seller's payout
+  // number is the separate paymentNumber + paymentProvider below.
   email              String?            @unique
+  phone              String?            @unique
+  paymentNumber      String? // seller's MoMo/Airtel number for manual P2P payouts
+  paymentProvider    String? // mtn_momo | airtel_money — which app the buyer pays with
   passwordHash       String?
   fullName           String
   bio                String?
@@ -222,15 +229,15 @@ model User {
 
 model OtpCode {
   id        String   @id @default(cuid())
-  phone     String
+  email     String // OTP is now delivered by email (was phone)
   codeHash  String // OTP is hashed — never stored or logged in plaintext (Section 10)
-  purpose   String   @default("login") // login | verify_phone
+  purpose   String   @default("login") // login | verify_email
   attempts  Int      @default(0)
   expiresAt DateTime
   consumed  Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  @@index([phone, purpose])
+  @@index([email, purpose])
   @@index([expiresAt])
 }
 
@@ -343,12 +350,21 @@ model Order {
   sellerId        String
   seller          User        @relation("Seller", fields: [sellerId], references: [id], onDelete: Cascade)
   amount          Int // RWF minor units
-  status          OrderStatus @default(PAYMENT_SENT)
-  escrow          Boolean     @default(true)
+  status          OrderStatus @default(PENDING_PAYMENT)
+  // ── Manual peer-to-peer payment (buyer sends money directly to the seller's
+  //    MoMo/Airtel number off-platform; both confirm in-app). ──
+  paymentMethod        String    @default("manual_momo") // manual_momo | manual_airtel
+  sellerPayoutNumber   String? // snapshot of the seller's number AT ORDER TIME (not a live join)
+  buyerMarkedPaidAt    DateTime? // when the buyer said "I've sent the payment"
+  buyerPaymentProofUrl String? // optional screenshot of the transfer, for disputes
+  sellerConfirmedAt    DateTime? // when the seller confirmed the money arrived
   deliveryMethod  String? // pickup | delivery
-  transactionId   String? // links to the Transaction ledger row
   disputeReportId String?
   reviewed        Boolean     @default(false)
+  // DORMANT (legacy escrow / MoMo path — unused by the manual flow, kept for the
+  // dormant PaymentProvider): escrow + a Transaction ledger link.
+  escrow          Boolean     @default(false)
+  transactionId   String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 

@@ -2,15 +2,16 @@ import 'server-only';
 import type { NotificationType, Prisma } from '@prisma/client';
 import { prisma } from './prisma';
 import { publish, isOnline } from './realtime';
-import { sms } from './sms';
+import { sendNotificationEmail } from './email';
 
-// High-signal notifications worth an SMS when the user is offline.
-const SMS_FALLBACK_TYPES: NotificationType[] = [
+// High-signal notifications worth an email when the user is offline.
+const EMAIL_FALLBACK_TYPES: NotificationType[] = [
   'MESSAGE',
   'APPLICATION_UPDATE',
   'VERIFICATION_APPROVED',
   'VERIFICATION_REJECTED',
   'LISTING_SOLD',
+  'PAYMENT',
 ];
 
 /**
@@ -51,23 +52,22 @@ export async function notify(params: {
     },
   });
 
-  // SMS fallback for offline users (best-effort, never blocks the caller).
-  if (!isOnline(params.userId) && SMS_FALLBACK_TYPES.includes(params.type)) {
-    void sendSmsFallback(params.userId, params.title, params.body);
+  // Email fallback for offline users (best-effort, never blocks the caller).
+  if (!isOnline(params.userId) && EMAIL_FALLBACK_TYPES.includes(params.type)) {
+    void sendEmailFallback(params.userId, params.title, params.body);
   }
 
   return notification;
 }
 
-async function sendSmsFallback(userId: string, title: string, body?: string) {
+async function sendEmailFallback(userId: string, title: string, body?: string) {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { phone: true },
+      select: { email: true },
     });
-    if (!user) return;
-    const text = body ? `Isoko: ${title} — ${body}` : `Isoko: ${title}`;
-    await sms.send(user.phone, text.slice(0, 300));
+    if (!user?.email) return;
+    await sendNotificationEmail(user.email, title, body);
   } catch {
     /* fallback is best-effort */
   }

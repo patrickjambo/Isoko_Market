@@ -61,6 +61,7 @@ async function main() {
   const admin = await prisma.user.create({
     data: {
       phone: '+250788000000',
+      email: 'admin@isoko.rw',
       fullName: 'Isoko Admin',
       role: 'ADMIN',
       adminRole: 'SUPER_ADMIN',
@@ -77,6 +78,7 @@ async function main() {
   await prisma.user.create({
     data: {
       phone: '+250788777777',
+      email: 'moderator@isoko.rw',
       fullName: 'Moderator Staff',
       role: 'ADMIN',
       adminRole: 'MODERATOR',
@@ -91,6 +93,9 @@ async function main() {
   const aline = await prisma.user.create({
     data: {
       phone: '+250788111111',
+      email: 'aline@example.rw',
+      paymentNumber: '+250788111111',
+      paymentProvider: 'mtn_momo',
       fullName: 'Aline Uwase',
       role: 'SELLER',
       isVerified: true,
@@ -107,6 +112,9 @@ async function main() {
   const eric = await prisma.user.create({
     data: {
       phone: '+250788222222',
+      email: 'eric@example.rw',
+      paymentNumber: '+250788222222',
+      paymentProvider: 'airtel_money',
       fullName: 'Eric Habimana',
       role: 'SELLER',
       isVerified: false,
@@ -122,6 +130,7 @@ async function main() {
   const claudine = await prisma.user.create({
     data: {
       phone: '+250788333333',
+      email: 'claudine@example.rw',
       fullName: 'Claudine Mukamana',
       role: 'EMPLOYER',
       isVerified: true,
@@ -137,6 +146,7 @@ async function main() {
   const jean = await prisma.user.create({
     data: {
       phone: '+250788444444',
+      email: 'jean@example.rw',
       fullName: 'Jean-Paul Niyonzima',
       role: 'BUYER',
       isVerified: false,
@@ -402,12 +412,12 @@ async function main() {
   });
 
   console.log('✅  Seed complete.');
-  console.log('   Demo accounts (log in via phone OTP — code printed in the dev console):');
-  console.log('   • Admin     +250788000000');
-  console.log('   • Seller    +250788111111  (Aline, verified)');
-  console.log('   • Seller    +250788222222  (Eric, pending verification)');
-  console.log('   • Employer  +250788333333  (Claudine, verified)');
-  console.log('   • Buyer     +250788444444  (Jean-Paul, unverified)');
+  console.log('   Demo accounts (log in via EMAIL OTP — code printed in the dev console):');
+  console.log('   • Admin     admin@isoko.rw');
+  console.log('   • Seller    aline@example.rw   (Aline, verified · MTN MoMo payout)');
+  console.log('   • Seller    eric@example.rw    (Eric, pending · Airtel Money payout)');
+  console.log('   • Employer  claudine@example.rw (Claudine, verified)');
+  console.log('   • Buyer     jean@example.rw    (Jean-Paul, unverified)');
 }
 
 main()

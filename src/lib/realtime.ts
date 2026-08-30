@@ -25,7 +25,8 @@ export type RealtimeEvent =
       entity: 'listing' | 'job' | 'order';
       id: string;
       status: string;
-      reason?: string; // sold | filled | closed | reopened | cancelled | relisted
+      reason?: string; // sold | filled | closed | reopened | cancelled | relisted |
+      // manual-P2P order flow: buyer_paid | seller_confirmed | item_received | disputed
     }
   | { type: 'admin_event'; name: string; label: string; at: string };
 

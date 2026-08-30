@@ -13,12 +13,12 @@ const createSchema = z.object({
   deliveryMethod: z.enum(['pickup', 'delivery']).optional(),
 });
 
-/** POST /api/orders — "Buy Now" checkout (escrow). */
+/** POST /api/orders — "Buy Now": places a manual peer-to-peer order (the buyer
+ *  then pays the seller directly and both confirm in-app). */
 export const POST = userRoute(async (req, _ctx, { user }) => {
   const input = createSchema.parse(await req.json().catch(() => ({})));
   const order = await createOrder({
     buyerId: user.id,
-    buyerPhone: user.phone,
     buyerName: user.fullName,
     listingId: input.listingId,
     deliveryMethod: input.deliveryMethod,

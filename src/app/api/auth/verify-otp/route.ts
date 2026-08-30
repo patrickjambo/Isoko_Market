@@ -1,7 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { route, jsonOk } from '@/lib/api';
 import { verifyOtpSchema } from '@/lib/validators/auth';
-import { normalizeRwandaPhone } from '@/lib/phone';
 import { consumeOtp } from '@/lib/otp-service';
 import { prisma } from '@/lib/prisma';
 import { createSession } from '@/lib/session';
@@ -13,13 +12,13 @@ import { intentToRole, intentHome, landingFor } from '@/lib/onboarding';
 export const POST = route(async (req: NextRequest) => {
   const body = await req.json().catch(() => ({}));
   const input = verifyOtpSchema.parse(body);
-  const phone = normalizeRwandaPhone(input.phone)!;
+  const email = input.email;
 
-  // Verifying the OTP proves ownership of the phone — this both logs in existing
-  // users and confirms the number for new registrations.
-  await consumeOtp(phone, input.code, 'login');
+  // Verifying the OTP proves ownership of the email — this both logs in existing
+  // users and confirms the address for new registrations.
+  await consumeOtp(email, input.code, 'login');
 
-  const existing = await prisma.user.findUnique({ where: { phone } });
+  const existing = await prisma.user.findUnique({ where: { email } });
 
   // Intent (from the "Get Started" fork) decides the role written — but the
   // explicit role select, if any, wins (Visitor spec §8).
@@ -29,7 +28,7 @@ export const POST = route(async (req: NextRequest) => {
     existing ??
     (await prisma.user.create({
       data: {
-        phone,
+        email,
         fullName: input.fullName?.trim() || 'Isoko user',
         role,
         preferredRole: input.intent ?? null,

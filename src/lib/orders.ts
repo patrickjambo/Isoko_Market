@@ -2,43 +2,51 @@ import 'server-only';
 import type { OrderStatus } from '@prisma/client';
 import { prisma } from './prisma';
 import { ApiError } from './api';
-import { startPayment } from './payments';
 import { notify } from './notifications';
 import { publishTopic } from './realtime';
 import { emitAdmin } from './admin-realtime';
 
+const rwf = (minor: number) => Math.round(minor / 100).toLocaleString();
+
 /**
- * Create an order = the single source of truth for a deal (Section 10). In one
- * transaction: charge the buyer into escrow, create the Order, and reserve the
- * listing (mark SOLD so nobody else can buy). Then notify BOTH sides and push
- * the live `listing:sold` event so anyone viewing updates within ~1s.
+ * Create an order = the single source of truth for a deal (Section 10). This is
+ * a MANUAL peer-to-peer payment flow: no money moves through the platform — the
+ * buyer will send it directly to the seller's MoMo/Airtel number and both sides
+ * confirm in-app. In one transaction we snapshot the seller's payout number (so
+ * a later profile change never rewrites history), create the Order in
+ * PENDING_PAYMENT, and reserve the listing (mark SOLD). Then notify both sides.
+ *
+ * The seller MUST have a payout number set — mirrors "verification unlocks
+ * reach": a seller can list without it, but can't be paid through the order flow.
  */
 export async function createOrder(params: {
   buyerId: string;
-  buyerPhone: string;
   buyerName: string;
   listingId: string;
   deliveryMethod?: string;
 }) {
   const listing = await prisma.listing.findUnique({
     where: { id: params.listingId },
-    select: { id: true, sellerId: true, title: true, price: true, status: true },
+    select: {
+      id: true,
+      sellerId: true,
+      title: true,
+      price: true,
+      status: true,
+      seller: { select: { paymentNumber: true, paymentProvider: true } },
+    },
   });
   if (!listing || listing.status === 'REMOVED') throw new ApiError('NOT_FOUND', 'Listing not found.');
   if (listing.sellerId === params.buyerId) throw new ApiError('BAD_REQUEST', 'You cannot buy your own listing.');
   if (listing.status !== 'ACTIVE') throw new ApiError('CONFLICT', 'This item is no longer available.');
 
-  // Charge into escrow (mock provider succeeds in dev).
-  const { transaction, result } = await startPayment({
-    userId: params.buyerId,
-    phone: params.buyerPhone,
-    type: 'ESCROW',
-    amount: listing.price,
-    metadata: { listingId: listing.id, kind: 'order' },
-  });
-  if (result.status === 'FAILED') throw new ApiError('BAD_REQUEST', 'Payment failed. Please try again.');
+  const payoutNumber = listing.seller.paymentNumber;
+  const provider = listing.seller.paymentProvider;
+  if (!payoutNumber || !provider) {
+    throw new ApiError('CONFLICT', 'This seller has not set up a payment number yet.');
+  }
 
-  // Reserve the listing + create the order atomically.
+  // Reserve the listing + create the order atomically, snapshotting the payout number.
   const [, order] = await prisma.$transaction([
     prisma.listing.update({ where: { id: listing.id }, data: { status: 'SOLD' } }),
     prisma.order.create({
@@ -47,10 +55,10 @@ export async function createOrder(params: {
         buyerId: params.buyerId,
         sellerId: listing.sellerId,
         amount: listing.price,
-        status: 'PAYMENT_SENT',
-        escrow: true,
+        status: 'PENDING_PAYMENT',
+        paymentMethod: provider === 'airtel_money' ? 'manual_airtel' : 'manual_momo',
+        sellerPayoutNumber: payoutNumber,
         deliveryMethod: params.deliveryMethod,
-        transactionId: transaction.id,
       },
       select: { id: true },
     }),
@@ -59,43 +67,27 @@ export async function createOrder(params: {
   // Propagate to anyone viewing the listing (Section 10).
   publishTopic(`listing:${listing.id}`, { type: 'entity_update', entity: 'listing', id: listing.id, status: 'SOLD', reason: 'sold' });
 
-  // Notify both sides — atomic in intent, never one without the other.
   await Promise.all([
     notify({
       userId: listing.sellerId,
       type: 'PAYMENT',
-      title: 'Payment received (in escrow)',
-      body: `${params.buyerName} paid for "${listing.title}". Hand over the item, then they confirm receipt.`,
+      title: 'New order',
+      body: `${params.buyerName} wants "${listing.title}" (RWF ${rwf(listing.price)}). They'll send the money to your number, then you confirm you received it.`,
       href: `/orders/${order.id}`,
       payload: { orderId: order.id },
     }),
     notify({
       userId: params.buyerId,
       type: 'PAYMENT',
-      title: 'Payment sent',
-      body: `Your payment for "${listing.title}" is held in escrow until you confirm receipt.`,
+      title: 'Order placed',
+      body: `Send RWF ${rwf(listing.price)} to the seller's ${provider === 'airtel_money' ? 'Airtel Money' : 'MoMo'} number, then mark it as paid.`,
       href: `/orders/${order.id}`,
       payload: { orderId: order.id },
     }),
   ]);
-  await emitAdmin('transaction.completed', `Escrow order — RWF ${Math.round(listing.price / 100).toLocaleString()}`);
+  await emitAdmin('order.created', `Manual order — RWF ${rwf(listing.price)}`);
 
   return order;
-}
-
-/** Release escrowed funds to the seller's wallet (on buyer receipt confirmation). */
-export async function releaseEscrow(orderId: string) {
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    select: { sellerId: true, amount: true, transactionId: true },
-  });
-  if (!order) return;
-  await prisma.$transaction([
-    prisma.user.update({ where: { id: order.sellerId }, data: { walletBalance: { increment: order.amount } } }),
-    ...(order.transactionId
-      ? [prisma.transaction.update({ where: { id: order.transactionId }, data: { status: 'SUCCESS' } })]
-      : []),
-  ]);
 }
 
 export async function getOrdersForUser(userId: string) {
@@ -120,4 +112,9 @@ export async function getOrdersForUser(userId: string) {
   }));
 }
 
-export const ORDER_FLOW: OrderStatus[] = ['PAYMENT_SENT', 'SELLER_CONFIRMED', 'COMPLETED'];
+export const ORDER_FLOW: OrderStatus[] = [
+  'PENDING_PAYMENT',
+  'BUYER_MARKED_PAID',
+  'SELLER_CONFIRMED',
+  'COMPLETED',
+];

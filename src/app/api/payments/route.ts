@@ -22,7 +22,7 @@ export const POST = route(async (req: NextRequest) => {
 
   const { transaction, result } = await startPayment({
     userId: user.id,
-    phone: user.phone,
+    phone: user.phone ?? '', // DORMANT platform-fee path (mock provider); real number wired later
     type: input.type,
     amount,
     metadata: input.metadata,
