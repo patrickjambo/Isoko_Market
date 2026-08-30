@@ -56,13 +56,15 @@ CREATE TYPE "AdminRole" AS ENUM ('SUPER_ADMIN', 'MODERATOR', 'SUPPORT', 'FINANCE
 CREATE TYPE "AccountStatus" AS ENUM ('ACTIVE', 'SUSPENDED', 'BANNED');
 
 -- CreateEnum
-CREATE TYPE "OrderStatus" AS ENUM ('PAYMENT_SENT', 'SELLER_CONFIRMED', 'COMPLETED', 'DISPUTED', 'CANCELLED');
+CREATE TYPE "OrderStatus" AS ENUM ('PENDING_PAYMENT', 'BUYER_MARKED_PAID', 'SELLER_CONFIRMED', 'COMPLETED', 'DISPUTED', 'CANCELLED', 'PAYMENT_SENT');
 
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
     "email" TEXT,
+    "phone" TEXT,
+    "paymentNumber" TEXT,
+    "paymentProvider" TEXT,
     "passwordHash" TEXT,
     "fullName" TEXT NOT NULL,
     "bio" TEXT,
@@ -91,7 +93,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "OtpCode" (
     "id" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
     "codeHash" TEXT NOT NULL,
     "purpose" TEXT NOT NULL DEFAULT 'login',
     "attempts" INTEGER NOT NULL DEFAULT 0,
@@ -193,12 +195,17 @@ CREATE TABLE "Order" (
     "buyerId" TEXT NOT NULL,
     "sellerId" TEXT NOT NULL,
     "amount" INTEGER NOT NULL,
-    "status" "OrderStatus" NOT NULL DEFAULT 'PAYMENT_SENT',
-    "escrow" BOOLEAN NOT NULL DEFAULT true,
+    "status" "OrderStatus" NOT NULL DEFAULT 'PENDING_PAYMENT',
+    "paymentMethod" TEXT NOT NULL DEFAULT 'manual_momo',
+    "sellerPayoutNumber" TEXT,
+    "buyerMarkedPaidAt" TIMESTAMP(3),
+    "buyerPaymentProofUrl" TEXT,
+    "sellerConfirmedAt" TIMESTAMP(3),
     "deliveryMethod" TEXT,
-    "transactionId" TEXT,
     "disputeReportId" TEXT,
     "reviewed" BOOLEAN NOT NULL DEFAULT false,
+    "escrow" BOOLEAN NOT NULL DEFAULT false,
+    "transactionId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -479,10 +486,10 @@ CREATE TABLE "LocaleString" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_referralCode_key" ON "User"("referralCode");
@@ -503,7 +510,7 @@ CREATE INDEX "User_referredById_idx" ON "User"("referredById");
 CREATE INDEX "User_accountStatus_idx" ON "User"("accountStatus");
 
 -- CreateIndex
-CREATE INDEX "OtpCode_phone_purpose_idx" ON "OtpCode"("phone", "purpose");
+CREATE INDEX "OtpCode_email_purpose_idx" ON "OtpCode"("email", "purpose");
 
 -- CreateIndex
 CREATE INDEX "OtpCode_expiresAt_idx" ON "OtpCode"("expiresAt");
