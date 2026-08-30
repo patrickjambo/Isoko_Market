@@ -54,6 +54,24 @@ async function persistBytes(bytes: Buffer, type: string, isPrivate: boolean): Pr
     return { url: `/uploads/${key}`, key };
   }
 
+  if (env.STORAGE_DRIVER === 'vercel_blob') {
+    // Vercel Blob: the token is auto-injected on Vercel; pass it explicitly so a
+    // local run can also target a real store. The returned `url` is a stable,
+    // CDN-served, unguessable URL — we store it as both url and key.
+    // NOTE: Blob has no private buckets / signed URLs; a "private" object gets
+    // the same unguessable public URL. Fine for an MVP, but ID documents are
+    // only "unlisted", not access-controlled — revisit with R2 + signed URLs
+    // before handling sensitive volume.
+    const { put } = await import('@vercel/blob');
+    const blob = await put(key, bytes, {
+      access: 'public',
+      contentType: type,
+      addRandomSuffix: false,
+      ...(env.BLOB_READ_WRITE_TOKEN ? { token: env.BLOB_READ_WRITE_TOKEN } : {}),
+    });
+    return { url: blob.url, key: blob.url };
+  }
+
   // TODO(prod): PutObject to S3/R2 here and return the object key. Public files
   // get a CDN URL; private files are returned as keys and resolved with
   // getSignedUrl() below.
@@ -180,6 +198,8 @@ export async function saveFileFromUrl(rawUrl: string, opts: { private?: boolean 
  * short-lived signed URL; in local dev the file is already under /public.
  */
 export function getSignedUrl(key: string): string {
+  // Vercel Blob stores the full CDN URL as the key — already viewable.
+  if (env.STORAGE_DRIVER === 'vercel_blob') return key;
   if (env.STORAGE_DRIVER === 'local') return `/uploads/${key}`;
   // TODO(prod): return S3/R2 presigned GET URL with a short TTL.
   return `/uploads/${key}`;

@@ -29,7 +29,13 @@ const schema = z.object({
 
   PAYMENTS_PROVIDER: z.enum(['mock', 'mtn_momo', 'airtel_money']).default('mock'),
 
-  STORAGE_DRIVER: z.enum(['local', 'r2', 's3']).default('local'),
+  // `local` writes to /public/uploads (dev only — a serverless host has no
+  // persistent disk). `vercel_blob` stores objects in Vercel Blob (prod). r2/s3
+  // are reserved for a future S3-compatible driver.
+  STORAGE_DRIVER: z.enum(['local', 'vercel_blob', 'r2', 's3']).default('local'),
+  // Auto-injected by Vercel when Blob is enabled; set locally to exercise the
+  // blob driver against a real store. Empty otherwise.
+  BLOB_READ_WRITE_TOKEN: z.string().optional().default(''),
 
   REALTIME_DRIVER: z.enum(['sse', 'pusher', 'ably']).default('sse'),
 });

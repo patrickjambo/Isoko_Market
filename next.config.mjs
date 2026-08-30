@@ -8,10 +8,11 @@ const nextConfig = {
   poweredByHeader: false,
   images: {
     // Listing photos, avatars, ID docs are served from local /uploads in dev.
-    // In production these come from S3-compatible storage (R2/S3) — add the
-    // bucket host to remotePatterns below.
+    // In production they come from the configured object store (STORAGE_DRIVER):
+    // Vercel Blob (*.public.blob.vercel-storage.com) or S3/R2.
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
+      { protocol: 'https', hostname: '**.public.blob.vercel-storage.com' },
       { protocol: 'https', hostname: '**.r2.cloudflarestorage.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
       // Deterministic placeholder photos used by the dev seed script.
