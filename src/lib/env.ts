@@ -16,9 +16,12 @@ const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 
   // Email is the auth/OTP + notification channel (replaces SMS). `console` prints
-  // to the server log for local dev; `resend` sends real email once a key is set.
-  EMAIL_PROVIDER: z.enum(['console', 'resend']).default('console'),
+  // to the server log for local dev; `resend`/`brevo` send real email once the
+  // matching key is set. Brevo delivers to any recipient after a single verified
+  // sender (no domain needed) — see src/lib/email.ts.
+  EMAIL_PROVIDER: z.enum(['console', 'resend', 'brevo']).default('console'),
   RESEND_API_KEY: z.string().optional().default(''),
+  BREVO_API_KEY: z.string().optional().default(''),
   EMAIL_FROM: z.string().default('Isoko Market <onboarding@resend.dev>'),
 
   // SMS is now DORMANT (phone is no longer the auth channel). Retained so the
