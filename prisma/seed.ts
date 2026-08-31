@@ -6,22 +6,12 @@
  * phone-OTP flow; in dev the OTP is printed to the server console.
  */
 import { PrismaClient, type Prisma } from '@prisma/client';
+import { CATEGORIES } from './reference-data';
 
 const prisma = new PrismaClient();
 const rwf = (francs: number) => francs * 100;
 // Demo listing photos are committed under public/seed/ — category-matched and
 // self-contained, so the demo never depends on a third-party image host.
-
-const CATEGORIES = [
-  { slug: 'phones', nameEn: 'Phones & Tablets', nameRw: 'Telefoni & Tablet', nameFr: 'Téléphones & tablettes', icon: 'Smartphone' },
-  { slug: 'electronics', nameEn: 'Electronics', nameRw: 'Ibikoresho by’amashanyarazi', nameFr: 'Électronique', icon: 'Cpu' },
-  { slug: 'fashion', nameEn: 'Fashion', nameRw: 'Imyambaro', nameFr: 'Mode', icon: 'Shirt' },
-  { slug: 'home', nameEn: 'Home & Furniture', nameRw: 'Iby’urugo & Ibikoresho', nameFr: 'Maison & meubles', icon: 'Sofa' },
-  { slug: 'vehicles', nameEn: 'Vehicles', nameRw: 'Ibinyabiziga', nameFr: 'Véhicules', icon: 'Car' },
-  { slug: 'agriculture', nameEn: 'Agriculture', nameRw: 'Ubuhinzi', nameFr: 'Agriculture', icon: 'Sprout' },
-  { slug: 'services', nameEn: 'Services', nameRw: 'Serivisi', nameFr: 'Services', icon: 'Wrench' },
-  { slug: 'food', nameEn: 'Food', nameRw: 'Ibiribwa', nameFr: 'Alimentation', icon: 'Apple' },
-];
 
 async function main() {
   console.log('🌱  Seeding Isoko Market…');
