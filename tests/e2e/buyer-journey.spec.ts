@@ -11,6 +11,9 @@ import { apiLogin, apiSetPayment, apiCreateListing, otpRegisterUI, uniqueEmail }
  * in-app, and the item only completes once the buyer acknowledges receipt.
  */
 test('buyer pays the seller directly, both confirm, and the buyer reviews', async ({ page, request }) => {
+  // The longest journey: two UI logins + the full order state machine + a review.
+  // Give it headroom over the default cap (cold route compiles + the 4s toast).
+  test.slow();
   // Seller (API context) with a payout number set + an active listing. The
   // payout number gates Buy Now — without it the listing can't be ordered.
   await apiLogin(request, uniqueEmail('seller'), { fullName: 'E2E Seller', role: 'SELLER' });
@@ -59,7 +62,14 @@ test('buyer pays the seller directly, both confirm, and the buyer reviews', asyn
   // Review the seller (5 stars) — write once, seller rating updates platform-wide.
   const stars = page.getByRole('button', { name: '5' });
   await expect(stars).toBeVisible();
-  await stars.click();
-  await page.getByRole('button', { name: /submit review/i }).click();
+  const submitReview = page.getByRole('button', { name: /submit review/i });
+  // The review card renders via router.refresh() after "confirm receipt", so the
+  // star click can land before it hydrates (or while the success toast overlaps
+  // it) — leaving Submit disabled. Retry the rating until the form is interactive.
+  await expect(async () => {
+    await stars.click();
+    await expect(submitReview).toBeEnabled({ timeout: 1000 });
+  }).toPass();
+  await submitReview.click();
   await expect(page.getByText(/thanks for your feedback/i)).toBeVisible();
 });

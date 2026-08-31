@@ -31,7 +31,10 @@ export default defineConfig({
   // up, Playwright starts one — but in CI/sandboxes where child processes are
   // reaped, start it yourself first: `E2E_TESTING=1 npm run dev`.
   webServer: {
-    command: 'E2E_TESTING=1 npm run dev',
+    // EMAIL_PROVIDER=console keeps the OTP flow off any real email provider, so
+    // tests never depend on (or get throttled by) Resend/Brevo — the code is
+    // returned to the client under E2E_TESTING instead.
+    command: 'E2E_TESTING=1 EMAIL_PROVIDER=console npm run dev',
     url: 'http://localhost:3000/en',
     reuseExistingServer: true,
     timeout: 180_000,
