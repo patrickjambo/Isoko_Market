@@ -3,11 +3,22 @@ import { route, jsonOk, jsonError, ApiError } from '@/lib/api';
 import { requestOtpSchema } from '@/lib/validators/auth';
 import { rateLimit } from '@/lib/rate-limit';
 import { issueOtp } from '@/lib/otp-service';
+import { prisma } from '@/lib/prisma';
 import { env } from '@/lib/env';
 
 export const POST = route(async (req: NextRequest) => {
   const body = await req.json().catch(() => ({}));
-  const { email } = requestOtpSchema.parse(body);
+  const { email, mode } = requestOtpSchema.parse(body);
+
+  // Login authenticates EXISTING accounts only — don't create one (or waste a
+  // code) for an unknown email; the client redirects these to Get Started so a
+  // new user registers with a goal + name.
+  if (mode === 'login') {
+    const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+    if (!existing) {
+      throw new ApiError('NOT_FOUND', 'No account found for this email. Please register first.');
+    }
+  }
 
   // Rate-limit OTP requests per email and per IP (Section 10).
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';

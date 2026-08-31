@@ -16,8 +16,13 @@ export const emailSchema = z
   .email('Enter a valid email address.')
   .max(160);
 
+// `login` only authenticates an EXISTING account; `register` is the only path
+// that creates one (with a goal + name). Defaults to register for back-compat.
+const authModeSchema = z.enum(['login', 'register']).optional().default('register');
+
 export const requestOtpSchema = z.object({
   email: emailSchema,
+  mode: authModeSchema,
 });
 
 export const verifyOtpSchema = z.object({
@@ -26,6 +31,7 @@ export const verifyOtpSchema = z.object({
     .string()
     .trim()
     .regex(/^\d{6}$/, 'Enter the 6-digit code.'),
+  mode: authModeSchema,
   // Provided only on first-time registration.
   fullName: z.string().trim().min(2).max(80).optional(),
   role: z.enum(['BUYER', 'SELLER', 'EMPLOYER']).optional(),

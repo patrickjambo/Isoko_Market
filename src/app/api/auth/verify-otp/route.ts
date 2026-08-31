@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { route, jsonOk } from '@/lib/api';
+import { route, jsonOk, ApiError } from '@/lib/api';
 import { verifyOtpSchema } from '@/lib/validators/auth';
 import { consumeOtp } from '@/lib/otp-service';
 import { prisma } from '@/lib/prisma';
@@ -19,6 +19,12 @@ export const POST = route(async (req: NextRequest) => {
   await consumeOtp(email, input.code, 'login');
 
   const existing = await prisma.user.findUnique({ where: { email } });
+
+  // Login never creates an account (register is the only signup path). Defensive:
+  // request-otp already blocks unknown emails on login, but guard here too.
+  if (input.mode === 'login' && !existing) {
+    throw new ApiError('NOT_FOUND', 'No account found for this email. Please register first.');
+  }
 
   // Intent (from the "Get Started" fork) decides the role written — but the
   // explicit role select, if any, wins (Visitor spec §8).

@@ -111,6 +111,7 @@
     "devCodeHint": "Uburyo bwo kwiga: kode yawe yandikwa kuri console ya seriveri.",
     "haveAccount": "Usanzwe ufite konti?",
     "noAccount": "Uri mushya kuri Isoko?",
+    "loginNoAccount": "Nta konti ifite iyo imeri — reka tugufashe kwiyandikisha.",
     "termsNote": "Mu gukomeza wemeye Amabwiriza n'Itegeko ry'Ibanga.",
     "loggedOut": "Wasohotse neza.",
     "invitedNote": "Watumiwe n'inshuti 🎉"

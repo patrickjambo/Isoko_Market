@@ -111,6 +111,7 @@
     "devCodeHint": "Development mode: your code is printed in the server console.",
     "haveAccount": "Already have an account?",
     "noAccount": "New to Isoko?",
+    "loginNoAccount": "No account with that email yet — let's set you up.",
     "termsNote": "By continuing you agree to our Terms and Privacy Policy.",
     "loggedOut": "You have been logged out.",
     "invitedNote": "You were invited by a friend 🎉"

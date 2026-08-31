@@ -63,10 +63,19 @@ export function AuthForm({
       const res = await fetch('/api/auth/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, mode }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message ?? 'error');
+      if (!res.ok) {
+        // Logging in with an email that has no account → send them to onboarding
+        // to register with a goal + name (login never creates accounts).
+        if (mode === 'login' && data.error?.code === 'NOT_FOUND') {
+          toast(t('loginNoAccount'), 'error');
+          router.push('/get-started');
+          return;
+        }
+        throw new Error(data.error?.message ?? 'error');
+      }
       setDevHint(Boolean(data.devHint));
       setStep('otp');
       setResendIn(30);
@@ -88,6 +97,7 @@ export function AuthForm({
         body: JSON.stringify({
           email,
           code,
+          mode,
           ...(mode === 'register'
             ? {
                 fullName,
