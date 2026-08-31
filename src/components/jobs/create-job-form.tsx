@@ -35,6 +35,7 @@ export function CreateJobForm({ partners = [] }: { partners?: { id: string; name
   const [payMin, setPayMin] = useState('');
   const [payMax, setPayMax] = useState('');
   const [payPeriod, setPayPeriod] = useState('month');
+  const [contactInfo, setContactInfo] = useState('');
   const [description, setDescription] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
   const [partnerId, setPartnerId] = useState('');
@@ -109,6 +110,7 @@ export function CreateJobForm({ partners = [] }: { partners?: { id: string; name
           payMax: payMax ? Number(payMax) : null,
           payPeriod,
           location,
+          contactInfo,
           skills,
           partnerId: partnerId || null,
         }),
@@ -235,6 +237,15 @@ export function CreateJobForm({ partners = [] }: { partners?: { id: string; name
         <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Kigali" required />
       </Field>
 
+      <Field label={t('form.contactLabel')} hint={t('form.contactHint')} error={errors.contactInfo}>
+        <Input
+          value={contactInfo}
+          onChange={(e) => setContactInfo(e.target.value)}
+          placeholder={t('form.contactPlaceholder')}
+          maxLength={200}
+        />
+      </Field>
+
       {/* Description with one-tap draft (§3 Step 5) */}
       <Field label={t('form.descriptionLabel')} error={errors.description}>
         <div className="mb-1.5 flex justify-end">
@@ -285,17 +296,23 @@ function cap(s: string): string {
 function Field({
   label,
   error,
+  hint,
   children,
 }: {
   label: string;
   error?: string;
+  hint?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
       {children}
-      {error && <p className="text-xs text-destructive">{error}</p>}
+      {error ? (
+        <p className="text-xs text-destructive">{error}</p>
+      ) : hint ? (
+        <p className="text-xs text-muted-foreground">{hint}</p>
+      ) : null}
     </div>
   );
 }

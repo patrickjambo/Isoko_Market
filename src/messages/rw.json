@@ -179,7 +179,8 @@
     "priceContext_above": "Igiciro kiri hejuru y'ibisa nabyo hafi",
     "mapView": "Ikarita",
     "mapNote": "Uduziga twerekana ibicuruzwa bingahe biri muri buri karere. Kanda kuri kamwe kugira ngo ushungure.",
-    "clearLocation": "Kuraho akarere"
+    "clearLocation": "Kuraho akarere",
+    "contactLabel": "Aho bakugeraho"
   },
   "jobs": {
     "title": "Akazi & Imirimo",
@@ -229,7 +230,10 @@
       "jobHint": "Buhoraho cyangwa busanzwe",
       "suggestedSkills": "Byatanzwe:",
       "payHint": "Imirimo isa iri hafi itanga {min}–{max} RWF",
-      "suggestDescription": "Nyibwira ibisobanuro"
+      "suggestDescription": "Nyibwira ibisobanuro",
+      "contactLabel": "Aho bakugeraho (si itegeko)",
+      "contactPlaceholder": "Telefoni, imeri, WhatsApp…",
+      "contactHint": "Uko abashaka akazi bakugeraho (si itegeko)."
     },
     "status": {
       "APPLIED": "Wasabye",
@@ -767,7 +771,7 @@
     "stepOf": "Intambwe {step} kuri {total}",
     "autosaved": "Byabitswe",
     "step1Title": "Ongeraho amafoto",
-    "step1Hint": "Amafoto asobanutse mu rumuri rwiza agurisha vuba.",
+    "step1Hint": "Shyiraho amafoto 1 kugeza 6 — n’ifoto imwe isobanutse irahagije. Iya mbere ni yo gifuniko.",
     "photoNudge": "Ongeraho nibura ifoto imwe kugira ngo ukomeze.",
     "step2Title": "Urimo kugurisha iki?",
     "step2Hint": "Tangira wandike — tuzagusabira ibisigaye.",
@@ -796,7 +800,10 @@
     "back": "Subira",
     "next": "Komeza",
     "publish": "Tangaza",
-    "published": "Igicuruzwa cyatangajwe!"
+    "published": "Igicuruzwa cyatangajwe!",
+    "contactLabel": "Aho bakugeraho (si itegeko)",
+    "contactPlaceholder": "Telefoni, imeri, WhatsApp, Instagram…",
+    "contactHint": "Uko abaguzi bakugeraho hanze ya porogaramu (si itegeko)."
   },
   "orders": {
     "title": "Amateka y'ubugure",

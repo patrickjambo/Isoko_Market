@@ -36,6 +36,7 @@ type Data = {
   description: string;
   tags: string[];
   showPhone: boolean;
+  contactInfo: string;
 };
 
 const EMPTY: Data = {
@@ -48,6 +49,7 @@ const EMPTY: Data = {
   description: '',
   tags: [],
   showPhone: false,
+  contactInfo: '',
 };
 
 const TOTAL = 6;
@@ -113,6 +115,7 @@ export function AddProductWizard({ categories }: { categories: Category[] }) {
           images: data.images,
           tags: data.tags,
           showPhone: data.showPhone,
+          contactInfo: data.contactInfo,
         }),
       });
       const j = await res.json();
@@ -279,6 +282,17 @@ export function AddProductWizard({ categories }: { categories: Category[] }) {
           <p className="text-xs text-muted-foreground">
             {data.showPhone ? t('showPhoneOn') : t('showPhoneOff')}
           </p>
+
+          <div className="space-y-1.5">
+            <Label>{t('contactLabel')}</Label>
+            <Input
+              value={data.contactInfo}
+              onChange={(e) => set('contactInfo', e.target.value)}
+              placeholder={t('contactPlaceholder')}
+              maxLength={200}
+            />
+            <p className="text-xs text-muted-foreground">{t('contactHint')}</p>
+          </div>
         </Step>
       )}
 

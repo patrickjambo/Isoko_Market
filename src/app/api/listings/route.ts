@@ -29,6 +29,7 @@ export const POST = route(async (req: NextRequest) => {
       categoryId: input.categoryId ?? null,
       condition: input.condition,
       location: input.location,
+      contactInfo: input.contactInfo?.trim() || null,
       images: {
         create: input.images.map((url, position) => ({ url, position })),
       },

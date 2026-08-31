@@ -179,7 +179,8 @@
     "priceContext_above": "Priced above similar items nearby",
     "mapView": "Map",
     "mapNote": "Bubbles show how many items are listed in each district. Tap one to filter.",
-    "clearLocation": "Clear location"
+    "clearLocation": "Clear location",
+    "contactLabel": "Contact"
   },
   "jobs": {
     "title": "Jobs & Gigs",
@@ -229,7 +230,10 @@
       "jobHint": "Ongoing or formal",
       "suggestedSkills": "Suggested:",
       "payHint": "Similar postings nearby pay {min}–{max} RWF",
-      "suggestDescription": "Suggest description"
+      "suggestDescription": "Suggest description",
+      "contactLabel": "Contact (optional)",
+      "contactPlaceholder": "Phone, email, WhatsApp…",
+      "contactHint": "How applicants can reach you directly (optional)."
     },
     "status": {
       "APPLIED": "Applied",
@@ -767,7 +771,7 @@
     "stepOf": "Step {step} of {total}",
     "autosaved": "Saved",
     "step1Title": "Add photos",
-    "step1Hint": "Clear photos in good light sell faster.",
+    "step1Hint": "Add 1 to 6 photos — even one clear photo works. The first is the cover.",
     "photoNudge": "Add at least one photo to continue.",
     "step2Title": "What are you selling?",
     "step2Hint": "Start typing — we'll suggest the rest.",
@@ -796,7 +800,10 @@
     "back": "Back",
     "next": "Next",
     "publish": "Publish",
-    "published": "Listing published!"
+    "published": "Listing published!",
+    "contactLabel": "Contact (optional)",
+    "contactPlaceholder": "Phone, email, WhatsApp, Instagram…",
+    "contactHint": "How buyers can reach you outside the app (optional)."
   },
   "orders": {
     "title": "Orders",

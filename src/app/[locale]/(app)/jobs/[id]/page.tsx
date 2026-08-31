@@ -150,6 +150,14 @@ export default async function JobDetailPage({
           <div className="whitespace-pre-wrap rounded-xl border border-border bg-card p-4 text-sm leading-relaxed">
             {job.description}
           </div>
+
+          {/* Extra contact the employer added (phone / email / WhatsApp / IG…) */}
+          {job.contactInfo && (
+            <div className="mt-3 rounded-xl border border-border bg-card p-4 text-sm">
+              <span className="text-muted-foreground">{t('form.contactLabel')}: </span>
+              <span className="font-medium">{job.contactInfo}</span>
+            </div>
+          )}
         </div>
 
         <div className="md:col-span-1">

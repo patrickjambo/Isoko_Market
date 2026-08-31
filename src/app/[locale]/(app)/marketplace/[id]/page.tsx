@@ -184,6 +184,14 @@ export default async function ListingDetailPage({
             </a>
           )}
 
+          {/* Extra contact the seller added for this post (phone / email / WhatsApp / IG…) */}
+          {listing.contactInfo && (
+            <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm">
+              <span className="text-muted-foreground">{t('contactLabel')}: </span>
+              <span className="font-medium">{listing.contactInfo}</span>
+            </div>
+          )}
+
           <div className="whitespace-pre-wrap rounded-xl border border-border bg-card p-4 text-sm leading-relaxed">
             {listing.description}
           </div>

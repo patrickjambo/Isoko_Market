@@ -179,7 +179,8 @@
     "priceContext_above": "Prix supérieur aux articles similaires à proximité",
     "mapView": "Carte",
     "mapNote": "Les bulles indiquent le nombre d'articles par district. Touchez-en une pour filtrer.",
-    "clearLocation": "Effacer le lieu"
+    "clearLocation": "Effacer le lieu",
+    "contactLabel": "Contact"
   },
   "jobs": {
     "title": "Emplois & missions",
@@ -229,7 +230,10 @@
       "jobHint": "Continu ou formel",
       "suggestedSkills": "Suggéré :",
       "payHint": "Des offres similaires paient {min}–{max} RWF",
-      "suggestDescription": "Suggérer une description"
+      "suggestDescription": "Suggérer une description",
+      "contactLabel": "Contact (facultatif)",
+      "contactPlaceholder": "Téléphone, e-mail, WhatsApp…",
+      "contactHint": "Comment les candidats peuvent vous joindre directement (facultatif)."
     },
     "status": {
       "APPLIED": "Envoyée",
@@ -767,7 +771,7 @@
     "stepOf": "Étape {step} sur {total}",
     "autosaved": "Enregistré",
     "step1Title": "Ajoutez des photos",
-    "step1Hint": "Des photos nettes et bien éclairées vendent plus vite.",
+    "step1Hint": "Ajoutez 1 à 6 photos — même une seule photo nette suffit. La première est la couverture.",
     "photoNudge": "Ajoutez au moins une photo pour continuer.",
     "step2Title": "Que vendez-vous ?",
     "step2Hint": "Commencez à taper — nous suggérons le reste.",
@@ -796,7 +800,10 @@
     "back": "Retour",
     "next": "Suivant",
     "publish": "Publier",
-    "published": "Annonce publiée !"
+    "published": "Annonce publiée !",
+    "contactLabel": "Contact (facultatif)",
+    "contactPlaceholder": "Téléphone, e-mail, WhatsApp, Instagram…",
+    "contactHint": "Comment les acheteurs peuvent vous joindre hors de l’appli (facultatif)."
   },
   "orders": {
     "title": "Commandes",
