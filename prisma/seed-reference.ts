@@ -128,6 +128,21 @@ const SECONDARY_SCHOOLS: { name: string; district?: string }[] = [
 ];
 
 export async function seedReference(prisma: PrismaClient) {
+  // Production BOOTSTRAP mode (SEED_IF_EMPTY=1, used by vercel-build): only seed
+  // when the tables are empty, so a redeploy never wipes divisions/institutions
+  // that live CVs already reference. Dev (`npm run db:seed:reference`) runs the
+  // full destructive re-seed below so data edits always take effect.
+  if (process.env.SEED_IF_EMPTY === '1') {
+    const [divs, insts] = await Promise.all([
+      prisma.adminDivision.count(),
+      prisma.institution.count(),
+    ]);
+    if (divs > 0 && insts > 0) {
+      console.log(`↩︎  Reference data already present (${divs} divisions, ${insts} institutions) — skipping.`);
+      return { skipped: true };
+    }
+  }
+
   // Idempotent: clear reference tables first (respect FK order).
   await prisma.faculty.deleteMany();
   await prisma.combination.deleteMany();
