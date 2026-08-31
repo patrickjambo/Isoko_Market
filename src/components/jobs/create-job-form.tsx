@@ -11,7 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
 import { SkillPicker } from '@/components/jobs/skill-picker';
+import { ContactFields } from '@/components/shared/contact-fields';
 import { suggestSkillsFromText, draftJobDescription, labelForSkill } from '@/lib/skills';
+import type { ContactChannels } from '@/lib/contact';
 
 /**
  * Post-a-Job form (§3). A single mobile-first screen with the same assists as
@@ -35,7 +37,7 @@ export function CreateJobForm({ partners = [] }: { partners?: { id: string; name
   const [payMin, setPayMin] = useState('');
   const [payMax, setPayMax] = useState('');
   const [payPeriod, setPayPeriod] = useState('month');
-  const [contactInfo, setContactInfo] = useState('');
+  const [contact, setContact] = useState<ContactChannels>({});
   const [description, setDescription] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
   const [partnerId, setPartnerId] = useState('');
@@ -110,7 +112,7 @@ export function CreateJobForm({ partners = [] }: { partners?: { id: string; name
           payMax: payMax ? Number(payMax) : null,
           payPeriod,
           location,
-          contactInfo,
+          contactInfo: contact,
           skills,
           partnerId: partnerId || null,
         }),
@@ -237,14 +239,7 @@ export function CreateJobForm({ partners = [] }: { partners?: { id: string; name
         <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Kigali" required />
       </Field>
 
-      <Field label={t('form.contactLabel')} hint={t('form.contactHint')} error={errors.contactInfo}>
-        <Input
-          value={contactInfo}
-          onChange={(e) => setContactInfo(e.target.value)}
-          placeholder={t('form.contactPlaceholder')}
-          maxLength={200}
-        />
-      </Field>
+      <ContactFields value={contact} onChange={setContact} />
 
       {/* Description with one-tap draft (§3 Step 5) */}
       <Field label={t('form.descriptionLabel')} error={errors.description}>

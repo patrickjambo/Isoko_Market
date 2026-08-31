@@ -289,7 +289,7 @@ model Listing {
   viewCount   Int              @default(0)
   tags        String[]         @default([])
   showPhone   Boolean          @default(false) // seller's contact preference (Section 8)
-  contactInfo String? // optional extra contact for this post: phone / email / WhatsApp / Instagram, etc.
+  contactInfo Json? // structured, clickable contact: { phone?, whatsapp?, email?, instagram? }
   staleNudgedAt DateTime? // when the "still available?" nudge was sent (Section 5)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
@@ -406,7 +406,7 @@ model Job {
   payMax      Int?
   payPeriod   String?   @default("month") // hour | day | month | fixed
   location    String
-  contactInfo String? // optional extra contact for applicants: phone / email / WhatsApp / Instagram, etc.
+  contactInfo Json? // structured, clickable contact: { phone?, whatsapp?, email?, instagram? }
   skills      String[]  @default([]) // required skills — canonical keys from the shared taxonomy (src/lib/skills.ts)
   viewCount   Int       @default(0) // powers the employer performance rule engine (§2)
   status      JobStatus @default(OPEN)

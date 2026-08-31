@@ -994,5 +994,14 @@
     "a4": "ID is optional and only used to award a Verified badge that builds trust. It's stored privately, never shown publicly or sold. Verification unlocks more reach — it's never required to start.",
     "q5": "How do I report a scam?",
     "a5": "Every listing, job and profile has a Report button. Reports go straight to our moderation team, who can suspend accounts and remove content."
+  },
+  "contact": {
+    "sectionLabel": "Contact (optional)",
+    "sectionHint": "Add how people can reach you — fill only what you use.",
+    "phonePlaceholder": "Phone number (e.g. 0788 123 456)",
+    "whatsappPlaceholder": "WhatsApp number",
+    "emailPlaceholder": "Email address",
+    "instagramPlaceholder": "Instagram (e.g. @yourshop)",
+    "title": "Contact"
   }
 }

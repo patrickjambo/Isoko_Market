@@ -3,6 +3,7 @@ import { route, jsonOk } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { createListingSchema } from '@/lib/validators/listing';
+import { cleanContact } from '@/lib/contact';
 import { francsToMinor } from '@/lib/utils';
 import { findDuplicate } from '@/lib/suggestions';
 import { emitAdmin } from '@/lib/admin-realtime';
@@ -31,7 +32,7 @@ export const POST = route(async (req: NextRequest) => {
       categoryId: input.categoryId ?? null,
       condition: input.condition,
       location: input.location,
-      contactInfo: input.contactInfo?.trim() || null,
+      ...(cleanContact(input.contactInfo) ? { contactInfo: cleanContact(input.contactInfo)! } : {}),
       tags: input.tags,
       showPhone: input.showPhone,
       images: { create: input.images.map((url, position) => ({ url, position })) },

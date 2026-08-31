@@ -994,5 +994,14 @@
     "a4": "La pièce d'identité est facultative et sert uniquement à attribuer un badge Vérifié qui renforce la confiance. Elle est stockée en privé, jamais affichée ni vendue. La vérification élargit votre portée — elle n'est jamais requise au départ.",
     "q5": "Comment signaler une arnaque ?",
     "a5": "Chaque annonce, offre et profil dispose d'un bouton Signaler. Les signalements vont directement à notre équipe de modération, qui peut suspendre des comptes et retirer du contenu."
+  },
+  "contact": {
+    "sectionLabel": "Contact (facultatif)",
+    "sectionHint": "Indiquez comment vous joindre — remplissez seulement ce que vous utilisez.",
+    "phonePlaceholder": "Numéro de téléphone (ex. 0788 123 456)",
+    "whatsappPlaceholder": "Numéro WhatsApp",
+    "emailPlaceholder": "Adresse e-mail",
+    "instagramPlaceholder": "Instagram (ex. @votreboutique)",
+    "title": "Contact"
   }
 }

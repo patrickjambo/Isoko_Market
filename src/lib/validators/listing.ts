@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { contactSchema } from '../contact';
 
 export const listingConditions = [
   'NEW',
@@ -19,9 +20,8 @@ export const createListingSchema = z.object({
   images: z.array(z.string().url()).max(6).default([]),
   tags: z.array(z.string().trim().min(1).max(40)).max(10).default([]),
   showPhone: z.boolean().default(false),
-  // Optional extra contact so buyers can reach the seller: phone / email /
-  // WhatsApp / Instagram, etc. Free-form on purpose.
-  contactInfo: z.string().trim().max(200).optional(),
+  // Structured, clickable contact channels (phone / WhatsApp / email / Instagram).
+  contactInfo: contactSchema.optional(),
 });
 
 /** Partial draft — every field optional so autosave never blocks on a dropped step. */

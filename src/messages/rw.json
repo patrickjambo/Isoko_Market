@@ -994,5 +994,14 @@
     "a4": "Indangamuntu ni ku bushake kandi ikoreshwa gusa mu gutanga ikimenyetso cyo kwemezwa cyubaka icyizere. Ibikwa mu ibanga, ntiyerekanwa cyangwa igurishwa. Kwemezwa bikwongerera ukigeraho — ntabwo bisabwa mu ntangiriro.",
     "q5": "Ni gute mvuga ku buriganya?",
     "a5": "Buri cyatanzwe, akazi n'umwirondoro bifite buto yo gutanga raporo. Raporo zigera ku itsinda ryacu rishinzwe kugenzura, rishobora guhagarika konti no gukuraho ibintu."
+  },
+  "contact": {
+    "sectionLabel": "Aho bakugeraho (si itegeko)",
+    "sectionHint": "Andika uko abantu bakugeraho — uzuza gusa ibyo ukoresha.",
+    "phonePlaceholder": "Nimero ya telefoni (urugero 0788 123 456)",
+    "whatsappPlaceholder": "Nimero ya WhatsApp",
+    "emailPlaceholder": "Aderesi imeyili",
+    "instagramPlaceholder": "Instagram (urugero @isokoyawe)",
+    "title": "Aho bakugeraho"
   }
 }

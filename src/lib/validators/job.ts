@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { contactSchema } from '../contact';
 
 // Canonical skill tokens from the shared taxonomy (src/lib/skills.ts).
 const skillList = z.array(z.string().trim().min(1).max(48)).max(20).default([]);
@@ -12,9 +13,8 @@ export const createJobSchema = z
     payMax: z.coerce.number().int().min(0).max(1_000_000_000).optional().nullable(),
     payPeriod: z.enum(['hour', 'day', 'month', 'fixed']).default('month'),
     location: z.string().trim().min(2, 'Add a location.').max(80),
-    // Optional extra contact so applicants can reach the employer directly:
-    // phone / email / WhatsApp / Instagram, etc. Free-form on purpose.
-    contactInfo: z.string().trim().max(200).optional(),
+    // Structured, clickable contact channels (phone / WhatsApp / email / Instagram).
+    contactInfo: contactSchema.optional(),
     // Required skills — drives match-quality scoring against seeker CVs (§5/§10).
     skills: skillList,
     // Optional: post under a partner's white-label board (Phase 5).

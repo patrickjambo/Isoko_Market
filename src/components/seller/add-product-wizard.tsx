@@ -20,6 +20,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { ImageUploader } from '@/components/shared/image-uploader';
+import { ContactFields } from '@/components/shared/contact-fields';
+import type { ContactChannels } from '@/lib/contact';
 import { useToast } from '@/components/ui/toast';
 import { listingConditions } from '@/lib/validators/listing';
 import { RWANDA_DISTRICTS } from '@/lib/rwanda';
@@ -36,7 +38,7 @@ type Data = {
   description: string;
   tags: string[];
   showPhone: boolean;
-  contactInfo: string;
+  contact: ContactChannels;
 };
 
 const EMPTY: Data = {
@@ -49,7 +51,7 @@ const EMPTY: Data = {
   description: '',
   tags: [],
   showPhone: false,
-  contactInfo: '',
+  contact: {},
 };
 
 const TOTAL = 6;
@@ -115,7 +117,7 @@ export function AddProductWizard({ categories }: { categories: Category[] }) {
           images: data.images,
           tags: data.tags,
           showPhone: data.showPhone,
-          contactInfo: data.contactInfo,
+          contactInfo: data.contact,
         }),
       });
       const j = await res.json();
@@ -283,16 +285,7 @@ export function AddProductWizard({ categories }: { categories: Category[] }) {
             {data.showPhone ? t('showPhoneOn') : t('showPhoneOff')}
           </p>
 
-          <div className="space-y-1.5">
-            <Label>{t('contactLabel')}</Label>
-            <Input
-              value={data.contactInfo}
-              onChange={(e) => set('contactInfo', e.target.value)}
-              placeholder={t('contactPlaceholder')}
-              maxLength={200}
-            />
-            <p className="text-xs text-muted-foreground">{t('contactHint')}</p>
-          </div>
+          <ContactFields value={data.contact} onChange={(v) => set('contact', v)} />
         </Step>
       )}
 

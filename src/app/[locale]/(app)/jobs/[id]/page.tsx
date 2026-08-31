@@ -8,9 +8,11 @@ import { SellerTrustCard } from '@/components/trust/seller-trust-card';
 import { ApplyButton } from '@/components/jobs/apply-button';
 import { LiveItemStatus } from '@/components/shared/live-item-status';
 import { MessageSellerButton } from '@/components/messaging/message-seller-button';
+import { ContactLinks } from '@/components/shared/contact-links';
 import { ReportDialog } from '@/components/trust/report-dialog';
 import { formatPay } from '@/components/jobs/job-card';
 import { getJob, getCvSkills } from '@/lib/queries';
+import { asContact } from '@/lib/contact';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { timeAgo } from '@/lib/utils';
@@ -26,6 +28,7 @@ export default async function JobDetailPage({
   setRequestLocale(params.locale);
   const t = await getTranslations('jobs');
   const tt = await getTranslations('trust');
+  const tContact = await getTranslations('contact');
   const locale = await getLocale();
 
   const [job, user] = await Promise.all([getJob(params.id), getCurrentUser()]);
@@ -151,11 +154,11 @@ export default async function JobDetailPage({
             {job.description}
           </div>
 
-          {/* Extra contact the employer added (phone / email / WhatsApp / IG…) */}
-          {job.contactInfo && (
-            <div className="mt-3 rounded-xl border border-border bg-card p-4 text-sm">
-              <span className="text-muted-foreground">{t('form.contactLabel')}: </span>
-              <span className="font-medium">{job.contactInfo}</span>
+          {/* Extra contact the employer added — tap-to-call / WhatsApp / email / IG. */}
+          {asContact(job.contactInfo) && (
+            <div className="mt-3 space-y-1.5">
+              <p className="text-sm font-semibold">{tContact('title')}</p>
+              <ContactLinks contact={asContact(job.contactInfo)} />
             </div>
           )}
         </div>

@@ -7,6 +7,8 @@ import { ImageGallery } from '@/components/marketplace/image-gallery';
 import { ListingCard } from '@/components/marketplace/listing-card';
 import { SellerTrustCard } from '@/components/trust/seller-trust-card';
 import { MessageSellerButton } from '@/components/messaging/message-seller-button';
+import { ContactLinks } from '@/components/shared/contact-links';
+import { asContact } from '@/lib/contact';
 import { FavoriteButton } from '@/components/marketplace/favorite-button';
 import { BuyNowButton } from '@/components/orders/buy-now-button';
 import { ReportDialog } from '@/components/trust/report-dialog';
@@ -184,11 +186,11 @@ export default async function ListingDetailPage({
             </a>
           )}
 
-          {/* Extra contact the seller added for this post (phone / email / WhatsApp / IG…) */}
-          {listing.contactInfo && (
-            <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm">
-              <span className="text-muted-foreground">{t('contactLabel')}: </span>
-              <span className="font-medium">{listing.contactInfo}</span>
+          {/* Extra contact the seller added — tap-to-call / WhatsApp / email / IG. */}
+          {asContact(listing.contactInfo) && (
+            <div className="space-y-1.5">
+              <p className="text-sm font-semibold">{t('contactLabel')}</p>
+              <ContactLinks contact={asContact(listing.contactInfo)} />
             </div>
           )}
 

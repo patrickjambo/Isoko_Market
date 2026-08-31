@@ -3,6 +3,7 @@ import { route, jsonOk } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { createJobSchema, jobFilterSchema } from '@/lib/validators/job';
+import { cleanContact } from '@/lib/contact';
 import { francsToMinor } from '@/lib/utils';
 import { searchJobs } from '@/lib/queries';
 import { canonicalSkill } from '@/lib/skills';
@@ -44,7 +45,7 @@ export const POST = route(async (req: NextRequest) => {
       payMax: input.payMax != null ? francsToMinor(input.payMax) : null,
       payPeriod: input.payPeriod,
       location: input.location,
-      contactInfo: input.contactInfo?.trim() || null,
+      ...(cleanContact(input.contactInfo) ? { contactInfo: cleanContact(input.contactInfo)! } : {}),
       skills,
       partnerId,
     },
