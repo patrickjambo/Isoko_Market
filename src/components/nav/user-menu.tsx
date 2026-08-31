@@ -1,6 +1,6 @@
 'use client';
 
-import { User, Wallet, ShieldCheck, LayoutDashboard, LogOut, FileText, Gift, Store, Heart, Package, Briefcase } from 'lucide-react';
+import { User, Wallet, ShieldCheck, LayoutDashboard, LogOut, FileText, Gift, Store, Heart, Package, Briefcase, MessageCircle, Send } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
@@ -37,7 +37,9 @@ export function UserMenu() {
     seller: { href: '/dashboard', icon: Store, label: t('seller.dashboard') },
     seeker: { href: '/cv', icon: FileText, label: t('cv.title') },
   };
-  const workspaces = adoptedWorkspaces(user).map((w) => wsLink[w]);
+  const adopted = adoptedWorkspaces(user);
+  const workspaces = adopted.map((w) => wsLink[w]);
+  const isSeeker = adopted.includes('seeker');
 
   return (
     <DropdownMenu>
@@ -70,6 +72,24 @@ export function UserMenu() {
             </DropdownMenuItem>
           );
         })}
+
+        {/* A job seeker's applications — where shortlisted/interview/hired/rejected
+            statuses land live (the CV workspace link is separate). */}
+        {isSeeker && (
+          <DropdownMenuItem asChild>
+            <Link href="/profile/applications">
+              <Send /> {t('profile.myApplications')}
+            </Link>
+          </DropdownMenuItem>
+        )}
+
+        {/* Messages — reachable on desktop too (mobile uses the bottom-nav tab).
+            Interview invites + employer messages arrive here in real time. */}
+        <DropdownMenuItem asChild>
+          <Link href="/messages">
+            <MessageCircle /> {t('nav.messages')}
+          </Link>
+        </DropdownMenuItem>
 
         {/* Personal items */}
         <DropdownMenuItem asChild>
