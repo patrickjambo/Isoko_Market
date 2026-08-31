@@ -5,6 +5,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { routing, type AppLocale } from '@/i18n/routing';
 import { getCurrentUser, touchLastActive } from '@/lib/auth';
 import { toSessionUser } from '@/lib/serialize';
+import { env } from '@/lib/env';
 import { Providers } from '@/components/providers';
 import '../globals.css';
 
@@ -16,7 +17,9 @@ export const metadata: Metadata = {
   description:
     'A trust-first, multilingual marketplace and job board for Rwandan youth. Buy, sell, and find work with verified people. Kinyarwanda, English & French.',
   applicationName: 'Isoko Market',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
+  // Use the validated env (empty/whitespace already normalized to the default)
+  // so an unset/blank NEXT_PUBLIC_APP_URL can't crash the build via new URL('').
+  metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
 };
 
 export const viewport: Viewport = {
