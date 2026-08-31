@@ -78,7 +78,7 @@ export function AuthForm({
       }
       setDevHint(Boolean(data.devHint));
       setStep('otp');
-      setResendIn(30);
+      setResendIn(50);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'error');
     } finally {
