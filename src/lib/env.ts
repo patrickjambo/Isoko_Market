@@ -24,6 +24,13 @@ const schema = z.object({
   BREVO_API_KEY: z.string().optional().default(''),
   EMAIL_FROM: z.string().default('Isoko Market <onboarding@resend.dev>'),
 
+  // AI assist (Claude) — writes listing descriptions, CV summaries, etc. from a
+  // few words. Optional: with no ANTHROPIC_API_KEY the app falls back to the
+  // built-in rule-based drafter, so nothing breaks. AI_MODEL defaults to Opus;
+  // set it to claude-haiku-4-5 for a much cheaper/faster option on short drafts.
+  ANTHROPIC_API_KEY: z.string().optional().default(''),
+  AI_MODEL: z.string().default('claude-opus-4-8'),
+
   // SMS is now DORMANT (phone is no longer the auth channel). Retained so the
   // adapter can be reactivated if transactional SMS is ever added.
   SMS_PROVIDER: z.enum(['console', 'pindo', 'africastalking']).default('console'),
