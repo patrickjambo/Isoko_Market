@@ -40,7 +40,18 @@ const schema = z.object({
   REALTIME_DRIVER: z.enum(['sse', 'pusher', 'ably']).default('sse'),
 });
 
-const parsed = schema.safeParse(process.env);
+// Values pasted into a hosting dashboard often carry stray whitespace or a
+// trailing newline, and a var set to "" is really "unset" — so trim everything
+// and drop empty strings to undefined, letting the schema defaults apply
+// instead of failing enum/url checks on ""/"resend\n".
+const normalizedEnv = Object.fromEntries(
+  Object.entries(process.env).map(([key, value]) => {
+    const trimmed = typeof value === 'string' ? value.trim() : value;
+    return [key, trimmed === '' ? undefined : trimmed];
+  })
+);
+
+const parsed = schema.safeParse(normalizedEnv);
 
 if (!parsed.success) {
   console.error('❌ Invalid environment variables:', parsed.error.flatten().fieldErrors);
