@@ -184,13 +184,25 @@ async function fetchImageSafely(rawUrl: string, timeoutMs = 10_000): Promise<Fet
 }
 
 /**
- * Fetch a remote image by URL and store it locally (so it renders through
- * next/image and never depends on the origin staying up). SSRF-guarded — see
- * fetchImageSafely.
+ * Fetch a remote image by URL and store it (so it renders through next/image and
+ * doesn't depend on the origin). SSRF-guarded — see fetchImageSafely.
+ *
+ * If persisting fails — e.g. storage isn't configured on a serverless host
+ * (STORAGE_DRIVER=local with a read-only filesystem, no Blob) — we fall back to
+ * referencing the ORIGINAL url. The image was already fetched + validated as a
+ * real image, so "paste an image URL" keeps working even before cloud storage
+ * is wired; next/image serves it (see next.config remotePatterns).
  */
 export async function saveFileFromUrl(rawUrl: string, opts: { private?: boolean } = {}): Promise<SaveResult> {
   const { type, bytes } = await fetchImageSafely(rawUrl);
-  return persistBytes(bytes, type, opts.private ?? false);
+  try {
+    return await persistBytes(bytes, type, opts.private ?? false);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('[storage] persist failed; referencing source URL:', err instanceof Error ? err.message : err);
+    const url = rawUrl.trim();
+    return { url, key: url };
+  }
 }
 
 /**

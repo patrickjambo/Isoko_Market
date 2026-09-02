@@ -180,7 +180,8 @@
     "mapView": "Carte",
     "mapNote": "Les bulles indiquent le nombre d'articles par district. Touchez-en une pour filtrer.",
     "clearLocation": "Effacer le lieu",
-    "contactLabel": "Contact"
+    "contactLabel": "Contact",
+    "editTitle": "Modifier l'annonce"
   },
   "jobs": {
     "title": "Emplois & missions",

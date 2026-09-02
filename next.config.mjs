@@ -17,6 +17,10 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
       // Deterministic placeholder photos used by the dev seed script.
       { protocol: 'https', hostname: 'picsum.photos' },
+      // "Add photo by URL" may reference the source image directly when object
+      // storage isn't configured yet (see saveFileFromUrl), so allow any https
+      // host. next/image still only serves valid images and caps their size.
+      { protocol: 'https', hostname: '**' },
     ],
   },
   async headers() {

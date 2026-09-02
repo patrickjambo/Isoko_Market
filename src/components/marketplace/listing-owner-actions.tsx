@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle2, Loader2, Rocket, Star } from 'lucide-react';
+import { CheckCircle2, Loader2, Rocket, Star, Pencil } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
@@ -49,6 +49,12 @@ export function ListingOwnerActions({
 
   return (
     <div className="flex flex-wrap gap-2">
+      <Button variant="outline" asChild>
+        <Link href={`/marketplace/${listingId}/edit`}>
+          <Pencil className="h-4 w-4" /> {tc('edit')}
+        </Link>
+      </Button>
+
       {status === 'SOLD' ? (
         <Button variant="outline" onClick={() => setStatus('ACTIVE')} disabled={loading}>
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}

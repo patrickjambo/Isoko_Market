@@ -180,7 +180,8 @@
     "mapView": "Map",
     "mapNote": "Bubbles show how many items are listed in each district. Tap one to filter.",
     "clearLocation": "Clear location",
-    "contactLabel": "Contact"
+    "contactLabel": "Contact",
+    "editTitle": "Edit listing"
   },
   "jobs": {
     "title": "Jobs & Gigs",
