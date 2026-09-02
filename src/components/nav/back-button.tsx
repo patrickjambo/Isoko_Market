@@ -4,18 +4,10 @@ import { ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/routing';
 
-// Top-level tab / workspace homes (reachable from the bottom nav or account
-// menu) — these don't get a back button.
-const ROOTS = new Set([
-  '/',
-  '/marketplace',
-  '/jobs',
-  '/messages',
-  '/profile',
-  '/dashboard',
-  '/employer',
-  '/admin',
-]);
+// Bottom-nav tab homes — reachable in one tap from the tab bar, so no back
+// button. Everything else (including dashboards, which are reached from the
+// account menu) gets one.
+const ROOTS = new Set(['/', '/marketplace', '/jobs', '/messages', '/profile']);
 
 /**
  * One consistent back button for every sub-page. Hidden on the top-level homes.
