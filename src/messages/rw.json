@@ -763,7 +763,9 @@
     "delete": "Siba",
     "updated": "Byavuguruwe",
     "deleted": "Byasibwe",
-    "dashboard": "Ikibaho cy'umucuruzi"
+    "dashboard": "Ikibaho cy'umucuruzi",
+    "cardSales": "Ibyagurishijwe",
+    "salesSummary": "{completed} byarangiye · {pending} birimo gukorwa"
   },
   "sell": {
     "title": "Gurisha ikintu",

@@ -124,3 +124,19 @@ export const ORDER_FLOW: OrderStatus[] = [
   'SELLER_CONFIRMED',
   'COMPLETED',
 ];
+
+/**
+ * Seller sales summary for the dashboard: total earned (from completed sales)
+ * plus how many sales are completed vs. still in progress (placed/paid/confirmed
+ * but not yet received). Amounts are RWF minor units.
+ */
+export async function getSellerSales(sellerId: string) {
+  const [earned, completed, pending] = await Promise.all([
+    prisma.order.aggregate({ where: { sellerId, status: 'COMPLETED' }, _sum: { amount: true } }),
+    prisma.order.count({ where: { sellerId, status: 'COMPLETED' } }),
+    prisma.order.count({
+      where: { sellerId, status: { in: ['PENDING_PAYMENT', 'BUYER_MARKED_PAID', 'SELLER_CONFIRMED'] } },
+    }),
+  ]);
+  return { totalEarned: earned._sum.amount ?? 0, completed, pending };
+}

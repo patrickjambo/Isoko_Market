@@ -763,7 +763,9 @@
     "delete": "Supprimer",
     "updated": "Mis à jour",
     "deleted": "Supprimé",
-    "dashboard": "Tableau vendeur"
+    "dashboard": "Tableau vendeur",
+    "cardSales": "Ventes",
+    "salesSummary": "{completed} terminées · {pending} en cours"
   },
   "sell": {
     "title": "Vendre un article",

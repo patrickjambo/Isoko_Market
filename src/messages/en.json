@@ -763,7 +763,9 @@
     "delete": "Delete",
     "updated": "Updated",
     "deleted": "Deleted",
-    "dashboard": "Seller dashboard"
+    "dashboard": "Seller dashboard",
+    "cardSales": "Sales",
+    "salesSummary": "{completed} completed · {pending} in progress"
   },
   "sell": {
     "title": "Sell an item",

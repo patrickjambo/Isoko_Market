@@ -7,12 +7,14 @@ import {
   Lightbulb,
   MessageCircle,
   ArrowRight,
+  Banknote,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { requireWorkspace } from '@/lib/workspace-guard';
 import { prisma } from '@/lib/prisma';
 import { getSellerInsights } from '@/lib/seller-insights';
+import { getSellerSales } from '@/lib/orders';
 import { formatRWF } from '@/lib/utils';
 import { Trend } from '@/components/admin/sparkline';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
@@ -26,7 +28,7 @@ export default async function SellerHome({ params }: { params: { locale: string 
 
   // Seller-only workspace — non-sellers are sent to their own home.
   const user = await requireWorkspace('seller', params.locale);
-  const [insights, unread] = await Promise.all([
+  const [insights, unread, sales] = await Promise.all([
     getSellerInsights(user.id),
     prisma.message.count({
       where: {
@@ -35,6 +37,7 @@ export default async function SellerHome({ params }: { params: { locale: string 
         readAt: null,
       },
     }),
+    getSellerSales(user.id),
   ]);
 
   const interest = insights.viewsTotal + insights.messagesThisWeek;
@@ -65,6 +68,13 @@ export default async function SellerHome({ params }: { params: { locale: string 
             <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
           </Link>
         )}
+
+        <Card href="/orders" icon={Banknote} label={t('cardSales')}>
+          <p className="text-2xl font-extrabold text-primary">{formatRWF(sales.totalEarned, params.locale)}</p>
+          <p className="text-xs text-muted-foreground">
+            {t('salesSummary', { completed: sales.completed, pending: sales.pending })}
+          </p>
+        </Card>
 
         <Card href="/dashboard/listings" icon={Package} label={t('cardMyListings')}>
           <p className="text-2xl font-extrabold">{insights.activeCount}</p>
