@@ -164,7 +164,7 @@
       "locationLabel": "Location",
       "photosLabel": "Photos",
       "photosHint": "Up to 6 photos. The first is the cover. Images are compressed automatically.",
-      "urlPlaceholder": "…or paste an image URL",
+      "urlPlaceholder": "Paste a DIRECT image link (right-click image → Copy image address)",
       "addUrl": "Add",
       "publish": "Publish listing",
       "publishing": "Publishing…"

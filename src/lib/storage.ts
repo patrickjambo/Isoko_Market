@@ -78,7 +78,7 @@ async function persistBytes(bytes: Buffer, type: string, isPrivate: boolean): Pr
   throw new Error(`Storage driver "${env.STORAGE_DRIVER}" not implemented.`);
 }
 
-type FetchedImage = { type: string; bytes: Buffer };
+type FetchedImage = { type: string; bytes: Buffer; url: string };
 
 /**
  * One HTTP(S) request PINNED to a pre-validated IP: the TCP connection goes to
@@ -91,7 +91,7 @@ function requestPinned(
   url: URL,
   ip: string,
   timeoutMs: number
-): Promise<{ redirect?: string; image?: FetchedImage }> {
+): Promise<{ redirect?: string; image?: { type: string; bytes: Buffer }; html?: string }> {
   return new Promise((resolve, reject) => {
     const lib = url.protocol === 'https:' ? https : http;
     const req = lib.request(
@@ -100,7 +100,9 @@ function requestPinned(
         port: url.port || (url.protocol === 'https:' ? 443 : 80),
         path: `${url.pathname}${url.search}`,
         method: 'GET',
-        headers: { accept: 'image/*', 'user-agent': 'IsokoMarket/1.0 (+listing image import)' },
+        // Accept images and HTML — an HTML page is parsed for its og:image so a
+        // pasted *page* URL (Unsplash, a product page) still yields the picture.
+        headers: { accept: 'image/*,text/html;q=0.5', 'user-agent': 'IsokoMarket/1.0 (+listing image import)' },
         timeout: timeoutMs,
         // Pin the connection to the pre-validated IP. Node calls this with
         // { all: true }, so it expects the array form.
@@ -121,35 +123,74 @@ function requestPinned(
           return;
         }
         const type = String(res.headers['content-type'] ?? '').split(';')[0]!.trim().toLowerCase();
-        if (!ALLOWED.has(type)) {
+        const isHtml = type === 'text/html' || type === 'application/xhtml+xml';
+        if (!ALLOWED.has(type) && !isHtml) {
           res.destroy();
           reject(new Error('Unsupported file type.'));
           return;
         }
-        if (Number(res.headers['content-length'] ?? 0) > MAX_BYTES) {
+        if (!isHtml && Number(res.headers['content-length'] ?? 0) > MAX_BYTES) {
           res.destroy();
           reject(new Error('File is too large (max 8 MB).'));
           return;
         }
+        const HTML_CAP = 512 * 1024; // only the <head> region is needed for og:image
         const chunks: Buffer[] = [];
         let total = 0;
+        let done = false;
         res.on('data', (chunk: Buffer) => {
+          if (done) return;
           total += chunk.length;
-          if (total > MAX_BYTES) {
+          if (!isHtml && total > MAX_BYTES) {
+            done = true;
             res.destroy();
             reject(new Error('File is too large (max 8 MB).'));
             return;
           }
           chunks.push(chunk);
+          if (isHtml && total > HTML_CAP) {
+            done = true;
+            res.destroy();
+            resolve({ html: Buffer.concat(chunks).toString('utf8') });
+          }
         });
-        res.on('end', () => resolve({ image: { type, bytes: Buffer.concat(chunks) } }));
-        res.on('error', () => reject(new Error("Couldn't fetch that image URL.")));
+        res.on('end', () => {
+          if (done) return;
+          done = true;
+          if (isHtml) resolve({ html: Buffer.concat(chunks).toString('utf8') });
+          else resolve({ image: { type, bytes: Buffer.concat(chunks) } });
+        });
+        res.on('error', () => {
+          if (done) return;
+          done = true;
+          reject(new Error("Couldn't fetch that image URL."));
+        });
       }
     );
     req.on('timeout', () => req.destroy(new Error("Couldn't fetch that image URL.")));
     req.on('error', () => reject(new Error("Couldn't fetch that image URL.")));
     req.end();
   });
+}
+
+/** Pull a direct image URL out of a web page's og:image / twitter:image meta. */
+function extractOgImage(html: string, base: URL): URL | null {
+  const patterns = [
+    /<meta[^>]+(?:property|name)=["']og:image(?::url|:secure_url)?["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']og:image(?::url|:secure_url)?["']/i,
+    /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
+  ];
+  for (const re of patterns) {
+    const m = html.match(re);
+    if (m?.[1]) {
+      try {
+        return new URL(m[1].replace(/&amp;/g, '&'), base);
+      } catch {
+        /* try the next pattern */
+      }
+    }
+  }
+  return null;
 }
 
 /**
@@ -167,7 +208,7 @@ async function fetchImageSafely(rawUrl: string, timeoutMs = 10_000): Promise<Fet
     throw new Error('Enter a valid image URL.');
   }
 
-  for (let hop = 0; hop < 5; hop++) {
+  for (let hop = 0; hop < 6; hop++) {
     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
       throw new Error('Only http(s) image URLs are allowed.');
     }
@@ -177,10 +218,18 @@ async function fetchImageSafely(rawUrl: string, timeoutMs = 10_000): Promise<Fet
     if (isBlockedAddress(address)) throw new Error('That address is not allowed.');
 
     const result = await requestPinned(url, address, timeoutMs);
-    if (result.image) return result.image;
+    if (result.image) return { ...result.image, url: url.toString() };
+    if (result.html) {
+      // Pasted a web page, not a direct image — follow its og:image (re-validated
+      // as a normal hop at the top of the loop).
+      const og = extractOgImage(result.html, url);
+      if (!og) throw new Error('That page has no image we can use — paste a direct image link.');
+      url = og;
+      continue;
+    }
     url = new URL(result.redirect!, url); // re-validated at the top of the next hop
   }
-  throw new Error("Couldn't fetch that image URL."); // too many redirects
+  throw new Error("Couldn't fetch that image URL."); // too many hops
 }
 
 /**
@@ -194,14 +243,14 @@ async function fetchImageSafely(rawUrl: string, timeoutMs = 10_000): Promise<Fet
  * is wired; next/image serves it (see next.config remotePatterns).
  */
 export async function saveFileFromUrl(rawUrl: string, opts: { private?: boolean } = {}): Promise<SaveResult> {
-  const { type, bytes } = await fetchImageSafely(rawUrl);
+  const { type, bytes, url: resolvedUrl } = await fetchImageSafely(rawUrl);
   try {
     return await persistBytes(bytes, type, opts.private ?? false);
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('[storage] persist failed; referencing source URL:', err instanceof Error ? err.message : err);
-    const url = rawUrl.trim();
-    return { url, key: url };
+    // Use the RESOLVED image URL (after redirects / og:image), not the page URL.
+    return { url: resolvedUrl, key: resolvedUrl };
   }
 }
 
