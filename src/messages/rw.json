@@ -863,7 +863,10 @@
     "manualPayNote": "Nyuma yo gutumiza, uzabona nimero ya MoMo/Airtel y'umucuruzi. Muyishyure mu buryo butaziguye, hanyuma mwembi mwemeze hano.",
     "manualSafety": "Emeza ubwishyu ari uko wamaze kubwohereza koko. Bika icyemezo cya MoMo/Airtel.",
     "placeOrder": "Tumiza",
-    "sellerNoPayment": "Umucuruzi ntiyashyizeho uburyo bwo kwishyurwa"
+    "sellerNoPayment": "Umucuruzi ntiyashyizeho uburyo bwo kwishyurwa",
+    "awaitingPayoutBuyer": "Turategereje ko umucuruzi atanga nimero yo kwishyuraho — twamumenyesheje. Uzabasha kwishyura akimara kuyongeraho.",
+    "awaitingPayoutSeller": "Umuguzi arashaka iki kintu! Ongeraho nimero yawe ya MoMo/Airtel kugira ngo ashobore kukwishyura.",
+    "addPayoutCta": "Ongeraho nimero yo kwishyuraho"
   },
   "saved": {
     "title": "Ibyabitswe",

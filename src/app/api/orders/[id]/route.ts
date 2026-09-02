@@ -25,7 +25,15 @@ async function loadOrder(id: string, actor: User) {
       },
       buyer: { select: { id: true, fullName: true, avatarUrl: true } },
       seller: {
-        select: { id: true, fullName: true, avatarUrl: true, isVerified: true, verificationStatus: true },
+        select: {
+          id: true,
+          fullName: true,
+          avatarUrl: true,
+          isVerified: true,
+          verificationStatus: true,
+          paymentNumber: true, // live fallback if the order was placed before the seller set one
+          paymentProvider: true,
+        },
       },
     },
   });
@@ -44,7 +52,10 @@ export const GET = userRoute(async (_req, ctx: { params: { id: string } }, { use
         status: order.status,
         amount: order.amount,
         paymentMethod: order.paymentMethod,
-        sellerPayoutNumber: order.sellerPayoutNumber,
+        // Prefer the snapshot; fall back to the seller's current number so an
+        // order placed before they set one reveals it the moment they do.
+        sellerPayoutNumber: order.sellerPayoutNumber ?? order.seller.paymentNumber ?? null,
+        awaitingSellerPayout: !(order.sellerPayoutNumber ?? order.seller.paymentNumber),
         buyerMarkedPaidAt: order.buyerMarkedPaidAt?.toISOString() ?? null,
         buyerPaymentProofUrl: order.buyerPaymentProofUrl,
         sellerConfirmedAt: order.sellerConfirmedAt?.toISOString() ?? null,

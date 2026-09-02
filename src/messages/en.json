@@ -863,7 +863,10 @@
     "manualPayNote": "After placing the order you'll see the seller's MoMo/Airtel number. Pay them directly, then you both confirm here.",
     "manualSafety": "Only confirm payment after you've actually sent it. Keep the confirmation from your MoMo/Airtel app.",
     "placeOrder": "Place order",
-    "sellerNoPayment": "Seller hasn't set up payments"
+    "sellerNoPayment": "Seller hasn't set up payments",
+    "awaitingPayoutBuyer": "Waiting for the seller to share their payment number — we've notified them. You'll be able to pay once they add it.",
+    "awaitingPayoutSeller": "A buyer wants this item! Add your MoMo/Airtel number so they can pay you.",
+    "addPayoutCta": "Add payment number"
   },
   "saved": {
     "title": "Saved",

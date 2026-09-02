@@ -863,7 +863,10 @@
     "manualPayNote": "Après la commande, vous verrez le numéro MoMo/Airtel du vendeur. Payez-le directement, puis confirmez tous les deux ici.",
     "manualSafety": "Ne confirmez le paiement qu'après l'avoir réellement envoyé. Conservez la confirmation de votre application MoMo/Airtel.",
     "placeOrder": "Commander",
-    "sellerNoPayment": "Le vendeur n'a pas configuré les paiements"
+    "sellerNoPayment": "Le vendeur n'a pas configuré les paiements",
+    "awaitingPayoutBuyer": "En attente que le vendeur communique son numéro de paiement — nous l'avons prévenu. Vous pourrez payer dès qu'il l'ajoute.",
+    "awaitingPayoutSeller": "Un acheteur veut cet article ! Ajoutez votre numéro MoMo/Airtel pour qu'il puisse vous payer.",
+    "addPayoutCta": "Ajouter un numéro de paiement"
   },
   "saved": {
     "title": "Enregistrés",

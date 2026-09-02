@@ -40,11 +40,13 @@ export async function createOrder(params: {
   if (listing.sellerId === params.buyerId) throw new ApiError('BAD_REQUEST', 'You cannot buy your own listing.');
   if (listing.status !== 'ACTIVE') throw new ApiError('CONFLICT', 'This item is no longer available.');
 
-  const payoutNumber = listing.seller.paymentNumber;
-  const provider = listing.seller.paymentProvider;
-  if (!payoutNumber || !provider) {
-    throw new ApiError('CONFLICT', 'This seller has not set up a payment number yet.');
-  }
+  // A payout number is NOT required to place an order. The buyer signals intent,
+  // the seller is notified to add their MoMo/Airtel number, and the buyer pays
+  // once it's shared — so "Buy" is always clickable and the seller always learns
+  // that someone wants their item.
+  const payoutNumber = listing.seller.paymentNumber ?? null;
+  const provider = listing.seller.paymentProvider ?? null;
+  const hasPayout = Boolean(payoutNumber);
 
   // Reserve the listing + create the order atomically, snapshotting the payout number.
   const [, order] = await prisma.$transaction([
@@ -57,7 +59,7 @@ export async function createOrder(params: {
         amount: listing.price,
         status: 'PENDING_PAYMENT',
         paymentMethod: provider === 'airtel_money' ? 'manual_airtel' : 'manual_momo',
-        sellerPayoutNumber: payoutNumber,
+        sellerPayoutNumber: payoutNumber, // may be null until the seller adds one
         deliveryMethod: params.deliveryMethod,
       },
       select: { id: true },
@@ -71,8 +73,10 @@ export async function createOrder(params: {
     notify({
       userId: listing.sellerId,
       type: 'PAYMENT',
-      title: 'New order',
-      body: `${params.buyerName} wants "${listing.title}" (RWF ${rwf(listing.price)}). They'll send the money to your number, then you confirm you received it.`,
+      title: hasPayout ? 'New order' : 'Someone wants to buy!',
+      body: hasPayout
+        ? `${params.buyerName} wants "${listing.title}" (RWF ${rwf(listing.price)}). They'll send the money to your number, then you confirm you received it.`
+        : `${params.buyerName} wants to buy "${listing.title}" (RWF ${rwf(listing.price)}). Add your MoMo/Airtel number in Settings so they can pay you.`,
       href: `/orders/${order.id}`,
       payload: { orderId: order.id },
     }),
@@ -80,7 +84,9 @@ export async function createOrder(params: {
       userId: params.buyerId,
       type: 'PAYMENT',
       title: 'Order placed',
-      body: `Send RWF ${rwf(listing.price)} to the seller's ${provider === 'airtel_money' ? 'Airtel Money' : 'MoMo'} number, then mark it as paid.`,
+      body: hasPayout
+        ? `Send RWF ${rwf(listing.price)} to the seller's ${provider === 'airtel_money' ? 'Airtel Money' : 'MoMo'} number, then mark it as paid.`
+        : `We've told the seller you want "${listing.title}". They'll share their payment number shortly — we'll notify you.`,
       href: `/orders/${order.id}`,
       payload: { orderId: order.id },
     }),

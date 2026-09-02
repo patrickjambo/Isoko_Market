@@ -37,13 +37,18 @@ export default async function OrderDetailPage({
     include: {
       listing: { select: { id: true, title: true, images: { take: 1, orderBy: { position: 'asc' }, select: { url: true } } } },
       buyer: { select: { id: true, fullName: true } },
-      seller: { select: { id: true, fullName: true, isVerified: true, verificationStatus: true } },
+      seller: { select: { id: true, fullName: true, isVerified: true, verificationStatus: true, paymentNumber: true, paymentProvider: true } },
     },
   });
   if (!order) notFound();
   // Access gate via the shared authorizer (rule 5). Non-participants get a 404.
   if (!(await can(user, 'order:view', order))) notFound();
   const role = order.buyerId === user.id ? 'buyer' : 'seller';
+
+  // Prefer the snapshot; fall back to the seller's current number so an order
+  // placed before they set a payout reveals it the moment they add one.
+  const payoutNumber = order.sellerPayoutNumber ?? order.seller.paymentNumber ?? null;
+  const awaitingSellerPayout = order.status === 'PENDING_PAYMENT' && !payoutNumber;
 
   const [ratingAgg, completedSales] = await Promise.all([
     prisma.review.aggregate({ where: { revieweeId: order.sellerId }, _avg: { rating: true }, _count: true }),
@@ -95,12 +100,35 @@ export default async function OrderDetailPage({
 
       {/* Manual payment: buyer sees the seller's number to pay; seller is prompted to check their app */}
       <div className="space-y-2">
-        {role === 'buyer' && order.status === 'PENDING_PAYMENT' && order.sellerPayoutNumber && (
+        {role === 'buyer' && order.status === 'PENDING_PAYMENT' && payoutNumber && (
           <PaymentInstructions
-            payoutNumber={order.sellerPayoutNumber}
+            payoutNumber={payoutNumber}
             method={order.paymentMethod}
             amountLabel={formatRWF(order.amount, params.locale)}
           />
+        )}
+        {/* Buyer ordered before the seller set a payout number — the seller has
+            been notified; the number will appear here once they add it. */}
+        {role === 'buyer' && awaitingSellerPayout && (
+          <div className="flex items-start gap-2 rounded-xl border border-accent/40 bg-accent/5 p-3 text-sm">
+            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+            <p>{t('awaitingPayoutBuyer')}</p>
+          </div>
+        )}
+        {/* Seller has an order but no payout number — nudge them to add one. */}
+        {role === 'seller' && awaitingSellerPayout && (
+          <div className="space-y-2 rounded-xl border border-accent/40 bg-accent/5 p-3 text-sm">
+            <p className="flex items-start gap-2">
+              <Clock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+              {t('awaitingPayoutSeller')}
+            </p>
+            <Link
+              href="/profile/settings"
+              className="inline-flex items-center rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground"
+            >
+              {t('addPayoutCta')}
+            </Link>
+          </div>
         )}
         {role === 'seller' && order.status === 'BUYER_MARKED_PAID' && (
           <div className="flex items-start gap-2 rounded-xl border border-accent/40 bg-accent/5 p-3 text-sm">

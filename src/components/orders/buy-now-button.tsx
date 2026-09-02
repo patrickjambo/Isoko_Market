@@ -30,12 +30,10 @@ export function BuyNowButton({
   listingId,
   price,
   locale,
-  sellerHasPayment = true,
 }: {
   listingId: string;
   price: number;
   locale: string;
-  sellerHasPayment?: boolean;
 }) {
   const t = useTranslations('orders');
   const router = useRouter();
@@ -54,14 +52,6 @@ export function BuyNowButton({
         onClick={() => router.push(`/register?returnTo=${encodeURIComponent(pathname)}`)}
       >
         <ShoppingBag className="h-4 w-4" /> {t('buyNow')}
-      </Button>
-    );
-  }
-
-  if (!sellerHasPayment) {
-    return (
-      <Button variant="outline" disabled title={t('sellerNoPayment')}>
-        <ShoppingBag className="h-4 w-4" /> {t('sellerNoPayment')}
       </Button>
     );
   }
