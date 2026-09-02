@@ -79,6 +79,56 @@ export function ChatThread({
 
   useEffect(scrollToBottom, [messages.length, otherTyping]);
 
+  // WhatsApp-style live sync without a refresh. SSE (below) gives instant updates
+  // when it reaches this client, but the in-memory bus can't cross Vercel's
+  // function instances — so poll the thread every ~3s while visible: new messages
+  // from the other side appear, and the GET also marks the thread read (which
+  // flips our sent messages to "seen" ✓✓ once the other side polls). Merges by id
+  // so it coexists with SSE and never re-renders when nothing changed.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let active = true;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const poll = async () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        const res = await fetch(`/api/messages?conversationId=${encodeURIComponent(conversationId)}`);
+        if (!res.ok) return;
+        const data = (await res.json()) as { messages?: ChatMessage[] };
+        if (!active || !Array.isArray(data.messages)) return;
+        setMessages((prev) => {
+          const byId = new Map(prev.map((m) => [m.id, m]));
+          let changed = false;
+          for (const m of data.messages!) {
+            const existing = byId.get(m.id);
+            if (!existing || existing.readAt !== m.readAt) {
+              byId.set(m.id, m);
+              changed = true;
+            }
+          }
+          if (!changed) return prev;
+          return Array.from(byId.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+        });
+      } catch {
+        /* ignore transient errors — the next tick retries */
+      }
+    };
+
+    const schedule = () => {
+      timer = setTimeout(async () => {
+        await poll();
+        if (active) schedule();
+      }, 3000);
+    };
+    schedule();
+
+    return () => {
+      active = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, [conversationId]);
+
   useRealtime((event) => {
     if (event.type === 'message' && event.conversationId === conversationId) {
       setOtherTyping(false);
