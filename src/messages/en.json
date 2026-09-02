@@ -1008,5 +1008,12 @@
     "emailPlaceholder": "Email address",
     "instagramPlaceholder": "Instagram (e.g. @yourshop)",
     "title": "Contact"
+  },
+  "roles": {
+    "buyer": "Buyer",
+    "seller": "Seller",
+    "seeker": "Job seeker",
+    "employer": "Employer",
+    "admin": "Admin"
   }
 }

@@ -41,6 +41,18 @@ export function UserMenu() {
   const workspaces = adopted.map((w) => wsLink[w]);
   const isSeeker = adopted.includes('seeker');
 
+  // A persistent "who you are" indicator: everyone is a buyer, plus each
+  // workspace they've adopted (seller / job seeker / employer). Admins are staff.
+  const roleChips =
+    user.role === 'ADMIN'
+      ? [t('roles.admin')]
+      : [
+          t('roles.buyer'),
+          ...(adopted.includes('seller') ? [t('roles.seller')] : []),
+          ...(adopted.includes('seeker') ? [t('roles.seeker')] : []),
+          ...(adopted.includes('employer') ? [t('roles.employer')] : []),
+        ];
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -57,6 +69,16 @@ export function UserMenu() {
               status={user.verificationStatus}
               label={user.isVerified ? t('trust.verifiedBadge') : undefined}
             />
+          </div>
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {roleChips.map((r) => (
+              <span
+                key={r}
+                className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground"
+              >
+                {r}
+              </span>
+            ))}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

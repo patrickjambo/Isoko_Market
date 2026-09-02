@@ -1008,5 +1008,12 @@
     "emailPlaceholder": "Aderesi imeyili",
     "instagramPlaceholder": "Instagram (urugero @isokoyawe)",
     "title": "Aho bakugeraho"
+  },
+  "roles": {
+    "buyer": "Umuguzi",
+    "seller": "Umucuruzi",
+    "seeker": "Ushaka akazi",
+    "employer": "Utanga akazi",
+    "admin": "Umuyobozi"
   }
 }
