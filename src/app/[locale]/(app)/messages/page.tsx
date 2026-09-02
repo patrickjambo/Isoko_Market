@@ -4,6 +4,7 @@ import { Link, redirect } from '@/i18n/routing';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PollRefresh } from '@/components/shared/poll-refresh';
 import { getCurrentUser } from '@/lib/auth';
 import { getConversationsForUser } from '@/lib/messaging';
 import { initials, timeAgo, cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ export default async function MessagesPage({ params }: { params: { locale: strin
 
   return (
     <div className="container max-w-2xl py-6">
+      <PollRefresh />
       <h1 className="mb-4 text-2xl font-bold tracking-tight">{t('title')}</h1>
 
       {conversations.length === 0 ? (
