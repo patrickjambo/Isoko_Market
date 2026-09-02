@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale, getLocale } from 'next-intl/server';
-import { ChevronLeft, MapPin, Users, Wallet, Sparkles } from 'lucide-react';
+import { MapPin, Users, Wallet, Sparkles } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -62,12 +62,6 @@ export default async function JobDetailPage({
   return (
     <div className="container max-w-4xl py-6">
       <LiveItemStatus topic={`job:${job.id}`} />
-      <Link
-        href="/jobs"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ChevronLeft className="h-4 w-4" /> {t('title')}
-      </Link>
 
       <div className="grid gap-6 md:grid-cols-3">
         <div className="space-y-5 md:col-span-2">

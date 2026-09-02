@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { ChevronLeft, MapPin, Tag, Phone } from 'lucide-react';
+import { MapPin, Tag, Phone } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { ImageGallery } from '@/components/marketplace/image-gallery';
@@ -85,12 +85,6 @@ export default async function ListingDetailPage({
   return (
     <div className="container py-6">
       <LiveItemStatus topic={`listing:${listing.id}`} />
-      <Link
-        href="/marketplace"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ChevronLeft className="h-4 w-4" /> {t('title')}
-      </Link>
 
       <div className="grid gap-8 lg:grid-cols-2">
         <ImageGallery

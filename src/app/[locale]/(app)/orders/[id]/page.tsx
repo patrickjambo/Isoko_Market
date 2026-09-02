@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { ChevronLeft, ShieldCheck, Info, ImageOff, AlertTriangle, Clock } from 'lucide-react';
+import { ShieldCheck, Info, ImageOff, AlertTriangle, Clock } from 'lucide-react';
 import { Link, redirect } from '@/i18n/routing';
 import { StarRating } from '@/components/trust/star-rating';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
@@ -60,9 +60,6 @@ export default async function OrderDetailPage({
   return (
     <div className="container max-w-2xl space-y-5 py-6">
       <LiveItemStatus topic={`order:${order.id}`} />
-      <Link href="/orders" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ChevronLeft className="h-4 w-4" /> {t('title')}
-      </Link>
 
       {/* Item + status */}
       <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">

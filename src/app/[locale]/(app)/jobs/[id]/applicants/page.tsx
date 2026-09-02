@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { ChevronLeft, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { Link, redirect } from '@/i18n/routing';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ApplicantReview } from '@/components/employer/applicant-review';
@@ -37,12 +37,6 @@ export default async function ApplicantsPage({
 
   return (
     <div className="container max-w-3xl py-6">
-      <Link
-        href={`/jobs/${job.id}`}
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ChevronLeft className="h-4 w-4" /> {job.title}
-      </Link>
       <h1 className="mb-1 text-2xl font-bold tracking-tight">{t('manageApplicants')}</h1>
       <p className="mb-6 text-sm text-muted-foreground">
         {t('applicants', { count: applicants.length })}
