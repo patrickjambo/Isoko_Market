@@ -9,12 +9,17 @@ export const listingConditions = [
   'FOR_PARTS',
 ] as const;
 
+export const listingKinds = ['PRODUCT', 'SERVICE'] as const;
+
 export const createListingSchema = z.object({
   title: z.string().trim().min(3, 'Add a short, clear title.').max(120),
   description: z.string().trim().min(10, 'Describe the item.').max(4000),
   // Price entered in whole RWF by the user; converted to minor units server-side.
   price: z.coerce.number().int('Enter a valid price.').min(0).max(1_000_000_000),
   categoryId: z.string().cuid().optional().nullable(),
+  // Optional (no default) so PUT edits that omit it leave the stored kind intact;
+  // create routes fall back to PRODUCT.
+  kind: z.enum(listingKinds).optional(),
   condition: z.enum(listingConditions).default('GOOD'),
   location: z.string().trim().min(2, 'Add a location.').max(80),
   images: z.array(z.string().url()).max(6).default([]),
@@ -30,6 +35,7 @@ export const draftDataSchema = z.object({
   description: z.string().trim().max(4000).optional(),
   price: z.coerce.number().int().min(0).max(1_000_000_000).optional().nullable(),
   categoryId: z.string().cuid().optional().nullable(),
+  kind: z.enum(listingKinds).optional(),
   condition: z.enum(listingConditions).optional(),
   location: z.string().trim().max(80).optional(),
   images: z.array(z.string().url()).max(6).optional(),

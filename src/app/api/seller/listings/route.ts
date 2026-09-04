@@ -31,6 +31,7 @@ export const POST = route(async (req: NextRequest) => {
       description: input.description,
       price: francsToMinor(input.price),
       categoryId: input.categoryId ?? null,
+      kind: input.kind ?? 'PRODUCT',
       condition: input.condition,
       location: input.location,
       ...(cleanContact(input.contactInfo) ? { contactInfo: cleanContact(input.contactInfo)! } : {}),

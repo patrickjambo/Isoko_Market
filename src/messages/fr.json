@@ -197,7 +197,8 @@
     "anyPrice": "Tout prix",
     "priceUnder": "moins de {max} RWF",
     "priceOver": "plus de {min} RWF",
-    "priceBetween": "{min}–{max} RWF"
+    "priceBetween": "{min}–{max} RWF",
+    "serviceBadge": "Service"
   },
   "jobs": {
     "title": "Emplois & missions",
@@ -822,7 +823,13 @@
     "published": "Annonce publiée !",
     "contactLabel": "Contact (facultatif)",
     "contactPlaceholder": "Téléphone, e-mail, WhatsApp, Instagram…",
-    "contactHint": "Comment les acheteurs peuvent vous joindre hors de l’appli (facultatif)."
+    "contactHint": "Comment les acheteurs peuvent vous joindre hors de l’appli (facultatif).",
+    "serviceTitle": "Proposer un service",
+    "serviceSubtitle": "Quelques étapes rapides — nous enregistrons au fur et à mesure.",
+    "service1Title": "Montrez votre travail",
+    "service1Hint": "Ajoutez jusqu’à 6 photos de votre travail ou de vous — même une photo claire inspire confiance. Facultatif mais recommandé.",
+    "servicePhotoNudge": "Une photo de vos réalisations aide les clients à vous choisir.",
+    "servicePriceLabel": "Votre tarif (RWF)"
   },
   "orders": {
     "title": "Commandes",

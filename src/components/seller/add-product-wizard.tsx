@@ -28,10 +28,12 @@ import { RWANDA_DISTRICTS } from '@/lib/rwanda';
 import { formatRWF, cn } from '@/lib/utils';
 
 type Category = { id: string; name: string };
+type ListingKind = 'PRODUCT' | 'SERVICE';
 type Data = {
   images: string[];
   title: string;
   categoryId: string;
+  kind: ListingKind;
   condition: string;
   location: string;
   price: number | '';
@@ -45,6 +47,7 @@ const EMPTY: Data = {
   images: [],
   title: '',
   categoryId: '',
+  kind: 'PRODUCT',
   condition: 'GOOD',
   location: '',
   price: '',
@@ -56,15 +59,22 @@ const EMPTY: Data = {
 
 const TOTAL = 6;
 
-export function AddProductWizard({ categories }: { categories: Category[] }) {
+export function AddProductWizard({
+  categories,
+  kind = 'PRODUCT',
+}: {
+  categories: Category[];
+  kind?: ListingKind;
+}) {
   const t = useTranslations('sell');
   const tc = useTranslations('marketplace');
   const locale = useLocale();
   const router = useRouter();
   const { toast } = useToast();
 
+  const isService = kind === 'SERVICE';
   const [step, setStep] = useState(1);
-  const [data, setData] = useState<Data>(EMPTY);
+  const [data, setData] = useState<Data>({ ...EMPTY, kind });
   const [loaded, setLoaded] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [duplicate, setDuplicate] = useState<{ id: string; title: string } | null>(null);
@@ -75,12 +85,14 @@ export function AddProductWizard({ categories }: { categories: Category[] }) {
       .then((r) => r.json())
       .then((j) => {
         if (j?.draft?.data) {
-          setData({ ...EMPTY, ...j.draft.data });
+          // The URL intent (product vs service) wins over whatever the draft had.
+          setData({ ...EMPTY, ...j.draft.data, kind });
           setStep(j.draft.step ?? 1);
         }
       })
       .finally(() => setLoaded(true));
-  }, []);
+    // `kind` is a stable prop from the URL; included to satisfy exhaustive-deps.
+  }, [kind]);
 
   // Autosave (debounced) at every change so nothing is lost on a dropped connection.
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -112,6 +124,7 @@ export function AddProductWizard({ categories }: { categories: Category[] }) {
           description: data.description,
           price: Number(data.price || 0),
           categoryId: data.categoryId || null,
+          kind: data.kind,
           condition: data.condition,
           location: data.location,
           images: data.images,
@@ -167,11 +180,14 @@ export function AddProductWizard({ categories }: { categories: Category[] }) {
       </div>
 
       {step === 1 && (
-        <Step title={t('step1Title')} hint={t('step1Hint')}>
+        <Step
+          title={isService ? t('service1Title') : t('step1Title')}
+          hint={isService ? t('service1Hint') : t('step1Hint')}
+        >
           <ImageUploader value={data.images} onChange={(v) => set('images', v)} max={6} />
           {data.images.length === 0 && (
             <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Camera className="h-4 w-4" /> {t('photoNudge')}
+              <Camera className="h-4 w-4" /> {isService ? t('servicePhotoNudge') : t('photoNudge')}
             </p>
           )}
         </Step>
@@ -204,28 +220,32 @@ export function AddProductWizard({ categories }: { categories: Category[] }) {
             </Select>
           </div>
 
-          <div className="space-y-1.5">
-            <Label>{tc('condition')}</Label>
-            <div className="flex flex-wrap gap-2">
-              {listingConditions.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => set('condition', c)}
-                  className={cn(
-                    'rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
-                    data.condition === c
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-input text-muted-foreground hover:bg-secondary'
-                  )}
-                >
-                  {tc(`condition.${c}`)}
-                </button>
-              ))}
+          {/* Condition is meaningless for a service — hide it entirely. */}
+          {!isService && (
+            <div className="space-y-1.5">
+              <Label>{tc('condition')}</Label>
+              <div className="flex flex-wrap gap-2">
+                {listingConditions.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => set('condition', c)}
+                    className={cn(
+                      'rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+                      data.condition === c
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-input text-muted-foreground hover:bg-secondary'
+                    )}
+                  >
+                    {tc(`condition.${c}`)}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <PriceField
+            serviceLabel={isService ? t('servicePriceLabel') : undefined}
             value={data.price}
             onChange={(v) => set('price', v)}
             categoryId={data.categoryId}
@@ -291,7 +311,7 @@ export function AddProductWizard({ categories }: { categories: Category[] }) {
 
       {step === 6 && (
         <Step title={t('step6Title')} hint={t('step6Hint')}>
-          <Review data={data} categoryName={categoryName} locale={locale} conditionLabel={(c) => tc(`condition.${c}`)} />
+          <Review data={data} categoryName={categoryName} locale={locale} isService={isService} conditionLabel={(c) => tc(`condition.${c}`)} />
           {duplicate && (
             <div className="flex items-start gap-2 rounded-lg border border-accent/40 bg-accent/5 p-3 text-sm">
               <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
@@ -426,12 +446,14 @@ function PriceField({
   categoryId,
   location,
   locale,
+  serviceLabel,
 }: {
   value: number | '';
   onChange: (v: number | '') => void;
   categoryId: string;
   location: string;
   locale: string;
+  serviceLabel?: string;
 }) {
   const t = useTranslations('sell');
   const [range, setRange] = useState<{ min: number; max: number } | null>(null);
@@ -447,7 +469,7 @@ function PriceField({
 
   return (
     <div className="space-y-1.5">
-      <Label>{t('priceLabel')}</Label>
+      <Label>{serviceLabel ?? t('priceLabel')}</Label>
       <Input
         type="number"
         inputMode="numeric"
@@ -560,11 +582,13 @@ function Review({
   data,
   categoryName,
   locale,
+  isService,
   conditionLabel,
 }: {
   data: Data;
   categoryName?: string;
   locale: string;
+  isService: boolean;
   conditionLabel: (c: string) => string;
 }) {
   const t = useTranslations('sell');
@@ -580,7 +604,9 @@ function Review({
         </p>
         <p className="font-semibold">{data.title || '—'}</p>
         <p className="text-sm text-muted-foreground">
-          {[categoryName, conditionLabel(data.condition), data.location].filter(Boolean).join(' · ')}
+          {[categoryName, isService ? null : conditionLabel(data.condition), data.location]
+            .filter(Boolean)
+            .join(' · ')}
         </p>
       </div>
       {data.description && <p className="whitespace-pre-wrap text-sm">{data.description}</p>}

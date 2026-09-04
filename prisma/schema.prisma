@@ -56,6 +56,11 @@ enum ListingCondition {
   FOR_PARTS
 }
 
+enum ListingKind {
+  PRODUCT // a physical item for sale
+  SERVICE // a service offered (skills, labour) — condition is not applicable
+}
+
 enum JobType {
   JOB
   GIG
@@ -281,7 +286,8 @@ model Listing {
   price       Int // RWF minor units
   categoryId  String?
   category    Category?        @relation(fields: [categoryId], references: [id])
-  condition   ListingCondition @default(GOOD)
+  kind        ListingKind      @default(PRODUCT) // product for sale vs. service offered
+  condition   ListingCondition @default(GOOD) // meaningful for PRODUCT only
   location    String
   status      ListingStatus    @default(ACTIVE)
   isFeatured  Boolean          @default(false)

@@ -39,6 +39,7 @@ export const PUT = route(async (req: NextRequest, ctx: { params: { id: string } 
         description: input.description,
         price: francsToMinor(input.price),
         categoryId: input.categoryId ?? null,
+        kind: input.kind, // undefined leaves the stored kind unchanged
         condition: input.condition,
         location: input.location,
         tags: input.tags,

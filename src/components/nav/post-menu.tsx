@@ -37,7 +37,7 @@ export function PostMenu({ full = false }: { full?: boolean }) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/sell">
+          <Link href="/dashboard/sell?kind=service">
             <Wrench className="text-primary" />
             {t('postService')}
           </Link>

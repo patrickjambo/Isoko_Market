@@ -197,7 +197,8 @@
     "anyPrice": "Igiciro cyose",
     "priceUnder": "munsi ya {max} RWF",
     "priceOver": "hejuru ya {min} RWF",
-    "priceBetween": "{min}–{max} RWF"
+    "priceBetween": "{min}–{max} RWF",
+    "serviceBadge": "Serivisi"
   },
   "jobs": {
     "title": "Akazi & Imirimo",
@@ -822,7 +823,13 @@
     "published": "Igicuruzwa cyatangajwe!",
     "contactLabel": "Aho bakugeraho (si itegeko)",
     "contactPlaceholder": "Telefoni, imeri, WhatsApp, Instagram…",
-    "contactHint": "Uko abaguzi bakugeraho hanze ya porogaramu (si itegeko)."
+    "contactHint": "Uko abaguzi bakugeraho hanze ya porogaramu (si itegeko).",
+    "serviceTitle": "Tanga serivisi",
+    "serviceSubtitle": "Intambwe nkeya — turabika uko ugenda.",
+    "service1Title": "Erekana akazi kawe",
+    "service1Hint": "Ongeraho amafoto agera kuri 6 y’akazi kawe cyangwa wowe — n’ifoto imwe isobanutse yubaka icyizere. Ntibisabwa ariko birasabwa.",
+    "servicePhotoNudge": "Ifoto y’akazi wakoze ifasha abakiriya kugutoranya.",
+    "servicePriceLabel": "Igiciro cyawe (RWF)"
   },
   "orders": {
     "title": "Amateka y'ubugure",

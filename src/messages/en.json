@@ -197,7 +197,8 @@
     "anyPrice": "Any price",
     "priceUnder": "under {max} RWF",
     "priceOver": "over {min} RWF",
-    "priceBetween": "{min}–{max} RWF"
+    "priceBetween": "{min}–{max} RWF",
+    "serviceBadge": "Service"
   },
   "jobs": {
     "title": "Jobs & Gigs",
@@ -822,7 +823,13 @@
     "published": "Listing published!",
     "contactLabel": "Contact (optional)",
     "contactPlaceholder": "Phone, email, WhatsApp, Instagram…",
-    "contactHint": "How buyers can reach you outside the app (optional)."
+    "contactHint": "How buyers can reach you outside the app (optional).",
+    "serviceTitle": "Offer a service",
+    "serviceSubtitle": "A few quick steps — we save as you go.",
+    "service1Title": "Show your work",
+    "service1Hint": "Add up to 6 photos of your work or yourself — even one clear photo builds trust. Optional but recommended.",
+    "servicePhotoNudge": "A photo of past work helps clients choose you.",
+    "servicePriceLabel": "Your rate (RWF)"
   },
   "orders": {
     "title": "Orders",

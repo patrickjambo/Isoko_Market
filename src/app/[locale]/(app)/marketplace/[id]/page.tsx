@@ -103,7 +103,11 @@ export default async function ListingDetailPage({
               {listing.isFeatured && listing.status === 'ACTIVE' && (
                 <Badge variant="accent">{t('featured')}</Badge>
               )}
-              <Badge variant="outline">{t(`condition.${listing.condition}`)}</Badge>
+              {listing.kind === 'SERVICE' ? (
+                <Badge variant="outline">{t('serviceBadge')}</Badge>
+              ) : (
+                <Badge variant="outline">{t(`condition.${listing.condition}`)}</Badge>
+              )}
             </div>
             <p className="text-3xl font-extrabold text-primary">
               {formatRWF(listing.price, params.locale)}

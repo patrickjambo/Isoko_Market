@@ -15,6 +15,7 @@ export type ListingCardData = {
   location: string;
   status: string;
   isFeatured: boolean;
+  kind?: string;
   images: { url: string }[];
   category?: { slug: string } | null;
   seller: { fullName: string; isVerified: boolean; verificationStatus: string };
@@ -55,6 +56,7 @@ export function ListingCard({
         <div className="flex min-w-0 flex-1 flex-col gap-1 py-1">
           <div className="flex items-center gap-2">
             <p className="text-base font-bold text-primary">{formatRWF(listing.price, locale)}</p>
+            {listing.kind === 'SERVICE' && <Badge variant="outline">{t('serviceBadge')}</Badge>}
             {listing.isFeatured && listing.status === 'ACTIVE' && (
               <Badge variant="accent">{t('featured')}</Badge>
             )}
@@ -101,6 +103,11 @@ export function ListingCard({
         {listing.status === 'SOLD' && (
           <Badge variant="secondary" className="absolute left-2 top-2">
             {t('sold')}
+          </Badge>
+        )}
+        {listing.kind === 'SERVICE' && listing.status === 'ACTIVE' && !listing.isFeatured && (
+          <Badge variant="outline" className="absolute left-2 top-2 bg-card/90 shadow">
+            {t('serviceBadge')}
           </Badge>
         )}
       </div>
