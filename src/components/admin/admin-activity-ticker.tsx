@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Radio, UserPlus, Package, Briefcase, CreditCard, Flag, ShieldCheck, ShieldX, KeyRound } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRealtime } from '@/hooks/use-realtime';
 import { cn } from '@/lib/utils';
 
-type Item = { id: number; name: string; label: string; at: string };
+type Item = { id: string; name: string; label: string; at: string };
 
 const ICONS: Record<string, LucideIcon> = {
   signup: UserPlus,
@@ -24,19 +24,61 @@ const ICONS: Record<string, LucideIcon> = {
 
 /**
  * Auto-scrolling live feed of platform activity (Section: Real-Time Activity
- * card). Fed by admin:* WebSocket/SSE events — nothing to poll.
+ * card). SSE (admin_event) updates it instantly on the same instance; a
+ * visibility-aware poll of /api/admin/activity keeps it populated everywhere
+ * else — on Vercel the ephemeral admin bus can't cross instances, so without
+ * the poll the ticker would sit empty. Both paths reconcile to the same
+ * deterministic-id list.
  */
 export function AdminActivityTicker() {
   const t = useTranslations('admin');
   const [items, setItems] = useState<Item[]>([]);
 
-  useRealtime((event) => {
-    if (event.type === 'admin_event') {
-      setItems((prev) =>
-        [{ id: Date.now() + Math.random(), name: event.name, label: event.label, at: event.at }, ...prev].slice(0, 12)
-      );
+  const refresh = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/activity', { cache: 'no-store' });
+      if (!res.ok) return;
+      const { data } = await res.json();
+      if (Array.isArray(data?.items)) setItems(data.items as Item[]);
+    } catch {
+      /* transient — next tick retries */
     }
+  }, []);
+
+  // SSE arrives → pull the authoritative list immediately (no manual merge).
+  useRealtime((event) => {
+    if (event.type === 'admin_event') void refresh();
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let id: ReturnType<typeof setInterval> | null = null;
+    const tick = () => {
+      if (document.visibilityState === 'visible') void refresh();
+    };
+    const start = () => {
+      if (id == null) id = setInterval(tick, 10000);
+    };
+    const stop = () => {
+      if (id != null) {
+        clearInterval(id);
+        id = null;
+      }
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        void refresh();
+        start();
+      } else stop();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    void refresh(); // seed immediately
+    start();
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [refresh]);
 
   return (
     <div className="flex h-full flex-col rounded-xl border border-border bg-card p-4">
