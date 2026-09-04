@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Package, Briefcase, FileText, Wallet, ChevronRight, Crown, BadgeCheck } from 'lucide-react';
+import { Package, Briefcase, FileText, Wallet, ChevronRight, Crown } from 'lucide-react';
 import { Link, redirect } from '@/i18n/routing';
 import { ProfileHeader } from '@/components/profile/profile-header';
 import { ListingCard } from '@/components/marketplace/listing-card';
@@ -111,7 +111,7 @@ export default async function ProfilePage({ params }: { params: { locale: string
             label={tp('subscribeCta')}
             title={tp('subscriptionTitle')}
             description={tp('subscriptionBody', { days: SUBSCRIPTION_DURATION_DAYS })}
-            icon={BadgeCheck}
+            icon="badge"
           />
         </div>
       </section>

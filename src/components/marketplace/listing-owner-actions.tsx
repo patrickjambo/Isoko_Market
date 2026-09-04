@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle2, Loader2, Rocket, Star, Pencil } from 'lucide-react';
+import { CheckCircle2, Loader2, Star, Pencil } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
@@ -84,7 +84,7 @@ export function ListingOwnerActions({
             label={t('boostListing')}
             title={t('boostListing')}
             description={t('boostBody', { days: FEATURE_DURATION_DAYS })}
-            icon={Rocket}
+            icon="rocket"
             variant="outline"
           />
         ))}

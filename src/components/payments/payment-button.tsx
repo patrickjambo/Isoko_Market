@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, Smartphone } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { Loader2, Smartphone, BadgeCheck, Rocket } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
@@ -18,6 +17,10 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
 
+// Icons referenced by NAME so a Server Component can use this Client Component
+// (a function/component can't cross the server→client boundary as a prop).
+const ICONS = { badge: BadgeCheck, rocket: Rocket, smartphone: Smartphone } as const;
+
 /**
  * Reusable Mobile Money purchase button for any premium feature (boost,
  * verified-seller subscription, paid job post). It only speaks to /api/payments,
@@ -30,7 +33,7 @@ export function PaymentButton({
   label,
   title,
   description,
-  icon: Icon,
+  icon,
   variant = 'accent',
   size = 'default',
   className,
@@ -41,7 +44,7 @@ export function PaymentButton({
   label: string;
   title: string;
   description?: string;
-  icon?: LucideIcon;
+  icon?: keyof typeof ICONS;
   variant?: 'default' | 'accent' | 'outline';
   size?: 'default' | 'sm' | 'lg';
   className?: string;
@@ -52,6 +55,7 @@ export function PaymentButton({
   const [open, setOpen] = useState(false);
   const [provider, setProvider] = useState('mtn_momo');
   const [loading, setLoading] = useState(false);
+  const Icon = icon ? ICONS[icon] : null;
 
   async function pay() {
     setLoading(true);
