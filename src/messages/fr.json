@@ -87,7 +87,8 @@
     "live": "En direct",
     "liveUpdating": "Mise à jour automatique",
     "newTodaySuffix": "nouveautés en 24h",
-    "trending": "Nouveautés du moment"
+    "trending": "Nouveautés du moment",
+    "services": "Services"
   },
   "auth": {
     "loginTitle": "Bon retour",

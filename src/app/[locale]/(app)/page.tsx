@@ -21,6 +21,7 @@ import { LiveBadge } from '@/components/home/live-badge';
 import {
   getFeaturedListings,
   getLatestJobs,
+  getLatestServices,
   getPlatformStats,
   getCategories,
 } from '@/lib/queries';
@@ -31,8 +32,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
   setRequestLocale(params.locale);
   const t = await getTranslations('home');
 
-  const [listings, jobs, stats, categories, user] = await Promise.all([
+  const [listings, services, jobs, stats, categories, user] = await Promise.all([
     getFeaturedListings(8),
+    getLatestServices(4),
     getLatestJobs(6),
     getPlatformStats(),
     getCategories(),
@@ -182,6 +184,18 @@ export default async function HomePage({ params }: { params: { locale: string } 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {listings.map((l) => (
               <ListingCard key={l.id} listing={l} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Services — live */}
+      {services.length > 0 && (
+        <section className="container py-6">
+          <SectionHeader title={t('services')} href="/marketplace?kind=SERVICE" live={t('live')} />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {services.map((s) => (
+              <ListingCard key={s.id} listing={s} />
             ))}
           </div>
         </section>

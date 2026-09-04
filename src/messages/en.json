@@ -87,7 +87,8 @@
     "live": "Live",
     "liveUpdating": "Updates automatically",
     "newTodaySuffix": "new in the last 24h",
-    "trending": "Fresh right now"
+    "trending": "Fresh right now",
+    "services": "Services"
   },
   "auth": {
     "loginTitle": "Welcome back",

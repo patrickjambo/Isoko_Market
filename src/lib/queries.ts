@@ -44,7 +44,18 @@ const listingCardSelect = {
 
 export async function getFeaturedListings(take = 8) {
   return prisma.listing.findMany({
-    where: { status: 'ACTIVE' },
+    // Products only — services get their own homepage strip (getLatestServices).
+    where: { status: 'ACTIVE', kind: 'PRODUCT' },
+    orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+    take,
+    select: listingCardSelect,
+  });
+}
+
+/** Recent active services for the homepage "Services" strip. */
+export async function getLatestServices(take = 4) {
+  return prisma.listing.findMany({
+    where: { status: 'ACTIVE', kind: 'SERVICE' },
     orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
     take,
     select: listingCardSelect,

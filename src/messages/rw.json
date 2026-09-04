@@ -87,7 +87,8 @@
     "live": "Bizima",
     "liveUpdating": "Bivugururwa byikora",
     "newTodaySuffix": "bishya mu masaha 24",
-    "trending": "Bishya nonaha"
+    "trending": "Bishya nonaha",
+    "services": "Serivisi"
   },
   "auth": {
     "loginTitle": "Murakaza neza",
