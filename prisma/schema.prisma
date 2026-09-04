@@ -523,18 +523,30 @@ model Application {
 // A seeker's stored "notify me" search (Section 8). Evaluated against every new
 // job/gig as it's created — not on a batch schedule — so urgent gigs reach
 // seekers while still relevant.
+enum SearchKind {
+  JOB
+  LISTING
+}
+
 model SavedSearch {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      SearchKind @default(JOB) // JOB seeker alert vs. marketplace buyer alert
   label     String
   q         String? // free-text term to match against title/description
-  type      JobType? // JOB | GIG | null (either)
+  type      JobType? // JOB | GIG | null (either) — job searches only
   location  String? // district / place substring
-  skills    String[] @default([]) // canonical taxonomy keys to match against job.skills
-  createdAt DateTime @default(now())
+  skills    String[]   @default([]) // canonical taxonomy keys to match against job.skills
+  // Marketplace (kind = LISTING) criteria:
+  categoryId String? // match listing.categoryId exactly
+  condition  String? // match listing.condition exactly
+  minPrice   Int? // in whole RWF (francs); compared against listing.price/100
+  maxPrice   Int? // in whole RWF (francs)
+  createdAt  DateTime   @default(now())
 
   @@index([userId])
+  @@index([kind])
 }
 
 // ─────────────────── Messaging & Notifications ───────────────

@@ -7,6 +7,7 @@ import { cleanContact } from '@/lib/contact';
 import { francsToMinor } from '@/lib/utils';
 import { searchListings } from '@/lib/queries';
 import { emitAdmin } from '@/lib/admin-realtime';
+import { notifyMatchingListingAlerts } from '@/lib/listing-alert';
 
 /** GET /api/listings — public, filtered search (also used by the mobile app). */
 export const GET = route(async (req: NextRequest) => {
@@ -35,7 +36,7 @@ export const POST = route(async (req: NextRequest) => {
         create: input.images.map((url, position) => ({ url, position })),
       },
     },
-    select: { id: true },
+    select: { id: true, title: true, description: true, categoryId: true, condition: true, location: true, price: true },
   });
 
   // Adopt BUYER→SELLER on first listing so the role reflects usage. This fires
@@ -48,6 +49,8 @@ export const POST = route(async (req: NextRequest) => {
   }
 
   await emitAdmin('listing.created', `New listing: ${input.title}`);
+  // Buyers who saved a matching search hear about it immediately (see jobs parity).
+  await notifyMatchingListingAlerts({ ...listing, sellerId: user.id });
 
   return jsonOk({ id: listing.id }, { status: 201 });
 });

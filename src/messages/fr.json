@@ -187,7 +187,9 @@
     "mapNote": "Les bulles indiquent le nombre d'articles par district. Touchez-en une pour filtrer.",
     "clearLocation": "Effacer le lieu",
     "contactLabel": "Contact",
-    "editTitle": "Modifier l'annonce"
+    "editTitle": "Modifier l'annonce",
+    "saveSearch": "Me notifier",
+    "searchSaved": "Nous vous notifierons"
   },
   "jobs": {
     "title": "Emplois & missions",

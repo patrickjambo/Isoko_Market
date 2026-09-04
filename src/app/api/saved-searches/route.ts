@@ -9,7 +9,7 @@ import { canonicalSkill } from '@/lib/skills';
 export const GET = route(async () => {
   const user = await requireUser();
   const items = await prisma.savedSearch.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, kind: 'JOB' },
     orderBy: { createdAt: 'desc' },
   });
   return jsonOk({ items });

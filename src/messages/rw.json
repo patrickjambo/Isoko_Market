@@ -187,7 +187,9 @@
     "mapNote": "Uduziga twerekana ibicuruzwa bingahe biri muri buri karere. Kanda kuri kamwe kugira ngo ushungure.",
     "clearLocation": "Kuraho akarere",
     "contactLabel": "Aho bakugeraho",
-    "editTitle": "Hindura igicuruzwa"
+    "editTitle": "Hindura igicuruzwa",
+    "saveSearch": "Menyesha",
+    "searchSaved": "Tuzakumenyesha"
   },
   "jobs": {
     "title": "Akazi & Imirimo",

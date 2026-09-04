@@ -7,6 +7,7 @@ import { cleanContact } from '@/lib/contact';
 import { francsToMinor } from '@/lib/utils';
 import { findDuplicate } from '@/lib/suggestions';
 import { emitAdmin } from '@/lib/admin-realtime';
+import { notifyMatchingListingAlerts } from '@/lib/listing-alert';
 
 /**
  * POST /api/seller/listings?force= — publish a listing from the wizard.
@@ -37,10 +38,12 @@ export const POST = route(async (req: NextRequest) => {
       showPhone: input.showPhone,
       images: { create: input.images.map((url, position) => ({ url, position })) },
     },
-    select: { id: true },
+    select: { id: true, title: true, description: true, categoryId: true, condition: true, location: true, price: true },
   });
 
   await prisma.listingDraft.deleteMany({ where: { sellerId: user.id } });
+  // Buyers who saved a matching search hear about it immediately (see jobs parity).
+  await notifyMatchingListingAlerts({ ...listing, sellerId: user.id });
   // Adopt BUYER→SELLER (see /api/listings): fires only for BUYER, so an ADMIN who
   // sells keeps ADMIN — `role === 'SELLER'` is not "has sold". Query listings.
   if (user.role === 'BUYER') {

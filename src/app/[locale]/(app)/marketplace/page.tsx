@@ -4,6 +4,7 @@ import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { ListingCard } from '@/components/marketplace/listing-card';
 import { MarketplaceFilters } from '@/components/marketplace/marketplace-filters';
+import { SaveSearchButton } from '@/components/marketplace/save-search-button';
 import { CategoryChips } from '@/components/marketplace/category-chips';
 import { ViewToggle } from '@/components/marketplace/view-toggle';
 import { MapView } from '@/components/marketplace/map-view';
@@ -77,6 +78,16 @@ export default async function MarketplacePage({
           {total} {t('title').toLowerCase()}
         </span>
         <div className="flex items-center gap-2">
+          <SaveSearchButton
+            current={{
+              q: searchParams.q,
+              categoryId: searchParams.categoryId,
+              condition: searchParams.condition,
+              location: searchParams.location,
+              minPrice: searchParams.minPrice,
+              maxPrice: searchParams.maxPrice,
+            }}
+          />
           <ViewToggle view={view} params={searchParams} />
           <MarketplaceFilters categories={localizedCategories} current={searchParams} />
         </div>

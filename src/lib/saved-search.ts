@@ -22,7 +22,7 @@ type NewJob = {
  */
 export async function notifyMatchingSavedSearches(job: NewJob): Promise<number> {
   const searches = await prisma.savedSearch.findMany({
-    where: { userId: { not: job.employerId } },
+    where: { kind: 'JOB', userId: { not: job.employerId } },
     select: { id: true, userId: true, label: true, q: true, type: true, location: true, skills: true },
   });
   if (searches.length === 0) return 0;

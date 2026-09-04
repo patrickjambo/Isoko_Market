@@ -187,7 +187,9 @@
     "mapNote": "Bubbles show how many items are listed in each district. Tap one to filter.",
     "clearLocation": "Clear location",
     "contactLabel": "Contact",
-    "editTitle": "Edit listing"
+    "editTitle": "Edit listing",
+    "saveSearch": "Notify me",
+    "searchSaved": "We'll notify you"
   },
   "jobs": {
     "title": "Jobs & Gigs",
