@@ -198,7 +198,9 @@
     "priceUnder": "under {max} RWF",
     "priceOver": "over {min} RWF",
     "priceBetween": "{min}–{max} RWF",
-    "serviceBadge": "Service"
+    "serviceBadge": "Service",
+    "products": "Products",
+    "services": "Services"
   },
   "jobs": {
     "title": "Jobs & Gigs",

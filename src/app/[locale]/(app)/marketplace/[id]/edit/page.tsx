@@ -44,6 +44,7 @@ export default async function EditListingPage({
           title: listing.title,
           price: String(Math.round(listing.price / 100)),
           categoryId: listing.categoryId ?? '',
+          kind: listing.kind,
           condition: listing.condition,
           location: listing.location,
           description: listing.description,

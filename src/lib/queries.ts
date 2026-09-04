@@ -61,6 +61,7 @@ export async function searchListings(filter: ListingFilter) {
     ];
   }
   if (filter.categoryId) where.categoryId = filter.categoryId;
+  if (filter.kind) where.kind = filter.kind;
   if (filter.condition) where.condition = filter.condition;
   if (filter.location) where.location = { contains: filter.location, mode: 'insensitive' };
   if (filter.verifiedOnly) where.seller = { isVerified: true };

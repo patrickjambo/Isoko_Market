@@ -198,7 +198,9 @@
     "priceUnder": "munsi ya {max} RWF",
     "priceOver": "hejuru ya {min} RWF",
     "priceBetween": "{min}–{max} RWF",
-    "serviceBadge": "Serivisi"
+    "serviceBadge": "Serivisi",
+    "products": "Ibicuruzwa",
+    "services": "Serivisi"
   },
   "jobs": {
     "title": "Akazi & Imirimo",

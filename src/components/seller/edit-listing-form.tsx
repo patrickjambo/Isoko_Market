@@ -21,6 +21,7 @@ export type EditListingInitial = {
   title: string;
   price: string; // whole RWF as a string for the input
   categoryId: string;
+  kind: string; // 'PRODUCT' | 'SERVICE' — hides Condition for services
   condition: string;
   location: string;
   description: string;
@@ -48,6 +49,7 @@ export function EditListingForm({
   const { toast } = useToast();
 
   const [d, setD] = useState<EditListingInitial>(initial);
+  const isService = d.kind === 'SERVICE';
   const [saving, setSaving] = useState(false);
   const set = (patch: Partial<EditListingInitial>) => setD((prev) => ({ ...prev, ...patch }));
 
@@ -96,9 +98,9 @@ export function EditListingForm({
         <Input value={d.title} onChange={(e) => set({ title: e.target.value })} maxLength={120} />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className={`grid gap-3 ${isService ? 'grid-cols-1' : 'grid-cols-2'}`}>
         <div className="space-y-1.5">
-          <Label>{t('priceLabel')}</Label>
+          <Label>{isService ? ts('servicePriceLabel') : t('priceLabel')}</Label>
           <Input
             type="number"
             inputMode="numeric"
@@ -106,16 +108,19 @@ export function EditListingForm({
             onChange={(e) => set({ price: e.target.value })}
           />
         </div>
-        <div className="space-y-1.5">
-          <Label>{t('conditionLabel')}</Label>
-          <Select value={d.condition} onChange={(e) => set({ condition: e.target.value })}>
-            {listingConditions.map((c) => (
-              <option key={c} value={c}>
-                {tcond(c)}
-              </option>
-            ))}
-          </Select>
-        </div>
+        {/* Condition is meaningless for a service — hide it. */}
+        {!isService && (
+          <div className="space-y-1.5">
+            <Label>{t('conditionLabel')}</Label>
+            <Select value={d.condition} onChange={(e) => set({ condition: e.target.value })}>
+              {listingConditions.map((c) => (
+                <option key={c} value={c}>
+                  {tcond(c)}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
       </div>
 
       <div className="space-y-1.5">

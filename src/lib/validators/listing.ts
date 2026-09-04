@@ -46,6 +46,7 @@ export const draftDataSchema = z.object({
 export const listingFilterSchema = z.object({
   q: z.string().trim().max(120).optional(),
   categoryId: z.string().optional(),
+  kind: z.enum(listingKinds).optional(),
   minPrice: z.coerce.number().int().min(0).optional(),
   maxPrice: z.coerce.number().int().min(0).optional(),
   location: z.string().trim().max(80).optional(),

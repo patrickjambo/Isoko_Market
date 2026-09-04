@@ -6,6 +6,7 @@ import { ListingCard } from '@/components/marketplace/listing-card';
 import { MarketplaceFilters } from '@/components/marketplace/marketplace-filters';
 import { SaveSearchButton } from '@/components/marketplace/save-search-button';
 import { CategoryChips } from '@/components/marketplace/category-chips';
+import { KindTabs } from '@/components/marketplace/kind-tabs';
 import { ViewToggle } from '@/components/marketplace/view-toggle';
 import { MapView } from '@/components/marketplace/map-view';
 import { SearchBar } from '@/components/nav/search-bar';
@@ -62,6 +63,11 @@ export default async function MarketplacePage({
       {/* Search is reachable directly on the feed (Section 8.2) */}
       <div className="mb-4">
         <SearchBar />
+      </div>
+
+      {/* Primary browse split: everything · products · services */}
+      <div className="mb-4">
+        <KindTabs current={searchParams.kind} params={searchParams} />
       </div>
 
       {/* Category chips (Section 8.3) */}
