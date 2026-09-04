@@ -14,6 +14,7 @@ import type { NotificationType } from '@prisma/client';
 import { Link, redirect } from '@/i18n/routing';
 import { EmptyState } from '@/components/shared/empty-state';
 import { MarkAllReadButton } from '@/components/notifications/mark-all-read';
+import { PollRefresh } from '@/components/shared/poll-refresh';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { timeAgo, cn } from '@/lib/utils';
@@ -49,6 +50,8 @@ export default async function NotificationsPage({ params }: { params: { locale: 
 
   return (
     <div className="container max-w-2xl py-6">
+      {/* New notifications land on their own, no manual reload. */}
+      <PollRefresh intervalMs={10000} />
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
         {notifications.some((n) => !n.readAt) && <MarkAllReadButton />}

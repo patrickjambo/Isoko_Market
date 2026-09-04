@@ -30,7 +30,8 @@
     "retry": "Réessayer",
     "error": "Une erreur s'est produite. Réessayez.",
     "noResults": "Aucun résultat trouvé",
-    "poweredByTrust": "Chaque profil affiche un statut de vérification"
+    "poweredByTrust": "Chaque profil affiche un statut de vérification",
+    "deleted": "Supprimé"
   },
   "nav": {
     "home": "Accueil",
@@ -189,7 +190,14 @@
     "contactLabel": "Contact",
     "editTitle": "Modifier l'annonce",
     "saveSearch": "Me notifier",
-    "searchSaved": "Nous vous notifierons"
+    "searchSaved": "Nous vous notifierons",
+    "alertsTitle": "Mes alertes",
+    "alertsSubtitle": "Nous vous notifierons dès qu'un article correspondant est publié.",
+    "alertsEmpty": "Aucune alerte — enregistrez une recherche depuis la marketplace pour être notifié.",
+    "anyPrice": "Tout prix",
+    "priceUnder": "moins de {max} RWF",
+    "priceOver": "plus de {min} RWF",
+    "priceBetween": "{min}–{max} RWF"
   },
   "jobs": {
     "title": "Emplois & missions",

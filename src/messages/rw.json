@@ -30,7 +30,8 @@
     "retry": "Ongera ugerageze",
     "error": "Habaye ikibazo. Ongera ugerageze.",
     "noResults": "Nta bisubizo byabonetse",
-    "poweredByTrust": "Buri mwirondoro werekana ko wemejwe"
+    "poweredByTrust": "Buri mwirondoro werekana ko wemejwe",
+    "deleted": "Byasibwe"
   },
   "nav": {
     "home": "Ahabanza",
@@ -189,7 +190,14 @@
     "contactLabel": "Aho bakugeraho",
     "editTitle": "Hindura igicuruzwa",
     "saveSearch": "Menyesha",
-    "searchSaved": "Tuzakumenyesha"
+    "searchSaved": "Tuzakumenyesha",
+    "alertsTitle": "Imenyesha yanjye",
+    "alertsSubtitle": "Tuzakumenyesha ako kanya igicuruzwa gihuye kiboneka.",
+    "alertsEmpty": "Nta menyesha uracyafite — bika ishakisha uhereye ku isoko kugira ngo umenyeshwe.",
+    "anyPrice": "Igiciro cyose",
+    "priceUnder": "munsi ya {max} RWF",
+    "priceOver": "hejuru ya {min} RWF",
+    "priceBetween": "{min}–{max} RWF"
   },
   "jobs": {
     "title": "Akazi & Imirimo",

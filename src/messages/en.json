@@ -30,7 +30,8 @@
     "retry": "Try again",
     "error": "Something went wrong. Please try again.",
     "noResults": "No results found",
-    "poweredByTrust": "Every profile shows a verification status"
+    "poweredByTrust": "Every profile shows a verification status",
+    "deleted": "Deleted"
   },
   "nav": {
     "home": "Home",
@@ -189,7 +190,14 @@
     "contactLabel": "Contact",
     "editTitle": "Edit listing",
     "saveSearch": "Notify me",
-    "searchSaved": "We'll notify you"
+    "searchSaved": "We'll notify you",
+    "alertsTitle": "My alerts",
+    "alertsSubtitle": "We'll notify you the moment a matching item is posted.",
+    "alertsEmpty": "No alerts yet — save a search from the marketplace to get notified.",
+    "anyPrice": "Any price",
+    "priceUnder": "under {max} RWF",
+    "priceOver": "over {min} RWF",
+    "priceBetween": "{min}–{max} RWF"
   },
   "jobs": {
     "title": "Jobs & Gigs",

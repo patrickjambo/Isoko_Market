@@ -1,6 +1,6 @@
 'use client';
 
-import { User, Wallet, ShieldCheck, LayoutDashboard, LogOut, FileText, Gift, Store, Heart, Package, Briefcase, MessageCircle, Send } from 'lucide-react';
+import { User, Wallet, ShieldCheck, LayoutDashboard, LogOut, FileText, Gift, Store, Heart, Package, Briefcase, MessageCircle, Send, BellRing } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
@@ -122,6 +122,11 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link href="/saved">
             <Heart /> {t('saved.title')}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/alerts">
+            <BellRing /> {t('marketplace.alertsTitle')}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
