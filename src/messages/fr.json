@@ -80,7 +80,13 @@
     "trustTitle": "Pourquoi nous demandons votre pièce d'identité",
     "trustBody": "La vérification protège Isoko Market. Votre pièce d'identité est chiffrée, jamais affichée publiquement, et sert uniquement à confirmer que vous êtes une personne réelle.",
     "ctaGetStarted": "Commencer",
-    "ctaSeeWhat": "Voir ce qui est sur Isoko Market"
+    "ctaSeeWhat": "Voir ce qui est sur Isoko Market",
+    "searchPlaceholder": "Rechercher téléphones, voitures, meubles, emplois…",
+    "browseCategories": "Parcourir par catégorie",
+    "live": "En direct",
+    "liveUpdating": "Mise à jour automatique",
+    "newTodaySuffix": "nouveautés en 24h",
+    "trending": "Nouveautés du moment"
   },
   "auth": {
     "loginTitle": "Bon retour",

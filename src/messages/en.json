@@ -80,7 +80,13 @@
     "trustTitle": "Why we ask for your ID",
     "trustBody": "Verification keeps Isoko Market safe. Your ID is encrypted, never shown publicly, and only used to confirm you are a real person.",
     "ctaGetStarted": "Get Started",
-    "ctaSeeWhat": "See what's on Isoko Market"
+    "ctaSeeWhat": "See what's on Isoko Market",
+    "searchPlaceholder": "Search phones, cars, furniture, jobs…",
+    "browseCategories": "Browse by category",
+    "live": "Live",
+    "liveUpdating": "Updates automatically",
+    "newTodaySuffix": "new in the last 24h",
+    "trending": "Fresh right now"
   },
   "auth": {
     "loginTitle": "Welcome back",

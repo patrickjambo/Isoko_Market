@@ -218,14 +218,18 @@ export async function getJob(id: string) {
 }
 
 export async function getPlatformStats() {
-  const [users, listings, transactions, jobs, filled] = await Promise.all([
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const [users, listings, transactions, jobs, filled, newToday] = await Promise.all([
     prisma.user.count(),
     prisma.listing.count({ where: { status: 'ACTIVE' } }),
     prisma.transaction.count({ where: { status: 'SUCCESS' } }),
     prisma.job.count(),
     prisma.application.count({ where: { status: 'HIRED' } }),
+    // Live freshness signal — climbs as sellers post, so the homepage visibly
+    // moves on its own with the poll-refresh below.
+    prisma.listing.count({ where: { status: 'ACTIVE', createdAt: { gte: since } } }),
   ]);
-  return { users, listings, transactions, jobs, filled };
+  return { users, listings, transactions, jobs, filled, newToday };
 }
 
 /**

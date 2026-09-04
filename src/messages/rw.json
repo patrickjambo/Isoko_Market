@@ -80,7 +80,13 @@
     "trustTitle": "Impamvu dusaba indangamuntu yawe",
     "trustBody": "Kwemeza bituma Isoko Market ririnda umutekano. Indangamuntu yawe irabikwa mu ibanga, ntiyerekanwa ku mugaragaro, kandi ikoreshwa gusa mu kwemeza ko uri umuntu nyawe.",
     "ctaGetStarted": "Tangira",
-    "ctaSeeWhat": "Reba ibiri kuri Isoko Market"
+    "ctaSeeWhat": "Reba ibiri kuri Isoko Market",
+    "searchPlaceholder": "Shakisha telefone, imodoka, ibikoresho, akazi…",
+    "browseCategories": "Reba ibyiciro",
+    "live": "Bizima",
+    "liveUpdating": "Bivugururwa byikora",
+    "newTodaySuffix": "bishya mu masaha 24",
+    "trending": "Bishya nonaha"
   },
   "auth": {
     "loginTitle": "Murakaza neza",

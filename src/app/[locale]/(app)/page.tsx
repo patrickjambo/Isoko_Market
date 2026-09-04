@@ -6,6 +6,7 @@ import {
   Languages,
   ArrowRight,
   Store,
+  Sparkles,
 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
@@ -13,17 +14,28 @@ import { ListingCard } from '@/components/marketplace/listing-card';
 import { JobCard } from '@/components/jobs/job-card';
 import { BuyerStrips } from '@/components/buyer/buyer-strips';
 import { WelcomeNudge } from '@/components/onboarding/welcome-nudge';
-import { getFeaturedListings, getLatestJobs, getPlatformStats } from '@/lib/queries';
+import { PollRefresh } from '@/components/shared/poll-refresh';
+import { CountUp } from '@/components/home/count-up';
+import { HeroSearch } from '@/components/home/hero-search';
+import { LiveBadge } from '@/components/home/live-badge';
+import {
+  getFeaturedListings,
+  getLatestJobs,
+  getPlatformStats,
+  getCategories,
+} from '@/lib/queries';
+import { categoryName } from '@/lib/i18n-helpers';
 import { getCurrentUser } from '@/lib/auth';
 
 export default async function HomePage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
   const t = await getTranslations('home');
 
-  const [listings, jobs, stats, user] = await Promise.all([
+  const [listings, jobs, stats, categories, user] = await Promise.all([
     getFeaturedListings(8),
     getLatestJobs(6),
     getPlatformStats(),
+    getCategories(),
     getCurrentUser(),
   ]);
 
@@ -34,8 +46,14 @@ export default async function HomePage({ params }: { params: { locale: string } 
     { icon: Languages, title: t('pillarLangTitle'), body: t('pillarLangBody') },
   ];
 
+  const topCategories = categories.slice(0, 8);
+
   return (
     <div>
+      {/* Auto-refresh the whole home feed (stats, featured, latest jobs) on a
+          visibility-aware interval — new posts appear without a manual reload. */}
+      <PollRefresh intervalMs={20000} />
+
       {/* One-time welcome nudge toward the chosen onboarding path (Visitor §6) */}
       {user && (
         <WelcomeNudge preferredRole={user.preferredRole} name={user.fullName.split(' ')[0]!} />
@@ -45,13 +63,33 @@ export default async function HomePage({ params }: { params: { locale: string } 
       {user && <BuyerStrips userId={user.id} location={user.location} locale={params.locale} />}
 
       {/* Hero */}
-      <section className="brand-gradient text-white">
-        <div className="container grid gap-8 py-14 md:grid-cols-2 md:items-center md:py-20">
+      <section className="relative overflow-hidden brand-gradient text-white">
+        {/* soft glow accents for depth */}
+        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+
+        <div className="container relative grid gap-10 py-14 md:grid-cols-2 md:items-center md:py-20">
           <div className="space-y-6">
+            {stats.newToday > 0 && (
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium backdrop-blur">
+                <Sparkles className="h-4 w-4 text-accent" />
+                <span>
+                  <span className="font-bold">
+                    <CountUp value={stats.newToday} />
+                  </span>{' '}
+                  {t('newTodaySuffix')}
+                </span>
+              </div>
+            )}
+
             <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl">
               {t('heroTitle')}
             </h1>
             <p className="max-w-xl text-base text-white/90 sm:text-lg">{t('heroSubtitle')}</p>
+
+            {/* Prominent, working search into the marketplace */}
+            <HeroSearch />
+
             <div className="flex flex-wrap gap-3">
               {user ? (
                 <Button size="lg" variant="accent" asChild>
@@ -73,10 +111,14 @@ export default async function HomePage({ params }: { params: { locale: string } 
                 className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
                 asChild
               >
-                <Link href="/marketplace">{t('ctaSeeWhat')}</Link>
+                <Link href="/jobs">
+                  <Briefcase className="h-5 w-5" /> {t('ctaJobs')}
+                </Link>
               </Button>
             </div>
-            {/* Social proof — omit any hollow zero rather than showing it (§2). */}
+
+            {/* Social proof — omit any hollow zero rather than showing it (§2).
+                Numbers tick up on their own as the feed refreshes. */}
             <dl className="flex gap-8 pt-2">
               {stats.users > 0 && <Stat value={stats.users} label={t('statsReached')} />}
               {stats.transactions > 0 && (
@@ -91,6 +133,26 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </div>
       </section>
 
+      {/* Category quick-links */}
+      {topCategories.length > 0 && (
+        <section className="border-b border-border bg-card/50">
+          <div className="container flex flex-wrap items-center gap-2 py-4">
+            <span className="mr-1 text-sm font-semibold text-muted-foreground">
+              {t('browseCategories')}
+            </span>
+            {topCategories.map((c) => (
+              <Link
+                key={c.id}
+                href={`/marketplace?categoryId=${c.id}`}
+                className="rounded-full border border-border bg-background px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-primary hover:bg-secondary hover:text-primary"
+              >
+                {categoryName(c, params.locale)}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Pillars */}
       <section className="container py-12">
         <h2 className="mb-6 text-center text-2xl font-bold tracking-tight">{t('pillarsTitle')}</h2>
@@ -98,7 +160,10 @@ export default async function HomePage({ params }: { params: { locale: string } 
           {pillars.map((p) => {
             const Icon = p.icon;
             return (
-              <div key={p.title} className="rounded-xl border border-border bg-card p-5">
+              <div
+                key={p.title}
+                className="rounded-xl border border-border bg-card p-5 transition-shadow hover:shadow-md"
+              >
                 <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-secondary text-primary">
                   <Icon className="h-6 w-6" />
                 </div>
@@ -110,10 +175,10 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </div>
       </section>
 
-      {/* Featured listings */}
+      {/* Featured listings — live */}
       {listings.length > 0 && (
         <section className="container py-6">
-          <SectionHeader title={t('featuredListings')} href="/marketplace" />
+          <SectionHeader title={t('featuredListings')} href="/marketplace" live={t('live')} />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {listings.map((l) => (
               <ListingCard key={l.id} listing={l} />
@@ -122,10 +187,10 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </section>
       )}
 
-      {/* Latest jobs */}
+      {/* Latest jobs — live */}
       {jobs.length > 0 && (
         <section className="container py-10">
-          <SectionHeader title={t('latestJobs')} href="/jobs" />
+          <SectionHeader title={t('latestJobs')} href="/jobs" live={t('live')} />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {jobs.map((j) => (
               <JobCard key={j.id} job={j} />
@@ -165,7 +230,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
 function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div>
-      <dt className="text-2xl font-extrabold">{value.toLocaleString()}</dt>
+      <dt className="text-2xl font-extrabold">
+        <CountUp value={value} />
+      </dt>
       <dd className="text-xs text-white/80">{label}</dd>
     </div>
   );
@@ -183,10 +250,13 @@ function TrustPanel({ title, body }: { title: string; body: string }) {
   );
 }
 
-function SectionHeader({ title, href }: { title: string; href: string }) {
+function SectionHeader({ title, href, live }: { title: string; href: string; live?: string }) {
   return (
     <div className="mb-4 flex items-center justify-between">
-      <h2 className="text-xl font-bold tracking-tight">{title}</h2>
+      <div className="flex items-center gap-2.5">
+        <h2 className="text-xl font-bold tracking-tight">{title}</h2>
+        {live && <LiveBadge label={live} />}
+      </div>
       <Button variant="ghost" size="sm" asChild>
         <Link href={href} aria-label={title}>
           <ArrowRight className="h-4 w-4" />
