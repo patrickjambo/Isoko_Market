@@ -545,11 +545,12 @@ model SavedSearch {
   location  String? // district / place substring
   skills    String[]   @default([]) // canonical taxonomy keys to match against job.skills
   // Marketplace (kind = LISTING) criteria:
-  categoryId String? // match listing.categoryId exactly
-  condition  String? // match listing.condition exactly
-  minPrice   Int? // in whole RWF (francs); compared against listing.price/100
-  maxPrice   Int? // in whole RWF (francs)
-  createdAt  DateTime   @default(now())
+  categoryId  String? // match listing.categoryId exactly
+  condition   String? // match listing.condition exactly
+  listingKind ListingKind? // match products vs services (null = either)
+  minPrice    Int? // in whole RWF (francs); compared against listing.price/100
+  maxPrice    Int? // in whole RWF (francs)
+  createdAt   DateTime   @default(now())
 
   @@index([userId])
   @@index([kind])

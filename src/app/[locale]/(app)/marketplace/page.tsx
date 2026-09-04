@@ -88,6 +88,7 @@ export default async function MarketplacePage({
             current={{
               q: searchParams.q,
               categoryId: searchParams.categoryId,
+              kind: searchParams.kind,
               condition: searchParams.condition,
               location: searchParams.location,
               minPrice: searchParams.minPrice,

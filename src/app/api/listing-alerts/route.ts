@@ -20,7 +20,7 @@ export const POST = route(async (req: NextRequest) => {
   const input = listingAlertSchema.parse(await req.json().catch(() => ({})));
 
   const hasCriteria =
-    Boolean(input.q || input.categoryId || input.condition || input.location) ||
+    Boolean(input.q || input.categoryId || input.condition || input.location || input.kind) ||
     input.minPrice != null ||
     input.maxPrice != null;
   // Reject an empty rule — it would match every listing and spam the buyer.
@@ -45,6 +45,7 @@ export const POST = route(async (req: NextRequest) => {
       q: input.q || null,
       categoryId: input.categoryId || null,
       condition: input.condition ?? null,
+      listingKind: input.kind ?? null,
       location: input.location || null,
       minPrice: input.minPrice ?? null,
       maxPrice: input.maxPrice ?? null,

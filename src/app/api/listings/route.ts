@@ -37,7 +37,7 @@ export const POST = route(async (req: NextRequest) => {
         create: input.images.map((url, position) => ({ url, position })),
       },
     },
-    select: { id: true, title: true, description: true, categoryId: true, condition: true, location: true, price: true },
+    select: { id: true, title: true, description: true, categoryId: true, kind: true, condition: true, location: true, price: true },
   });
 
   // Adopt BUYER→SELLER on first listing so the role reflects usage. This fires

@@ -7,6 +7,7 @@ type NewListing = {
   title: string;
   description: string;
   categoryId: string | null;
+  kind: string; // 'PRODUCT' | 'SERVICE'
   condition: string;
   location: string;
   price: number; // minor units (RWF × 100), as stored on Listing
@@ -31,6 +32,7 @@ export async function notifyMatchingListingAlerts(listing: NewListing): Promise<
       location: true,
       categoryId: true,
       condition: true,
+      listingKind: true,
       minPrice: true,
       maxPrice: true,
     },
@@ -47,6 +49,7 @@ export async function notifyMatchingListingAlerts(listing: NewListing): Promise<
 
   for (const s of searches) {
     if (notified.has(s.userId)) continue;
+    if (s.listingKind && s.listingKind !== listing.kind) continue;
     if (s.categoryId && s.categoryId !== listing.categoryId) continue;
     if (s.condition && s.condition !== listing.condition) continue;
     if (s.location && !location.includes(s.location.toLowerCase().split(',')[0]!.trim())) continue;
@@ -57,7 +60,15 @@ export async function notifyMatchingListingAlerts(listing: NewListing): Promise<
     if (s.minPrice != null && francs < s.minPrice) continue;
     if (s.maxPrice != null && francs > s.maxPrice) continue;
     // A rule with no criteria at all would match everything — skip it.
-    if (!s.q && !s.location && !s.categoryId && !s.condition && s.minPrice == null && s.maxPrice == null)
+    if (
+      !s.q &&
+      !s.location &&
+      !s.categoryId &&
+      !s.condition &&
+      !s.listingKind &&
+      s.minPrice == null &&
+      s.maxPrice == null
+    )
       continue;
 
     notified.add(s.userId);

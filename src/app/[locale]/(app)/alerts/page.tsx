@@ -40,11 +40,15 @@ export default async function AlertsPage({ params }: { params: { locale: string 
     return '';
   };
 
+  const kindLabel = (k: string | null) =>
+    k === 'SERVICE' ? t('services') : k === 'PRODUCT' ? t('products') : '';
+
   const rows = alerts.map((a) => ({
     id: a.id,
     label: a.label,
     summary:
       [
+        kindLabel(a.listingKind),
         a.q,
         catName(a.categoryId),
         a.condition ? tcond(a.condition) : '',

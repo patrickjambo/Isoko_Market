@@ -61,6 +61,7 @@ export const listingAlertSchema = z.object({
   label: z.string().trim().max(80).optional(),
   q: z.string().trim().max(120).optional(),
   categoryId: z.string().optional(),
+  kind: z.enum(listingKinds).optional(),
   condition: z.enum(listingConditions).optional(),
   location: z.string().trim().max(80).optional(),
   minPrice: z.coerce.number().int().min(0).max(1_000_000_000).optional(),

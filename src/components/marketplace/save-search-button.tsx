@@ -11,6 +11,7 @@ import { useRouter, usePathname } from '@/i18n/routing';
 type Current = {
   q?: string;
   categoryId?: string;
+  kind?: string;
   condition?: string;
   location?: string;
   minPrice?: string;
@@ -33,7 +34,13 @@ export function SaveSearchButton({ current }: { current: Current }) {
 
   // Nothing to save if there are no active filters.
   const hasFilter = Boolean(
-    current.q || current.categoryId || current.condition || current.location || current.minPrice || current.maxPrice
+    current.q ||
+      current.categoryId ||
+      current.kind ||
+      current.condition ||
+      current.location ||
+      current.minPrice ||
+      current.maxPrice
   );
   if (!hasFilter) return null;
 
@@ -47,6 +54,7 @@ export function SaveSearchButton({ current }: { current: Current }) {
         body: JSON.stringify({
           q: current.q,
           categoryId: current.categoryId,
+          kind: current.kind,
           condition: current.condition,
           location: current.location,
           minPrice: current.minPrice ? Number(current.minPrice) : undefined,

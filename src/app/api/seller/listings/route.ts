@@ -39,7 +39,7 @@ export const POST = route(async (req: NextRequest) => {
       showPhone: input.showPhone,
       images: { create: input.images.map((url, position) => ({ url, position })) },
     },
-    select: { id: true, title: true, description: true, categoryId: true, condition: true, location: true, price: true },
+    select: { id: true, title: true, description: true, categoryId: true, kind: true, condition: true, location: true, price: true },
   });
 
   await prisma.listingDraft.deleteMany({ where: { sellerId: user.id } });
