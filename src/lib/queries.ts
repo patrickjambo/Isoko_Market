@@ -42,25 +42,34 @@ const listingCardSelect = {
   seller: { select: { fullName: true, isVerified: true, verificationStatus: true } },
 } satisfies Prisma.ListingSelect;
 
-export async function getFeaturedListings(take = 8) {
-  return prisma.listing.findMany({
-    // Products only — services get their own homepage strip (getLatestServices).
-    where: { status: 'ACTIVE', kind: 'PRODUCT' },
-    orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
-    take,
-    select: listingCardSelect,
-  });
-}
+// Homepage feeds are cached briefly (30s): the page re-renders on a poll, so
+// without this every viewer would re-run these every 20s. New posts still show
+// within the window, and the marketplace/jobs search paths stay uncached/fresh.
+export const getFeaturedListings = unstable_cache(
+  async (take = 8) =>
+    prisma.listing.findMany({
+      // Products only — services get their own homepage strip (getLatestServices).
+      where: { status: 'ACTIVE', kind: 'PRODUCT' },
+      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+      take,
+      select: listingCardSelect,
+    }),
+  ['home-featured-listings'],
+  { revalidate: 30 }
+);
 
 /** Recent active services for the homepage "Services" strip. */
-export async function getLatestServices(take = 4) {
-  return prisma.listing.findMany({
-    where: { status: 'ACTIVE', kind: 'SERVICE' },
-    orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
-    take,
-    select: listingCardSelect,
-  });
-}
+export const getLatestServices = unstable_cache(
+  async (take = 4) =>
+    prisma.listing.findMany({
+      where: { status: 'ACTIVE', kind: 'SERVICE' },
+      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+      take,
+      select: listingCardSelect,
+    }),
+  ['home-latest-services'],
+  { revalidate: 30 }
+);
 
 export async function searchListings(filter: ListingFilter) {
   const where: Prisma.ListingWhereInput = { status: 'ACTIVE' };
@@ -174,14 +183,17 @@ const jobCardSelect = {
   employer: { select: { fullName: true, isVerified: true } },
 } satisfies Prisma.JobSelect;
 
-export async function getLatestJobs(take = 6) {
-  return prisma.job.findMany({
-    where: { status: 'OPEN' },
-    orderBy: { createdAt: 'desc' },
-    take,
-    select: jobCardSelect,
-  });
-}
+export const getLatestJobs = unstable_cache(
+  async (take = 6) =>
+    prisma.job.findMany({
+      where: { status: 'OPEN' },
+      orderBy: { createdAt: 'desc' },
+      take,
+      select: jobCardSelect,
+    }),
+  ['home-latest-jobs'],
+  { revalidate: 30 }
+);
 
 export async function searchJobs(filter: JobFilter) {
   const where: Prisma.JobWhereInput = { status: 'OPEN' };
@@ -230,20 +242,25 @@ export async function getJob(id: string) {
   });
 }
 
-export async function getPlatformStats() {
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const [users, listings, transactions, jobs, filled, newToday] = await Promise.all([
-    prisma.user.count(),
-    prisma.listing.count({ where: { status: 'ACTIVE' } }),
-    prisma.transaction.count({ where: { status: 'SUCCESS' } }),
-    prisma.job.count(),
-    prisma.application.count({ where: { status: 'HIRED' } }),
-    // Live freshness signal — climbs as sellers post, so the homepage visibly
-    // moves on its own with the poll-refresh below.
-    prisma.listing.count({ where: { status: 'ACTIVE', createdAt: { gte: since } } }),
-  ]);
-  return { users, listings, transactions, jobs, filled, newToday };
-}
+// Six COUNTs — cached 60s so the homepage poll doesn't re-count on every tick
+// for every viewer. Counters tolerate a minute of staleness.
+export const getPlatformStats = unstable_cache(
+  async () => {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const [users, listings, transactions, jobs, filled, newToday] = await Promise.all([
+      prisma.user.count(),
+      prisma.listing.count({ where: { status: 'ACTIVE' } }),
+      prisma.transaction.count({ where: { status: 'SUCCESS' } }),
+      prisma.job.count(),
+      prisma.application.count({ where: { status: 'HIRED' } }),
+      // Freshness signal — climbs as sellers post.
+      prisma.listing.count({ where: { status: 'ACTIVE', createdAt: { gte: since } } }),
+    ]);
+    return { users, listings, transactions, jobs, filled, newToday };
+  },
+  ['platform-stats'],
+  { revalidate: 60 }
+);
 
 /**
  * Personalized buyer-home data (Section 2): recently viewed, active orders, and

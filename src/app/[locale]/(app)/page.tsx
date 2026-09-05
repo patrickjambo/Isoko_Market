@@ -52,9 +52,10 @@ export default async function HomePage({ params }: { params: { locale: string } 
 
   return (
     <div>
-      {/* Auto-refresh the whole home feed (stats, featured, latest jobs) on a
-          visibility-aware interval — new posts appear without a manual reload. */}
-      <PollRefresh intervalMs={20000} />
+      {/* Auto-refresh the home feed on a visibility-aware interval aligned with
+          the 30s data cache (getPlatformStats/getFeaturedListings…) — new posts
+          appear on their own without re-querying the DB every tick. */}
+      <PollRefresh intervalMs={30000} />
 
       {/* One-time welcome nudge toward the chosen onboarding path (Visitor §6) */}
       {user && (
