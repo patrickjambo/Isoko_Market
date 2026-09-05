@@ -149,7 +149,10 @@ export default async function ListingDetailPage({
               />
             ) : (
               <>
-                {listing.status === 'ACTIVE' && (
+                {/* Products use the manual-payment order flow; a service is
+                    arranged by contacting the provider, so it leads with a
+                    prominent "Request this service" instead of Buy Now. */}
+                {listing.status === 'ACTIVE' && listing.kind !== 'SERVICE' && (
                   <BuyNowButton
                     listingId={listing.id}
                     price={listing.price}
@@ -158,8 +161,8 @@ export default async function ListingDetailPage({
                 )}
                 <MessageSellerButton
                   listingId={listing.id}
-                  label={t('messageSeller')}
-                  variant="outline"
+                  label={listing.kind === 'SERVICE' ? t('requestService') : t('messageSeller')}
+                  variant={listing.kind === 'SERVICE' ? 'accent' : 'outline'}
                 />
                 <FavoriteButton
                   listingId={listing.id}

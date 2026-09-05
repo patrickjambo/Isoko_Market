@@ -201,7 +201,8 @@
     "priceBetween": "{min}–{max} RWF",
     "serviceBadge": "Serivisi",
     "products": "Ibicuruzwa",
-    "services": "Serivisi"
+    "services": "Serivisi",
+    "requestService": "Saba iyi serivisi"
   },
   "jobs": {
     "title": "Akazi & Imirimo",
