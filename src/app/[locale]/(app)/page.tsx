@@ -48,7 +48,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
     { icon: Languages, title: t('pillarLangTitle'), body: t('pillarLangBody') },
   ];
 
-  const topCategories = categories.slice(0, 8);
+  const topCategories = categories.filter((c) => c.kind === 'PRODUCT').slice(0, 8);
 
   return (
     <div>

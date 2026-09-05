@@ -41,10 +41,11 @@ export default async function MarketplacePage({
   const favSet = user ? await favoritedSet(user.id, rawItems.map((i) => i.id)) : new Set<string>();
   const items = rawItems.map((i) => ({ ...i, favorited: favSet.has(i.id) }));
   const showFavorite = Boolean(user);
-  const localizedCategories = categories.map((c) => ({
-    id: c.id,
-    name: categoryName(c, params.locale),
-  }));
+  // Show categories that match the active Products/Services tab (all when on "All").
+  const kindFilter = searchParams.kind;
+  const localizedCategories = categories
+    .filter((c) => !kindFilter || c.kind === kindFilter)
+    .map((c) => ({ id: c.id, name: categoryName(c, params.locale) }));
 
   return (
     <div className="container py-6">

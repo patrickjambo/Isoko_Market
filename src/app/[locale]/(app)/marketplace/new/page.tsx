@@ -18,7 +18,9 @@ export default async function NewListingPage({ params }: { params: { locale: str
       <h1 className="text-2xl font-bold tracking-tight">{t('createTitle')}</h1>
       <p className="mb-6 text-sm text-muted-foreground">{t('createSubtitle')}</p>
       <CreateListingForm
-        categories={categories.map((c) => ({ id: c.id, name: categoryName(c, params.locale) }))}
+        categories={categories
+          .filter((c) => c.kind === 'PRODUCT')
+          .map((c) => ({ id: c.id, name: categoryName(c, params.locale) }))}
       />
     </div>
   );

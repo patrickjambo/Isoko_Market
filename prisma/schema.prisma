@@ -268,13 +268,16 @@ model VerificationRequest {
 // ─────────────────────── Marketplace ───────────────────────
 
 model Category {
-  id       String    @id @default(cuid())
-  slug     String    @unique
+  id       String      @id @default(cuid())
+  slug     String      @unique
   nameRw   String
   nameEn   String
   nameFr   String
   icon     String? // lucide icon name
+  kind     ListingKind @default(PRODUCT) // product categories vs. service categories
   listings Listing[]
+
+  @@index([kind])
 }
 
 model Listing {

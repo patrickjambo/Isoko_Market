@@ -16,7 +16,7 @@ async function main() {
   for (const c of CATEGORIES) {
     await prisma.category.upsert({
       where: { slug: c.slug },
-      update: { nameEn: c.nameEn, nameRw: c.nameRw, nameFr: c.nameFr, icon: c.icon },
+      update: { nameEn: c.nameEn, nameRw: c.nameRw, nameFr: c.nameFr, icon: c.icon, kind: c.kind },
       create: c,
     });
   }

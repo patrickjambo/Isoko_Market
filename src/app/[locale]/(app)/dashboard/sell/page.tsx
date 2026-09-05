@@ -16,6 +16,7 @@ export default async function SellPage({
   const t = await getTranslations('sell');
   const categories = await getCategories();
   const isService = searchParams.kind === 'service';
+  const wantKind = isService ? 'SERVICE' : 'PRODUCT';
 
   return (
     <div>
@@ -27,7 +28,9 @@ export default async function SellPage({
       </p>
       <AddProductWizard
         kind={isService ? 'SERVICE' : 'PRODUCT'}
-        categories={categories.map((c) => ({ id: c.id, name: categoryName(c, params.locale) }))}
+        categories={categories
+          .filter((c) => c.kind === wantKind)
+          .map((c) => ({ id: c.id, name: categoryName(c, params.locale) }))}
       />
     </div>
   );

@@ -39,7 +39,9 @@ export default async function EditListingPage({
       <h1 className="mb-4 text-2xl font-bold tracking-tight">{t('editTitle')}</h1>
       <EditListingForm
         listingId={listing.id}
-        categories={categories.map((c) => ({ id: c.id, name: categoryName(c, params.locale) }))}
+        categories={categories
+          .filter((c) => c.kind === listing.kind)
+          .map((c) => ({ id: c.id, name: categoryName(c, params.locale) }))}
         initial={{
           title: listing.title,
           price: String(Math.round(listing.price / 100)),
