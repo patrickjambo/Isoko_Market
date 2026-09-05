@@ -332,10 +332,38 @@ export function draftDescription(input: {
   location?: string;
   tags?: string[];
   locale?: string;
+  kind?: 'PRODUCT' | 'SERVICE';
 }): string {
-  const { title, category, condition, location, tags = [], locale = 'en' } = input;
-  const cond = condition ? conditionWord(condition, locale) : '';
+  const { title, category, condition, location, tags = [], locale = 'en', kind } = input;
   const tagLine = tags.length ? tags.join(', ') : '';
+
+  // Services never carry a condition and read as an offer, not an item for sale.
+  if (kind === 'SERVICE') {
+    if (locale === 'rw') {
+      let s = `Ntanga serivisi ya ${title}${category ? ` mu cyiciro cya ${category}` : ''}`.trim();
+      if (location) s += `, nkorera i ${location}`;
+      s += '.';
+      if (tagLine) s += ` Ibyo ntanga: ${tagLine}.`;
+      s += ' Vugana nanjye kugira ngo tubiganireho.';
+      return s;
+    }
+    if (locale === 'fr') {
+      let s = `Je propose un service de ${title}${category ? ` (${category})` : ''}`.trim();
+      if (location) s += `, disponible à ${location}`;
+      s += '.';
+      if (tagLine) s += ` Prestations : ${tagLine}.`;
+      s += ' Contactez-moi pour en discuter.';
+      return s;
+    }
+    let s = `I offer ${title}${category ? ` (${category})` : ''} services`.trim();
+    if (location) s += `, available in ${location}`;
+    s += '.';
+    if (tagLine) s += ` What I offer: ${tagLine}.`;
+    s += ' Message me to discuss.';
+    return s;
+  }
+
+  const cond = condition ? conditionWord(condition, locale) : '';
 
   if (locale === 'rw') {
     let s = `${cond} ${title}${category ? ` mu cyiciro cya ${category}` : ''}`.trim();

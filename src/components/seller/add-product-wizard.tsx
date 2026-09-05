@@ -557,7 +557,8 @@ function SuggestDescription({
         body: JSON.stringify({
           title: data.title,
           category: categoryName,
-          condition: data.condition,
+          kind: data.kind,
+          condition: data.kind === 'SERVICE' ? undefined : data.condition,
           location: data.location,
           tags: data.tags,
           locale,

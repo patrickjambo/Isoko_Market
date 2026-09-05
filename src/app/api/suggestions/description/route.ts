@@ -14,6 +14,7 @@ const schema = z.object({
   location: z.string().trim().max(80).optional(),
   tags: z.array(z.string().trim().max(40)).max(10).optional(),
   locale: z.enum(['rw', 'en', 'fr']).optional(),
+  kind: z.enum(['PRODUCT', 'SERVICE']).optional(),
 });
 
 /**
