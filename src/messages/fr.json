@@ -31,7 +31,8 @@
     "error": "Une erreur s'est produite. Réessayez.",
     "noResults": "Aucun résultat trouvé",
     "poweredByTrust": "Chaque profil affiche un statut de vérification",
-    "deleted": "Supprimé"
+    "deleted": "Supprimé",
+    "clear": "Effacer"
   },
   "nav": {
     "home": "Accueil",
@@ -294,7 +295,8 @@
     "nearbyGigsToday": "Missions proches aujourd’hui",
     "coverNoteSuggested": "Je suis intéressé(e) et disponible immédiatement.",
     "snapshotNote": "Une copie de votre CV est enregistrée avec cette candidature.",
-    "gateApply": "Inscrivez-vous pour postuler — ça prend 30 secondes et protège votre identité."
+    "gateApply": "Inscrivez-vous pour postuler — ça prend 30 secondes et protège votre identité.",
+    "filters": "Filtres"
   },
   "cv": {
     "title": "Créateur de CV",

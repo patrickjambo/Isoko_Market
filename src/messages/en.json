@@ -31,7 +31,8 @@
     "error": "Something went wrong. Please try again.",
     "noResults": "No results found",
     "poweredByTrust": "Every profile shows a verification status",
-    "deleted": "Deleted"
+    "deleted": "Deleted",
+    "clear": "Clear"
   },
   "nav": {
     "home": "Home",
@@ -294,7 +295,8 @@
     "nearbyGigsToday": "Nearby gigs today",
     "coverNoteSuggested": "I'm interested and available immediately.",
     "snapshotNote": "A copy of your CV is saved with this application.",
-    "gateApply": "Sign up to apply — it takes 30 seconds and keeps your identity safe."
+    "gateApply": "Sign up to apply — it takes 30 seconds and keeps your identity safe.",
+    "filters": "Filters"
   },
   "cv": {
     "title": "CV builder",

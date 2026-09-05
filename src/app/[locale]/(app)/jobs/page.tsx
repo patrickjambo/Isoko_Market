@@ -4,6 +4,7 @@ import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { JobCard } from '@/components/jobs/job-card';
 import { JobFilters } from '@/components/jobs/job-filters';
+import { JobFilterDialog } from '@/components/jobs/job-filter-dialog';
 import { SaveSearchButton } from '@/components/jobs/save-search-button';
 import { SeekerHome } from '@/components/jobs/seeker-home';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -55,6 +56,7 @@ export default async function JobsPage({
         <div className="min-w-0 flex-1">
           <JobFilters current={searchParams} />
         </div>
+        <JobFilterDialog current={searchParams} />
         <SaveSearchButton
           current={{ q: searchParams.q, type: searchParams.type, location: searchParams.location }}
         />

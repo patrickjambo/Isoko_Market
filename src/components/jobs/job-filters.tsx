@@ -16,6 +16,7 @@ export function JobFilters({ current }: { current: Record<string, string | undef
     const sp = new URLSearchParams();
     if (current.q) sp.set('q', current.q);
     if (current.location) sp.set('location', current.location);
+    if (current.minPay) sp.set('minPay', current.minPay); // keep the pay filter
     if (type) sp.set('type', type);
     router.push(`/jobs?${sp.toString()}`);
   }

@@ -31,7 +31,8 @@
     "error": "Habaye ikibazo. Ongera ugerageze.",
     "noResults": "Nta bisubizo byabonetse",
     "poweredByTrust": "Buri mwirondoro werekana ko wemejwe",
-    "deleted": "Byasibwe"
+    "deleted": "Byasibwe",
+    "clear": "Siba"
   },
   "nav": {
     "home": "Ahabanza",
@@ -294,7 +295,8 @@
     "nearbyGigsToday": "Imirimo iri hafi uyu munsi",
     "coverNoteSuggested": "Ndabishaka kandi ndahari ako kanya.",
     "snapshotNote": "Kopi ya CV yawe ibikwa kuri ubu busabe.",
-    "gateApply": "Iyandikishe kugira ngo usabe — bitwara amasegonda 30 kandi birinda umwirondoro wawe."
+    "gateApply": "Iyandikishe kugira ngo usabe — bitwara amasegonda 30 kandi birinda umwirondoro wawe.",
+    "filters": "Muyunguruzi"
   },
   "cv": {
     "title": "Kubaka CV",
