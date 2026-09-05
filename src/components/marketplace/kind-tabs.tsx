@@ -20,9 +20,12 @@ export function KindTabs({
   const tc = useTranslations('common');
   const router = useRouter();
 
+  // Category and condition are kind-specific, so switching tab clears them —
+  // otherwise a product category carried onto the Services tab matches nothing.
+  const DROP = new Set(['kind', 'page', 'categoryId', 'condition']);
   const go = (kind?: string) => {
     const sp = new URLSearchParams(
-      Object.entries(params).filter(([k, v]) => v && k !== 'kind' && k !== 'page') as [string, string][]
+      Object.entries(params).filter(([k, v]) => v && !DROP.has(k)) as [string, string][]
     );
     if (kind) sp.set('kind', kind);
     const qs = sp.toString();

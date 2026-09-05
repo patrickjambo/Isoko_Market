@@ -44,6 +44,7 @@ export function MarketplaceFilters({
   function apply() {
     const sp = new URLSearchParams();
     if (current.q) sp.set('q', current.q);
+    if (current.kind) sp.set('kind', current.kind); // keep the Products/Services tab
     if (state.categoryId) sp.set('categoryId', state.categoryId);
     if (state.minPrice) sp.set('minPrice', state.minPrice);
     if (state.maxPrice) sp.set('maxPrice', state.maxPrice);

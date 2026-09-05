@@ -22,6 +22,7 @@ export function CategoryChips({
     if (params.q) sp.set('q', params.q);
     if (params.view) sp.set('view', params.view);
     if (params.sort) sp.set('sort', params.sort);
+    if (params.kind) sp.set('kind', params.kind); // keep the Products/Services tab selected
     if (categoryId) sp.set('categoryId', categoryId);
     const qs = sp.toString();
     return qs ? `/marketplace?${qs}` : '/marketplace';
