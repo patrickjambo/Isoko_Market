@@ -412,7 +412,13 @@
     "typeCoverLetter": "Application letter",
     "typeCertificate": "Certificate",
     "typeId": "ID document",
-    "typeOther": "Other"
+    "typeOther": "Other",
+    "choiceTitle": "How would you like your CV?",
+    "choiceHint": "Choose one: build a CV with our tool, or upload a CV you already have. Employers you apply to will see it.",
+    "tabBuild": "Build a CV",
+    "tabBuildHint": "Fill in a guided form — no CV file needed.",
+    "tabUpload": "Upload my CV",
+    "tabUploadHint": "Already have a CV or documents? Upload them from your device."
   },
   "messages": {
     "title": "Messages",

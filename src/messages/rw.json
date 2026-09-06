@@ -412,7 +412,13 @@
     "typeCoverLetter": "Ibaruwa isaba akazi",
     "typeCertificate": "Impamyabushobozi",
     "typeId": "Indangamuntu",
-    "typeOther": "Ibindi"
+    "typeOther": "Ibindi",
+    "choiceTitle": "Wifuza CV imeze ite?",
+    "choiceHint": "Hitamo kimwe: kora CV ukoresheje igikoresho cyacu, cyangwa wohereze CV usanganywe. Abakoresha usaba akazi bazayibona.",
+    "tabBuild": "Kora CV",
+    "tabBuildHint": "Uzuza ifishi iyobowe — nta dosiye ya CV ikenewe.",
+    "tabUpload": "Ohereza CV yanjye",
+    "tabUploadHint": "Usanganywe CV cyangwa inyandiko? Zohereze uzivanye kuri telefoni yawe."
   },
   "messages": {
     "title": "Ubutumwa",

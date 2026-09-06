@@ -412,7 +412,13 @@
     "typeCoverLetter": "Lettre de motivation",
     "typeCertificate": "Certificat",
     "typeId": "Pièce d'identité",
-    "typeOther": "Autre"
+    "typeOther": "Autre",
+    "choiceTitle": "Comment souhaitez-vous votre CV ?",
+    "choiceHint": "Choisissez : créez un CV avec notre outil, ou téléversez un CV que vous avez déjà. Les employeurs auxquels vous postulez le verront.",
+    "tabBuild": "Créer un CV",
+    "tabBuildHint": "Remplissez un formulaire guidé — aucun fichier requis.",
+    "tabUpload": "Téléverser mon CV",
+    "tabUploadHint": "Vous avez déjà un CV ou des documents ? Téléversez-les depuis votre appareil."
   },
   "messages": {
     "title": "Messages",
