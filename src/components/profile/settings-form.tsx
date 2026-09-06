@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/components/ui/toast';
+import { LocationButton } from '@/components/shared/location-button';
 import { initials } from '@/lib/utils';
 
 export function SettingsForm({
@@ -20,6 +21,8 @@ export function SettingsForm({
     fullName: string;
     bio: string;
     location: string;
+    latitude: number | null;
+    longitude: number | null;
     avatarUrl: string | null;
     paymentNumber: string | null;
     paymentProvider: string | null;
@@ -27,11 +30,18 @@ export function SettingsForm({
 }) {
   const t = useTranslations('profile');
   const tc = useTranslations('common');
+  const ts = useTranslations('sell');
   const router = useRouter();
   const { toast } = useToast();
   const [avatarUrl, setAvatarUrl] = useState(initial.avatarUrl);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [location, setLocation] = useState(initial.location);
+  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(
+    initial.latitude != null && initial.longitude != null
+      ? { latitude: initial.latitude, longitude: initial.longitude }
+      : null
+  );
 
   async function onAvatar(file?: File) {
     if (!file) return;
@@ -62,7 +72,9 @@ export function SettingsForm({
         body: JSON.stringify({
           fullName: form.get('fullName'),
           bio: form.get('bio'),
-          location: form.get('location'),
+          location,
+          latitude: coords?.latitude ?? null,
+          longitude: coords?.longitude ?? null,
           ...(avatarUrl ? { avatarUrl } : {}),
           // Only send payout details when a number is provided (schema validates it).
           ...(paymentNumber
@@ -113,7 +125,23 @@ export function SettingsForm({
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="location">{t('title')}</Label>
-        <Input name="location" defaultValue={initial.location} placeholder="Kigali" />
+        <Input
+          name="location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="Kigali"
+        />
+        <div className="flex items-center gap-2">
+          <LocationButton
+            done={coords != null}
+            onLocated={(g) => {
+              setCoords({ latitude: g.latitude, longitude: g.longitude });
+              if (!location.trim() && g.label) setLocation(g.label);
+            }}
+          />
+          {coords != null && <span className="text-xs text-success">{ts('locationPinned')}</span>}
+        </div>
+        <p className="text-xs text-muted-foreground">{t('locationSavedHint')}</p>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="bio">Bio</Label>

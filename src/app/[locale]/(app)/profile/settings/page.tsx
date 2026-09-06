@@ -21,6 +21,8 @@ export default async function SettingsPage({ params }: { params: { locale: strin
           fullName: user.fullName,
           bio: user.bio ?? '',
           location: user.location ?? '',
+          latitude: user.latitude,
+          longitude: user.longitude,
           avatarUrl: user.avatarUrl,
           paymentNumber: user.paymentNumber,
           paymentProvider: user.paymentProvider,

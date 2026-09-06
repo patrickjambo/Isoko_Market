@@ -507,7 +507,8 @@
     "paymentSectionTitle": "Ubwishyu (kugira ngo wakire ibyaguzwe)",
     "paymentSectionHint": "Abaguzi bohereza amafaranga kuri iyi nimero. Birakenewe mbere y'uko 'Gura' ikora ku bicuruzwa byawe.",
     "paymentNumberLabel": "Nimero yo kwishyurirwaho",
-    "paymentProviderLabel": "Uwatanga serivisi"
+    "paymentProviderLabel": "Uwatanga serivisi",
+    "locationSavedHint": "Bibitswe rimwe, byuzuza aho uri iyo utangaza kandi bikoreshwa muri \"hafi yanjye\"."
   },
   "verification": {
     "title": "Wemezwe",

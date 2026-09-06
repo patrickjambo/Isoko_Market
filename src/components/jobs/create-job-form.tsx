@@ -22,7 +22,13 @@ import type { ContactChannels } from '@/lib/contact';
  * comparable postings, and a one-tap description draft — so posting stays under
  * 90 seconds (DoD §1) and feels like one consistent platform tool.
  */
-export function CreateJobForm({ partners = [] }: { partners?: { id: string; name: string }[] }) {
+export function CreateJobForm({
+  partners = [],
+  defaultLocation,
+}: {
+  partners?: { id: string; name: string }[];
+  defaultLocation?: { location: string; latitude: number | null; longitude: number | null };
+}) {
   const t = useTranslations('jobs');
   const te = useTranslations('errors');
   const locale = useLocale();
@@ -34,8 +40,12 @@ export function CreateJobForm({ partners = [] }: { partners?: { id: string; name
 
   const [title, setTitle] = useState('');
   const [type, setType] = useState<'JOB' | 'GIG'>('JOB');
-  const [location, setLocation] = useState('');
-  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [location, setLocation] = useState(defaultLocation?.location ?? '');
+  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(
+    defaultLocation?.latitude != null && defaultLocation?.longitude != null
+      ? { latitude: defaultLocation.latitude, longitude: defaultLocation.longitude }
+      : null
+  );
   const [payMin, setPayMin] = useState('');
   const [payMax, setPayMax] = useState('');
   const [payPeriod, setPayPeriod] = useState('month');

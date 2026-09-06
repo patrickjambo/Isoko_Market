@@ -507,7 +507,8 @@
     "paymentSectionTitle": "Payment (to receive orders)",
     "paymentSectionHint": "Buyers send money to this number. Required before Buy Now works on your listings.",
     "paymentNumberLabel": "Payment number",
-    "paymentProviderLabel": "Provider"
+    "paymentProviderLabel": "Provider",
+    "locationSavedHint": "Saved once, this fills your location when you post and powers \"near me\"."
   },
   "verification": {
     "title": "Get verified",

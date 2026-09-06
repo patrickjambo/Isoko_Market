@@ -72,9 +72,11 @@ const TOTAL = 6;
 export function AddProductWizard({
   categories,
   kind = 'PRODUCT',
+  defaultLocation,
 }: {
   categories: Category[];
   kind?: ListingKind;
+  defaultLocation?: { location: string; latitude: number | null; longitude: number | null };
 }) {
   const t = useTranslations('sell');
   const tc = useTranslations('marketplace');
@@ -83,8 +85,19 @@ export function AddProductWizard({
   const { toast } = useToast();
 
   const isService = kind === 'SERVICE';
+  // Saved-location defaults (from the seller's profile) — stable primitives so
+  // the draft effect deps stay simple.
+  const defLoc = defaultLocation?.location ?? '';
+  const defLat = defaultLocation?.latitude ?? null;
+  const defLng = defaultLocation?.longitude ?? null;
   const [step, setStep] = useState(1);
-  const [data, setData] = useState<Data>({ ...EMPTY, kind });
+  const [data, setData] = useState<Data>({
+    ...EMPTY,
+    kind,
+    location: defLoc,
+    latitude: defLat,
+    longitude: defLng,
+  });
   // Local, appendable category list so a seller-added category shows immediately.
   const [cats, setCats] = useState<Category[]>(categories);
   const [loaded, setLoaded] = useState(false);
@@ -97,14 +110,23 @@ export function AddProductWizard({
       .then((r) => r.json())
       .then((j) => {
         if (j?.draft?.data) {
+          const d = j.draft.data;
           // The URL intent (product vs service) wins over whatever the draft had.
-          setData({ ...EMPTY, ...j.draft.data, kind });
+          // Fall back to the seller's saved location when the draft has none.
+          setData({
+            ...EMPTY,
+            ...d,
+            kind,
+            location: d.location || defLoc,
+            latitude: d.latitude ?? defLat,
+            longitude: d.longitude ?? defLng,
+          });
           setStep(j.draft.step ?? 1);
         }
       })
       .finally(() => setLoaded(true));
-    // `kind` is a stable prop from the URL; included to satisfy exhaustive-deps.
-  }, [kind]);
+    // Stable props from the server; listed to satisfy exhaustive-deps.
+  }, [kind, defLoc, defLat, defLng]);
 
   // Autosave (debounced) at every change so nothing is lost on a dropped connection.
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);

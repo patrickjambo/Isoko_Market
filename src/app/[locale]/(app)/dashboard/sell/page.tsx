@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getCategories } from '@/lib/queries';
 import { categoryName } from '@/lib/i18n-helpers';
+import { getCurrentUser } from '@/lib/auth';
 import { AddProductWizard } from '@/components/seller/add-product-wizard';
 
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,7 @@ export default async function SellPage({
 }) {
   setRequestLocale(params.locale);
   const t = await getTranslations('sell');
-  const categories = await getCategories();
+  const [categories, user] = await Promise.all([getCategories(), getCurrentUser()]);
   const isService = searchParams.kind === 'service';
   const wantKind = isService ? 'SERVICE' : 'PRODUCT';
 
@@ -31,6 +32,11 @@ export default async function SellPage({
         categories={categories
           .filter((c) => c.kind === wantKind)
           .map((c) => ({ id: c.id, name: categoryName(c, params.locale), slug: c.slug }))}
+        defaultLocation={{
+          location: user?.location ?? '',
+          latitude: user?.latitude ?? null,
+          longitude: user?.longitude ?? null,
+        }}
       />
     </div>
   );

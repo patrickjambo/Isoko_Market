@@ -507,7 +507,8 @@
     "paymentSectionTitle": "Paiement (pour recevoir des commandes)",
     "paymentSectionHint": "Les acheteurs envoient l'argent à ce numéro. Requis avant que « Acheter » fonctionne sur vos annonces.",
     "paymentNumberLabel": "Numéro de paiement",
-    "paymentProviderLabel": "Opérateur"
+    "paymentProviderLabel": "Opérateur",
+    "locationSavedHint": "Enregistrée une fois, elle remplit votre lieu lors des publications et alimente « près de moi »."
   },
   "verification": {
     "title": "Se faire vérifier",

@@ -23,7 +23,14 @@ export default async function NewJobPage({ params }: { params: { locale: string 
     <div className="container max-w-2xl py-6">
       <h1 className="text-2xl font-bold tracking-tight">{t('createTitle')}</h1>
       <p className="mb-6 text-sm text-muted-foreground">{t('createSubtitle')}</p>
-      <CreateJobForm partners={partners} />
+      <CreateJobForm
+        partners={partners}
+        defaultLocation={{
+          location: user.location ?? '',
+          latitude: user.latitude,
+          longitude: user.longitude,
+        }}
+      />
     </div>
   );
 }

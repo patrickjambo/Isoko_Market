@@ -58,6 +58,8 @@ export const updateProfileSchema = z.object({
   fullName: z.string().trim().min(2).max(80).optional(),
   bio: z.string().trim().max(500).optional(),
   location: z.string().trim().max(80).optional(),
+  latitude: z.coerce.number().min(-90).max(90).optional().nullable(),
+  longitude: z.coerce.number().min(-180).max(180).optional().nullable(),
   locale: z.enum(['rw', 'en', 'fr']).optional(),
   avatarUrl: z.string().url().optional(),
   // Seller payout details for the manual peer-to-peer payment flow.

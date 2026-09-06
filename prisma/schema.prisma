@@ -184,6 +184,10 @@ model User {
   bio                String?
   avatarUrl          String?
   location           String?
+  // Saved coordinates (from "Use my location") so posting auto-fills and
+  // "near me" is instant — set once, reused everywhere.
+  latitude           Float?
+  longitude          Float?
   locale             Locale             @default(rw)
   role               Role               @default(BUYER)
   // Onboarding intent (buy_sell | find_work | hire | browse). Records the path a
