@@ -24,12 +24,14 @@ export const POST = route(async (req: NextRequest, ctx: { params: { id: string }
     throw new ApiError('BAD_REQUEST', 'You cannot apply to your own job.');
   }
 
-  const cv = await prisma.cV.findUnique({
-    where: { userId: user.id },
-    select: { id: true, structuredData: true },
-  });
-  if (!cv) {
-    throw new ApiError('BAD_REQUEST', 'Create your CV before applying.');
+  // A seeker can apply with the structured CV OR uploaded documents (the employer
+  // sees whichever they have). Require at least one so an application is never empty.
+  const [cv, docCount] = await Promise.all([
+    prisma.cV.findUnique({ where: { userId: user.id }, select: { id: true, structuredData: true } }),
+    prisma.seekerDocument.count({ where: { userId: user.id } }),
+  ]);
+  if (!cv && docCount === 0) {
+    throw new ApiError('BAD_REQUEST', 'Add a CV or upload a document before applying.');
   }
 
   const existing = await prisma.application.findUnique({
@@ -42,10 +44,15 @@ export const POST = route(async (req: NextRequest, ctx: { params: { id: string }
     data: {
       jobId: job.id,
       applicantId: user.id,
-      cvId: cv.id,
-      // Freeze the CV as it is now — editing it later never changes what this
-      // employer reviewed (§10 immutable snapshot).
-      cvSnapshot: cv.structuredData ?? undefined,
+      // CV is optional — a document-only applicant has no structured snapshot.
+      ...(cv
+        ? {
+            cvId: cv.id,
+            // Freeze the CV as it is now — editing it later never changes what
+            // this employer reviewed (§10 immutable snapshot).
+            cvSnapshot: cv.structuredData ?? undefined,
+          }
+        : {}),
       coverNote,
     },
     select: { id: true },

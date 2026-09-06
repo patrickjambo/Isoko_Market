@@ -36,10 +36,13 @@ export default async function JobDetailPage({
 
   const isOwner = user?.id === job.employer.id;
 
-  const [hasCv, existingApplication, ratingAgg, cvSkills] = await Promise.all([
+  const [hasCv, docCount, existingApplication, ratingAgg, cvSkills] = await Promise.all([
     user
       ? prisma.cV.findUnique({ where: { userId: user.id }, select: { id: true } })
       : Promise.resolve(null),
+    // Seekers can also apply with an uploaded document (CV/letter) — not only the
+    // structured builder.
+    user ? prisma.seekerDocument.count({ where: { userId: user.id } }) : Promise.resolve(0),
     user
       ? prisma.application.findUnique({
           where: { jobId_applicantId: { jobId: job.id, applicantId: user.id } },
@@ -49,6 +52,7 @@ export default async function JobDetailPage({
     prisma.review.aggregate({ where: { revieweeId: job.employer.id }, _avg: { rating: true } }),
     user && !isOwner ? getCvSkills(user.id) : Promise.resolve([]),
   ]);
+  const canApply = Boolean(hasCv) || docCount > 0;
 
   const pay = formatPay(job, locale, t('payNegotiable'), (p) => t(`form.period${cap(p)}`));
   // "Why you match" — real overlap between the seeker's CV and this posting (§5).
@@ -98,7 +102,7 @@ export default async function JobDetailPage({
               <>
                 <ApplyButton
                   jobId={job.id}
-                  hasCv={Boolean(hasCv)}
+                  canApply={canApply}
                   alreadyApplied={Boolean(existingApplication)}
                 />
                 <MessageSellerButton

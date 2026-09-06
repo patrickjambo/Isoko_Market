@@ -53,6 +53,10 @@ const ERROR_TRANSLATIONS: Record<string, LocalizedError> = {
   "A reason is required for this action.": { rw: "Impamvu irakenewe kuri iki gikorwa.", fr: "Une raison est requise pour cette action." },
   "At least one Super Admin is required.": { rw: "Nibura Umuyobozi Mukuru umwe arakenewe.", fr: "Au moins un Super Admin est requis." },
   "Create your CV before applying.": { rw: "Kora CV yawe mbere yo gusaba.", fr: "Créez votre CV avant de postuler." },
+  "Add a CV or upload a document before applying.": {
+    rw: "Kora CV cyangwa wohereze inyandiko mbere yo gusaba.",
+    fr: "Ajoutez un CV ou téléversez un document avant de postuler.",
+  },
   "Enter the institution name.": { rw: "Andika izina ry’ikigo.", fr: "Saisissez le nom de l’établissement." },
   "Invalid division level.": { rw: "Urwego rw’akarere ntirwemewe.", fr: "Niveau de division invalide." },
   "Invalid institution type.": { rw: "Ubwoko bw’ikigo ntibwemewe.", fr: "Type d’établissement invalide." },

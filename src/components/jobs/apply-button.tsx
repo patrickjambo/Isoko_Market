@@ -20,11 +20,12 @@ import { SignUpPrompt } from '@/components/auth/sign-up-prompt';
 
 export function ApplyButton({
   jobId,
-  hasCv,
+  canApply,
   alreadyApplied,
 }: {
   jobId: string;
-  hasCv: boolean;
+  /** True when the seeker has a structured CV OR at least one uploaded document. */
+  canApply: boolean;
   alreadyApplied: boolean;
 }) {
   const t = useTranslations('jobs');
@@ -51,8 +52,9 @@ export function ApplyButton({
     return <SignUpPrompt reason={t('gateApply')} triggerLabel={t('apply')} />;
   }
 
-  // No CV yet — guide the user to the builder first (Section 6.3).
-  if (!hasCv) {
+  // No CV and no uploaded document — send the user to the CV page, where they can
+  // either build a CV or upload one (Section 6.3).
+  if (!canApply) {
     return (
       <Dialog>
         <DialogTrigger asChild>
