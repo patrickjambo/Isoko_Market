@@ -204,7 +204,9 @@
     "products": "Ibicuruzwa",
     "services": "Serivisi",
     "requestService": "Saba iyi serivisi",
-    "specifications": "Ibiranga"
+    "specifications": "Ibiranga",
+    "filterByFeatures": "Shungura ku biranga",
+    "clearFeatures": "Siba"
   },
   "jobs": {
     "title": "Akazi & Imirimo",

@@ -204,7 +204,9 @@
     "products": "Products",
     "services": "Services",
     "requestService": "Request this service",
-    "specifications": "Specifications"
+    "specifications": "Specifications",
+    "filterByFeatures": "Filter by features",
+    "clearFeatures": "Clear"
   },
   "jobs": {
     "title": "Jobs & Gigs",

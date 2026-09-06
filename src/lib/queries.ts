@@ -87,6 +87,69 @@ export const getLatestServices = unstable_cache(
   { revalidate: 30 }
 );
 
+/** Parse the `specs` URL param (JSON array of [label, value] tuples) safely. */
+export function parseSpecFilter(specs?: string | null): [string, string][] {
+  if (!specs) return [];
+  try {
+    const parsed = JSON.parse(specs);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (p): p is [string, string] =>
+          Array.isArray(p) &&
+          p.length === 2 &&
+          typeof p[0] === 'string' &&
+          typeof p[1] === 'string' &&
+          p[0].trim() !== '' &&
+          p[1].trim() !== ''
+      )
+      .slice(0, 8); // bound the AND fan-out
+  } catch {
+    return [];
+  }
+}
+
+export type SpecFacet = { label: string; values: string[] };
+
+/**
+ * Available spec facets for ONE category — derived from that category's real
+ * listings, so a phone category yields RAM/Storage and a car category yields
+ * Year/Mileage. Only labels with ≥2 distinct values (a real choice) are kept.
+ * Category-scoped by design: specs are meaningless across different product types.
+ */
+export async function getCategorySpecFacets(categoryId: string): Promise<SpecFacet[]> {
+  const rows = await prisma.listing.findMany({
+    where: { status: 'ACTIVE', kind: 'PRODUCT', categoryId },
+    select: { specs: true },
+    orderBy: { createdAt: 'desc' },
+    take: 300, // bounded sample
+  });
+
+  const byLabel = new Map<string, Map<string, number>>();
+  for (const r of rows) {
+    if (!Array.isArray(r.specs)) continue;
+    for (const s of r.specs as { label?: string; value?: string }[]) {
+      const label = s?.label?.trim();
+      const value = s?.value?.trim();
+      if (!label || !value) continue;
+      if (!byLabel.has(label)) byLabel.set(label, new Map());
+      const vm = byLabel.get(label)!;
+      vm.set(value, (vm.get(value) ?? 0) + 1);
+    }
+  }
+
+  return [...byLabel.entries()]
+    .map(([label, vm]) => ({
+      label,
+      values: [...vm.entries()]
+        .sort((a, b) => b[1] - a[1]) // most common first
+        .slice(0, 12)
+        .map(([v]) => v),
+    }))
+    .filter((f) => f.values.length >= 2) // a facet needs a real choice
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
 export async function searchListings(filter: ListingFilter) {
   const where: Prisma.ListingWhereInput = { status: 'ACTIVE' };
 
@@ -99,6 +162,15 @@ export async function searchListings(filter: ListingFilter) {
   if (filter.categoryId) where.categoryId = filter.categoryId;
   if (filter.kind) where.kind = filter.kind;
   if (filter.condition) where.condition = filter.condition;
+  // Spec facet filters (category-scoped): each selected label:value must be
+  // present in the listing's specs. AND across labels; exact {label,value} match
+  // via JSONB containment. Values come from real data so they always match.
+  const specPairs = parseSpecFilter(filter.specs);
+  if (specPairs.length > 0) {
+    where.AND = specPairs.map(([label, value]) => ({
+      specs: { array_contains: [{ label, value }] },
+    }));
+  }
   if (filter.location) where.location = { contains: filter.location, mode: 'insensitive' };
   if (filter.verifiedOnly) where.seller = { isVerified: true };
   if (filter.minPrice != null || filter.maxPrice != null) {

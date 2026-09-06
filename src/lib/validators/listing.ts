@@ -57,6 +57,8 @@ export const listingFilterSchema = z.object({
   q: z.string().trim().max(120).optional(),
   categoryId: z.string().optional(),
   kind: z.enum(listingKinds).optional(),
+  // JSON array of [label, value] tuples — category-scoped spec facet filters.
+  specs: z.string().max(1000).optional(),
   minPrice: z.coerce.number().int().min(0).optional(),
   maxPrice: z.coerce.number().int().min(0).optional(),
   location: z.string().trim().max(80).optional(),

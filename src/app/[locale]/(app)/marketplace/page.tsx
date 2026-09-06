@@ -7,13 +7,20 @@ import { MarketplaceFilters } from '@/components/marketplace/marketplace-filters
 import { SaveSearchButton } from '@/components/marketplace/save-search-button';
 import { CategoryChips } from '@/components/marketplace/category-chips';
 import { KindTabs } from '@/components/marketplace/kind-tabs';
+import { SpecFilters } from '@/components/marketplace/spec-filters';
 import { ViewToggle } from '@/components/marketplace/view-toggle';
 import { MapView } from '@/components/marketplace/map-view';
 import { SearchBar } from '@/components/nav/search-bar';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Pagination } from '@/components/shared/pagination';
 import { listingFilterSchema } from '@/lib/validators/listing';
-import { searchListings, getCategories, favoritedSet, getDistrictCounts } from '@/lib/queries';
+import {
+  searchListings,
+  getCategories,
+  favoritedSet,
+  getDistrictCounts,
+  getCategorySpecFacets,
+} from '@/lib/queries';
 import { getCurrentUser } from '@/lib/auth';
 import { categoryName } from '@/lib/i18n-helpers';
 
@@ -32,9 +39,13 @@ export default async function MarketplacePage({
   const filter = listingFilterSchema.parse(searchParams);
   const view = searchParams.view === 'list' ? 'list' : searchParams.view === 'map' ? 'map' : 'grid';
   const districtCounts = view === 'map' ? await getDistrictCounts() : {};
-  const [{ items: rawItems, total, page, pageSize }, categories, user] = await Promise.all([
+  // Spec facets are category-scoped — only fetch them once a (product) category
+  // is chosen, so a car's features never mix with a phone's.
+  const showSpecFacets = Boolean(filter.categoryId) && searchParams.kind !== 'SERVICE';
+  const [{ items: rawItems, total, page, pageSize }, categories, specFacets, user] = await Promise.all([
     searchListings(filter),
     getCategories(),
+    showSpecFacets ? getCategorySpecFacets(filter.categoryId!) : Promise.resolve([]),
     getCurrentUser(),
   ]);
   // Annotate each card with the buyer's saved state (server-synced hearts).
@@ -79,6 +90,13 @@ export default async function MarketplacePage({
           params={searchParams}
         />
       </div>
+
+      {/* Category-scoped feature filters (RAM for phones, Year for cars, …) */}
+      {specFacets.length > 0 && (
+        <div className="mb-4">
+          <SpecFilters facets={specFacets} params={searchParams} />
+        </div>
+      )}
 
       <div className="mb-5 flex items-center justify-between gap-2">
         <span className="text-sm text-muted-foreground">

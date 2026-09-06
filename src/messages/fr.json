@@ -204,7 +204,9 @@
     "products": "Produits",
     "services": "Services",
     "requestService": "Demander ce service",
-    "specifications": "Caractéristiques"
+    "specifications": "Caractéristiques",
+    "filterByFeatures": "Filtrer par caractéristiques",
+    "clearFeatures": "Effacer"
   },
   "jobs": {
     "title": "Emplois & missions",
