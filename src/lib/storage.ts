@@ -1,6 +1,6 @@
 import 'server-only';
 import { randomUUID } from 'node:crypto';
-import { writeFile, mkdir } from 'node:fs/promises';
+import { writeFile, mkdir, readFile } from 'node:fs/promises';
 import { lookup } from 'node:dns/promises';
 import http from 'node:http';
 import https from 'node:https';
@@ -28,6 +28,18 @@ const ALLOWED = new Set([
 ]);
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 
+// Jobseeker documents: PDF / Word / scanned image. Mapped to a clean extension
+// (the docx MIME subtype is unusable as a file extension). 10 MB cap.
+const DOC_EXT: Record<string, string> = {
+  'application/pdf': 'pdf',
+  'application/msword': 'doc',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+};
+const DOC_MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+
 export async function saveFile(
   file: File,
   opts: { private?: boolean } = {}
@@ -42,9 +54,26 @@ export async function saveFile(
   return persistBytes(Buffer.from(await file.arrayBuffer()), file.type, opts.private ?? false);
 }
 
+/**
+ * Save a jobseeker document (CV, cover letter, certificate, ID, …). Always
+ * private. Accepts PDF, Word (.doc/.docx) and images; rejects anything else.
+ */
+export async function saveDocument(file: File): Promise<SaveResult & { ext: string }> {
+  const ext = DOC_EXT[file.type];
+  if (!ext) throw new Error('Unsupported file. Upload a PDF, Word document, or an image.');
+  if (file.size > DOC_MAX_BYTES) throw new Error('File is too large (max 10 MB).');
+  const saved = await persistBytes(Buffer.from(await file.arrayBuffer()), file.type, true, ext);
+  return { ...saved, ext };
+}
+
 /** Write validated bytes to the configured store and return its URL + key. */
-async function persistBytes(bytes: Buffer, type: string, isPrivate: boolean): Promise<SaveResult> {
-  const ext = type.split('/')[1]?.replace('jpeg', 'jpg') ?? 'bin';
+async function persistBytes(
+  bytes: Buffer,
+  type: string,
+  isPrivate: boolean,
+  extOverride?: string
+): Promise<SaveResult> {
+  const ext = extOverride ?? (type.split('/')[1]?.replace('jpeg', 'jpg') ?? 'bin');
   const key = `${isPrivate ? 'private' : 'public'}/${randomUUID()}.${ext}`;
 
   if (env.STORAGE_DRIVER === 'local') {
@@ -264,4 +293,19 @@ export function getSignedUrl(key: string): string {
   if (env.STORAGE_DRIVER === 'local') return `/uploads/${key}`;
   // TODO(prod): return S3/R2 presigned GET URL with a short TTL.
   return `/uploads/${key}`;
+}
+
+/**
+ * Read a stored object's bytes so a gated route can STREAM a private document to
+ * an authorized viewer — the underlying storage URL is never exposed (important
+ * for ID documents; see the "unlisted, not access-controlled" note above). Blob
+ * keys are full URLs (fetched server-side); local keys resolve under /public.
+ */
+export async function getFileBytes(key: string): Promise<Buffer> {
+  if (env.STORAGE_DRIVER === 'vercel_blob' || /^https?:\/\//.test(key)) {
+    const res = await fetch(key);
+    if (!res.ok) throw new Error('File not found.');
+    return Buffer.from(await res.arrayBuffer());
+  }
+  return readFile(path.join(UPLOAD_ROOT, key));
 }

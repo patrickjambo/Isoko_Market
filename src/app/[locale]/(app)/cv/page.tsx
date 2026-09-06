@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { cvDataSchema, type CvData } from '@/lib/validators/cv';
 import { CvBuilder } from '@/components/cv/cv-builder';
+import { DocumentManager } from '@/components/cv/document-manager';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,9 @@ export default async function CvPage({ params }: { params: { locale: string } })
       <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
       <p className="mb-6 text-sm text-muted-foreground">{t('subtitle')}</p>
       <CvBuilder initial={initial} fullName={user.fullName} />
+      <div className="mt-6">
+        <DocumentManager />
+      </div>
     </div>
   );
 }

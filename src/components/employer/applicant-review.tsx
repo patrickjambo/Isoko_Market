@@ -29,6 +29,14 @@ import { initials, timeAgo } from '@/lib/utils';
 
 type Sort = 'match' | 'newest' | 'verified';
 
+const DOC_TYPE_KEY: Record<string, string> = {
+  CV: 'typeCv',
+  COVER_LETTER: 'typeCoverLetter',
+  CERTIFICATE: 'typeCertificate',
+  ID_DOCUMENT: 'typeId',
+  OTHER: 'typeOther',
+};
+
 /**
  * Scan-fast applicant triage (§4): match-scored, sortable/filterable cards with
  * inline Shortlist / View CV / Message / Reject — no separate page for routine
@@ -175,6 +183,25 @@ export function ApplicantReview({
                   <p className="mt-0.5 text-xs text-muted-foreground">{timeAgo(new Date(a.appliedAt), locale)}</p>
                 </div>
               </div>
+
+              {/* Uploaded documents (CV, cover letter, certificates, ID) — gated download */}
+              {a.documents.length > 0 && (
+                <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">{tcv('documentsTitle')}:</span>
+                  {a.documents.map((doc) => (
+                    <a
+                      key={doc.id}
+                      href={`/api/documents/${doc.id}/file`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={doc.label}
+                      className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary/40 px-2.5 py-1 text-xs font-medium transition-colors hover:border-primary hover:text-primary"
+                    >
+                      <FileText className="h-3 w-3" /> {tcv(DOC_TYPE_KEY[doc.type] ?? 'typeOther')}
+                    </a>
+                  ))}
+                </div>
+              )}
 
               {/* Inline triage actions */}
               <div className="mt-2.5 flex flex-wrap gap-1.5">

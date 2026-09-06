@@ -400,7 +400,19 @@
     "addReference": "Add reference",
     "refName": "Referee name",
     "refRelationship": "Relationship",
-    "refPhone": "Phone"
+    "refPhone": "Phone",
+    "documentsTitle": "My documents",
+    "documentsHint": "Upload an existing CV, cover letter, certificate or ID from your device. Employers you apply to can view these.",
+    "documentType": "Document type",
+    "uploadFromDevice": "Upload from device",
+    "documentFormats": "PDF, Word or image · up to 10 MB",
+    "noDocuments": "No documents yet.",
+    "docUploaded": "Document uploaded",
+    "typeCv": "CV / Resume",
+    "typeCoverLetter": "Application letter",
+    "typeCertificate": "Certificate",
+    "typeId": "ID document",
+    "typeOther": "Other"
   },
   "messages": {
     "title": "Messages",

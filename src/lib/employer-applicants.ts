@@ -18,6 +18,7 @@ export type ApplicantItem = {
   match: { score: number; tier: MatchTier; overlap: string[] };
   summary: string;
   snapshot: CvData | null;
+  documents: { id: string; type: string; label: string; sizeBytes: number }[];
 };
 
 /** One-line CV summary for fast scanning (§4) from the immutable snapshot. */
@@ -52,7 +53,18 @@ export async function getEmployerApplicants(
       coverNote: true,
       cvSnapshot: true,
       job: { select: { id: true, title: true, skills: true } },
-      applicant: { select: { fullName: true, avatarUrl: true, isVerified: true } },
+      applicant: {
+        select: {
+          fullName: true,
+          avatarUrl: true,
+          isVerified: true,
+          // Documents the seeker uploaded (CV, cover letter, certificates, ID).
+          documents: {
+            orderBy: { createdAt: 'desc' },
+            select: { id: true, type: true, label: true, sizeBytes: true },
+          },
+        },
+      },
     },
   });
 
@@ -73,6 +85,7 @@ export async function getEmployerApplicants(
       match: { score: m.score, tier: m.tier, overlap: m.overlap.map((k) => labelForSkill(k, locale)) },
       summary,
       snapshot: (a.cvSnapshot ?? null) as CvData | null,
+      documents: a.applicant.documents,
     };
   });
 }

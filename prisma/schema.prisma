@@ -209,6 +209,7 @@ model User {
   jobs                Job[]
   applications        Application[]
   cv                  CV?
+  documents           SeekerDocument[]
   messages            Message[]
   conversationLinks   ConversationParticipant[]
   transactions        Transaction[]
@@ -432,6 +433,33 @@ model Job {
   @@index([location])
   @@index([employerId])
   @@index([partnerId])
+}
+
+enum SeekerDocumentType {
+  CV
+  COVER_LETTER
+  CERTIFICATE
+  ID_DOCUMENT
+  OTHER
+}
+
+// A file a jobseeker uploaded from their device (existing CV, cover letter,
+// certificate, ID, …). Stored in the PRIVATE bucket; viewable by the owner and
+// by an employer who has received an application from this seeker (see the gated
+// /api/documents/[id]/file route). Distinct from the structured CV builder —
+// this is "bring your own document".
+model SeekerDocument {
+  id        String             @id @default(cuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      SeekerDocumentType @default(OTHER)
+  label     String // original filename or a user-given label
+  key       String // private storage key
+  mimeType  String
+  sizeBytes Int
+  createdAt DateTime           @default(now())
+
+  @@index([userId])
 }
 
 model CV {

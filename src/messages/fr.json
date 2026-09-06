@@ -400,7 +400,19 @@
     "addReference": "Ajouter une référence",
     "refName": "Nom du référent",
     "refRelationship": "Relation",
-    "refPhone": "Téléphone"
+    "refPhone": "Téléphone",
+    "documentsTitle": "Mes documents",
+    "documentsHint": "Téléversez un CV, une lettre de motivation, un certificat ou une pièce d'identité depuis votre appareil. Les employeurs auxquels vous postulez peuvent les consulter.",
+    "documentType": "Type de document",
+    "uploadFromDevice": "Téléverser depuis l'appareil",
+    "documentFormats": "PDF, Word ou image · jusqu'à 10 Mo",
+    "noDocuments": "Aucun document.",
+    "docUploaded": "Document téléversé",
+    "typeCv": "CV",
+    "typeCoverLetter": "Lettre de motivation",
+    "typeCertificate": "Certificat",
+    "typeId": "Pièce d'identité",
+    "typeOther": "Autre"
   },
   "messages": {
     "title": "Messages",

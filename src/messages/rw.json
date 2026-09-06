@@ -400,7 +400,19 @@
     "addReference": "Ongeraho umutangabuhamya",
     "refName": "Izina ry’umutangabuhamya",
     "refRelationship": "Isano",
-    "refPhone": "Telefone"
+    "refPhone": "Telefone",
+    "documentsTitle": "Inyandiko zanjye",
+    "documentsHint": "Ohereza CV, ibaruwa isaba akazi, impamyabushobozi cyangwa indangamuntu bivuye kuri telefoni yawe. Abakoresha usaba akazi barabibona.",
+    "documentType": "Ubwoko bw'inyandiko",
+    "uploadFromDevice": "Ohereza bivuye kuri telefoni",
+    "documentFormats": "PDF, Word cyangwa ifoto · ntarengwa 10 MB",
+    "noDocuments": "Nta nyandiko urafite.",
+    "docUploaded": "Inyandiko yoherejwe",
+    "typeCv": "CV",
+    "typeCoverLetter": "Ibaruwa isaba akazi",
+    "typeCertificate": "Impamyabushobozi",
+    "typeId": "Indangamuntu",
+    "typeOther": "Ibindi"
   },
   "messages": {
     "title": "Ubutumwa",
