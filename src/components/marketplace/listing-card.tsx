@@ -5,7 +5,7 @@ import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { TrustBadge } from '@/components/trust/trust-badge';
 import { FavoriteHeart } from '@/components/marketplace/favorite-heart';
-import { formatRWF, cn } from '@/lib/utils';
+import { formatRWF, cn, formatDistance } from '@/lib/utils';
 import { listingCover } from '@/lib/listing-image';
 
 export type ListingCardData = {
@@ -16,6 +16,7 @@ export type ListingCardData = {
   status: string;
   isFeatured: boolean;
   kind?: string;
+  distanceKm?: number;
   images: { url: string }[];
   category?: { slug: string } | null;
   seller: { fullName: string; isVerified: boolean; verificationStatus: string };
@@ -67,6 +68,9 @@ export function ListingCard({
             <span className="inline-flex items-center gap-1">
               <MapPin className="h-3 w-3 shrink-0" /> {listing.location}
             </span>
+            {listing.distanceKm != null && Number.isFinite(listing.distanceKm) && (
+              <span className="font-medium text-primary">{formatDistance(listing.distanceKm)}</span>
+            )}
             {listing.seller.isVerified && (
               <TrustBadge variant="listing" status="VERIFIED" verifiedLabel={tt('verifiedBadge')} />
             )}
@@ -119,6 +123,11 @@ export function ListingCard({
         <div className="mt-auto flex items-center gap-1 text-xs text-muted-foreground">
           <MapPin className="h-3 w-3 shrink-0" />
           <span className="truncate">{listing.location}</span>
+          {listing.distanceKm != null && Number.isFinite(listing.distanceKm) && (
+            <span className="shrink-0 font-medium text-primary">
+              · {formatDistance(listing.distanceKm)}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           {listing.seller.isVerified && (

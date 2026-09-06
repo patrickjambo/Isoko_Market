@@ -60,6 +60,14 @@ export function isActiveToday(lastActiveAt: Date | string | null | undefined): b
   return Date.now() - d.getTime() < 24 * 60 * 60 * 1000;
 }
 
+/** Human-friendly distance: "600 m", "2.3 km", "14 km". */
+export function formatDistance(km: number): string {
+  if (!Number.isFinite(km)) return '';
+  if (km < 1) return `${Math.round(km * 1000)} m`;
+  if (km < 10) return `${km.toFixed(1)} km`;
+  return `${Math.round(km)} km`;
+}
+
 /** URL-safe slug from a display name (used for white-label board URLs). */
 export function slugify(input: string): string {
   return input

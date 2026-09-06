@@ -38,6 +38,8 @@ const listingCardSelect = {
   status: true,
   isFeatured: true,
   kind: true,
+  latitude: true,
+  longitude: true,
   images: { orderBy: { position: 'asc' }, take: 1, select: { url: true } },
   category: { select: { slug: true } },
   seller: { select: { fullName: true, isVerified: true, verificationStatus: true } },
@@ -188,6 +190,32 @@ export async function searchListings(filter: ListingFilter) {
     if (filter.maxPrice != null) where.price.lte = filter.maxPrice * 100;
   }
 
+  // "Near me": sort by actual distance and attach it. The bounding box already
+  // caps the set, so we sort in JS (nearest-first) rather than reach for PostGIS.
+  if (filter.lat != null && filter.lng != null) {
+    const rows = await prisma.listing.findMany({
+      where,
+      select: listingCardSelect,
+      take: 300, // bounded by the ~25 km box
+    });
+    const ranked = rows
+      .map((r) => ({
+        ...r,
+        distanceKm:
+          r.latitude != null && r.longitude != null
+            ? haversineKm(filter.lat!, filter.lng!, r.latitude, r.longitude)
+            : Number.POSITIVE_INFINITY,
+      }))
+      .sort((a, b) => a.distanceKm - b.distanceKm);
+    const start = (filter.page - 1) * PAGE_SIZE;
+    return {
+      items: ranked.slice(start, start + PAGE_SIZE),
+      total: ranked.length,
+      page: filter.page,
+      pageSize: PAGE_SIZE,
+    };
+  }
+
   const orderBy: Prisma.ListingOrderByWithRelationInput[] =
     filter.sort === 'price_asc'
       ? [{ price: 'asc' }]
@@ -207,6 +235,19 @@ export async function searchListings(filter: ListingFilter) {
   ]);
 
   return { items, total, page: filter.page, pageSize: PAGE_SIZE };
+}
+
+/** Great-circle distance in km between two lat/lng points (haversine). */
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 export async function getListing(id: string) {
