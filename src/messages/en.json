@@ -203,7 +203,8 @@
     "serviceBadge": "Service",
     "products": "Products",
     "services": "Services",
-    "requestService": "Request this service"
+    "requestService": "Request this service",
+    "specifications": "Specifications"
   },
   "jobs": {
     "title": "Jobs & Gigs",
@@ -853,7 +854,16 @@
     "service1Title": "Show your work",
     "service1Hint": "Add up to 6 photos of your work or yourself — even one clear photo builds trust. Optional but recommended.",
     "servicePhotoNudge": "A photo of past work helps clients choose you.",
-    "servicePriceLabel": "Your rate (RWF)"
+    "servicePriceLabel": "Your rate (RWF)",
+    "specsLabel": "Features (optional)",
+    "specsHint": "Add details buyers care about — e.g. RAM, storage, year. Tap a suggestion or add your own.",
+    "specLabelPlaceholder": "Feature (e.g. RAM)",
+    "specValuePlaceholder": "Value (e.g. 8GB)",
+    "addSpec": "Add feature",
+    "addCategory": "Can't find it? Add a category",
+    "categoryAdded": "Category added",
+    "newCategoryPlaceholder": "New category name",
+    "saveCategory": "Save category"
   },
   "orders": {
     "title": "Orders",

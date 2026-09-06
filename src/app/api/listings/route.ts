@@ -33,6 +33,7 @@ export const POST = route(async (req: NextRequest) => {
       condition: input.condition,
       location: input.location,
       ...(cleanContact(input.contactInfo) ? { contactInfo: cleanContact(input.contactInfo)! } : {}),
+      ...(input.specs?.length ? { specs: input.specs } : {}),
       images: {
         create: input.images.map((url, position) => ({ url, position })),
       },

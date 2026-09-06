@@ -41,7 +41,7 @@ export default async function EditListingPage({
         listingId={listing.id}
         categories={categories
           .filter((c) => c.kind === listing.kind)
-          .map((c) => ({ id: c.id, name: categoryName(c, params.locale) }))}
+          .map((c) => ({ id: c.id, name: categoryName(c, params.locale), slug: c.slug }))}
         initial={{
           title: listing.title,
           price: String(Math.round(listing.price / 100)),
@@ -54,6 +54,11 @@ export default async function EditListingPage({
           contact: asContact(listing.contactInfo) ?? {},
           showPhone: listing.showPhone,
           tags: listing.tags,
+          specs: Array.isArray(listing.specs)
+            ? (listing.specs as { label?: string; value?: string }[])
+                .filter((s) => s?.label && s?.value)
+                .map((s) => ({ label: String(s.label), value: String(s.value) }))
+            : [],
         }}
       />
     </div>

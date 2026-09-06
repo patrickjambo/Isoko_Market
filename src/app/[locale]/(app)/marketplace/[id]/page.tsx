@@ -198,6 +198,30 @@ export default async function ListingDetailPage({
             {listing.description}
           </div>
 
+          {/* Product specifications (RAM, processor, year, …) so the buyer sees
+              the full details before contacting/buying. */}
+          {(() => {
+            const specs = Array.isArray(listing.specs)
+              ? (listing.specs as { label?: string; value?: string }[]).filter(
+                  (s) => s?.label?.trim() && s?.value?.trim()
+                )
+              : [];
+            if (specs.length === 0) return null;
+            return (
+              <div className="rounded-xl border border-border bg-card p-4">
+                <h2 className="mb-3 text-sm font-semibold">{t('specifications')}</h2>
+                <dl className="divide-y divide-border/60 text-sm">
+                  {specs.map((s, i) => (
+                    <div key={i} className="flex justify-between gap-3 py-1.5">
+                      <dt className="text-muted-foreground">{s.label}</dt>
+                      <dd className="text-right font-medium">{s.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            );
+          })()}
+
           <SellerTrustCard
             person={listing.seller}
             rating={ratingAgg._avg.rating ?? 0}

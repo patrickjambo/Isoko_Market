@@ -11,6 +11,13 @@ export const listingConditions = [
 
 export const listingKinds = ['PRODUCT', 'SERVICE'] as const;
 
+// A product feature row, e.g. { label: "RAM", value: "8GB" }.
+export const listingSpecSchema = z.object({
+  label: z.string().trim().min(1).max(40),
+  value: z.string().trim().min(1).max(200),
+});
+export type ListingSpec = z.infer<typeof listingSpecSchema>;
+
 export const createListingSchema = z.object({
   title: z.string().trim().min(3, 'Add a short, clear title.').max(120),
   description: z.string().trim().min(10, 'Describe the item.').max(4000),
@@ -24,6 +31,8 @@ export const createListingSchema = z.object({
   location: z.string().trim().min(2, 'Add a location.').max(80),
   images: z.array(z.string().url()).max(6).default([]),
   tags: z.array(z.string().trim().min(1).max(40)).max(10).default([]),
+  // Structured product features (RAM, processor, year, …) shown to buyers.
+  specs: z.array(listingSpecSchema).max(20).optional(),
   showPhone: z.boolean().default(false),
   // Structured, clickable contact channels (phone / WhatsApp / email / Instagram).
   contactInfo: contactSchema.optional(),
@@ -37,6 +46,7 @@ export const draftDataSchema = z.object({
   categoryId: z.string().cuid().optional().nullable(),
   kind: z.enum(listingKinds).optional(),
   condition: z.enum(listingConditions).optional(),
+  specs: z.array(listingSpecSchema).max(20).optional(),
   location: z.string().trim().max(80).optional(),
   images: z.array(z.string().url()).max(6).optional(),
   tags: z.array(z.string().trim().max(40)).max(10).optional(),

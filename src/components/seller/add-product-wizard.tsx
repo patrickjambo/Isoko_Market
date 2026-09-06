@@ -21,13 +21,16 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { ImageUploader } from '@/components/shared/image-uploader';
 import { ContactFields } from '@/components/shared/contact-fields';
+import { SpecsEditor } from '@/components/seller/specs-editor';
+import { CategoryPicker } from '@/components/seller/category-picker';
 import type { ContactChannels } from '@/lib/contact';
 import { useToast } from '@/components/ui/toast';
-import { listingConditions } from '@/lib/validators/listing';
+import { listingConditions, type ListingSpec } from '@/lib/validators/listing';
+import { specSuggestionsFor } from '@/lib/specs';
 import { RWANDA_DISTRICTS } from '@/lib/rwanda';
 import { formatRWF, cn } from '@/lib/utils';
 
-type Category = { id: string; name: string };
+type Category = { id: string; name: string; slug?: string };
 type ListingKind = 'PRODUCT' | 'SERVICE';
 type Data = {
   images: string[];
@@ -39,6 +42,7 @@ type Data = {
   price: number | '';
   description: string;
   tags: string[];
+  specs: ListingSpec[];
   showPhone: boolean;
   contact: ContactChannels;
 };
@@ -53,6 +57,7 @@ const EMPTY: Data = {
   price: '',
   description: '',
   tags: [],
+  specs: [],
   showPhone: false,
   contact: {},
 };
@@ -75,6 +80,8 @@ export function AddProductWizard({
   const isService = kind === 'SERVICE';
   const [step, setStep] = useState(1);
   const [data, setData] = useState<Data>({ ...EMPTY, kind });
+  // Local, appendable category list so a seller-added category shows immediately.
+  const [cats, setCats] = useState<Category[]>(categories);
   const [loaded, setLoaded] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [duplicate, setDuplicate] = useState<{ id: string; title: string } | null>(null);
@@ -110,7 +117,8 @@ export function AddProductWizard({
 
   const set = <K extends keyof Data>(k: K, v: Data[K]) => setData((d) => ({ ...d, [k]: v }));
 
-  const categoryName = categories.find((c) => c.id === data.categoryId)?.name;
+  const selectedCategory = cats.find((c) => c.id === data.categoryId);
+  const categoryName = selectedCategory?.name;
 
   async function publish(force = false) {
     setPublishing(true);
@@ -129,6 +137,7 @@ export function AddProductWizard({
           location: data.location,
           images: data.images,
           tags: data.tags,
+          specs: isService ? [] : data.specs.filter((s) => s.label.trim() && s.value.trim()),
           showPhone: data.showPhone,
           contactInfo: data.contact,
         }),
@@ -199,7 +208,7 @@ export function AddProductWizard({
             value={data.title}
             onChange={(v) => set('title', v)}
             onPickCategory={(name) => {
-              const match = categories.find((c) => c.name.toLowerCase() === name.toLowerCase());
+              const match = cats.find((c) => c.name.toLowerCase() === name.toLowerCase());
               if (match) set('categoryId', match.id);
             }}
             locale={locale}
@@ -210,15 +219,14 @@ export function AddProductWizard({
 
       {step === 3 && (
         <Step title={t('step3Title')} hint={t('step3Hint')}>
-          <div className="space-y-1.5">
-            <Label>{tc('form.categoryLabel')}</Label>
-            <Select value={data.categoryId} onChange={(e) => set('categoryId', e.target.value)}>
-              <option value="">—</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </Select>
-          </div>
+          <CategoryPicker
+            categories={cats}
+            value={data.categoryId}
+            onChange={(id) => set('categoryId', id)}
+            onAdded={(cat) => setCats((prev) => [...prev, cat])}
+            kind={data.kind}
+            label={tc('form.categoryLabel')}
+          />
 
           {/* Condition is meaningless for a service — hide it entirely. */}
           {!isService && (
@@ -252,6 +260,16 @@ export function AddProductWizard({
             location={data.location}
             locale={locale}
           />
+
+          {/* Product features (RAM, processor, year, …) — buyers see the details.
+              Not applicable to a service. */}
+          {!isService && (
+            <SpecsEditor
+              value={data.specs}
+              onChange={(v) => set('specs', v)}
+              suggestions={specSuggestionsFor(selectedCategory?.slug)}
+            />
+          )}
 
           {data.categoryId && (
             <TagField categoryId={data.categoryId} tags={data.tags} onChange={(v) => set('tags', v)} />
@@ -611,6 +629,18 @@ function Review({
         </p>
       </div>
       {data.description && <p className="whitespace-pre-wrap text-sm">{data.description}</p>}
+      {data.specs.filter((s) => s.label.trim() && s.value.trim()).length > 0 && (
+        <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
+          {data.specs
+            .filter((s) => s.label.trim() && s.value.trim())
+            .map((s, i) => (
+              <div key={i} className="flex justify-between gap-2 border-b border-border/50 py-0.5">
+                <dt className="text-muted-foreground">{s.label}</dt>
+                <dd className="font-medium">{s.value}</dd>
+              </div>
+            ))}
+        </dl>
+      )}
       {data.tags.length > 0 && (
         <p className="text-xs text-muted-foreground">{data.tags.join(' · ')}</p>
       )}

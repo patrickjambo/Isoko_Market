@@ -276,6 +276,10 @@ model Category {
   nameFr   String
   icon     String? // lucide icon name
   kind     ListingKind @default(PRODUCT) // product categories vs. service categories
+  // Set when a seller adds a category on the fly (dynamic categories); null for
+  // the seeded set. Lets admins review/curate user-created categories later.
+  createdById String?
+  createdAt   DateTime    @default(now())
   listings Listing[]
 
   @@index([kind])
@@ -298,6 +302,8 @@ model Listing {
   featuredUntil DateTime?
   viewCount   Int              @default(0)
   tags        String[]         @default([])
+  // Structured product features shown to buyers, e.g. [{label:"RAM",value:"8GB"}].
+  specs       Json?
   showPhone   Boolean          @default(false) // seller's contact preference (Section 8)
   contactInfo Json? // structured, clickable contact: { phone?, whatsapp?, email?, instagram? }
   staleNudgedAt DateTime? // when the "still available?" nudge was sent (Section 5)

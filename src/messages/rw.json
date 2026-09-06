@@ -203,7 +203,8 @@
     "serviceBadge": "Serivisi",
     "products": "Ibicuruzwa",
     "services": "Serivisi",
-    "requestService": "Saba iyi serivisi"
+    "requestService": "Saba iyi serivisi",
+    "specifications": "Ibiranga"
   },
   "jobs": {
     "title": "Akazi & Imirimo",
@@ -853,7 +854,16 @@
     "service1Title": "Erekana akazi kawe",
     "service1Hint": "Ongeraho amafoto agera kuri 6 y’akazi kawe cyangwa wowe — n’ifoto imwe isobanutse yubaka icyizere. Ntibisabwa ariko birasabwa.",
     "servicePhotoNudge": "Ifoto y’akazi wakoze ifasha abakiriya kugutoranya.",
-    "servicePriceLabel": "Igiciro cyawe (RWF)"
+    "servicePriceLabel": "Igiciro cyawe (RWF)",
+    "specsLabel": "Ibiranga (si ngombwa)",
+    "specsHint": "Ongeraho ibisobanuro abaguzi bakeneye — urugero: RAM, ububiko, umwaka. Kanda ku cyifuzo cyangwa wiyongereho.",
+    "specLabelPlaceholder": "Ikiranga (urugero RAM)",
+    "specValuePlaceholder": "Agaciro (urugero 8GB)",
+    "addSpec": "Ongeraho ikiranga",
+    "addCategory": "Ntabwo urabibona? Ongeraho icyiciro",
+    "categoryAdded": "Icyiciro cyongewemo",
+    "newCategoryPlaceholder": "Izina ry'icyiciro gishya",
+    "saveCategory": "Bika icyiciro"
   },
   "orders": {
     "title": "Amateka y'ubugure",

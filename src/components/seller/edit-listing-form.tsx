@@ -12,10 +12,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/toast';
 import { ImageUploader } from '@/components/shared/image-uploader';
 import { ContactFields } from '@/components/shared/contact-fields';
-import { listingConditions } from '@/lib/validators/listing';
+import { SpecsEditor } from '@/components/seller/specs-editor';
+import { listingConditions, type ListingSpec } from '@/lib/validators/listing';
+import { specSuggestionsFor } from '@/lib/specs';
 import type { ContactChannels } from '@/lib/contact';
 
-type Category = { id: string; name: string };
+type Category = { id: string; name: string; slug?: string };
 
 export type EditListingInitial = {
   title: string;
@@ -29,6 +31,7 @@ export type EditListingInitial = {
   contact: ContactChannels;
   showPhone: boolean;
   tags: string[];
+  specs: ListingSpec[];
 };
 
 /** Single-page edit form for a seller's own listing (photos, price, name, …). */
@@ -70,6 +73,7 @@ export function EditListingForm({
           location: d.location,
           images: d.images,
           tags: d.tags,
+          specs: isService ? [] : d.specs.filter((s) => s.label.trim() && s.value.trim()),
           showPhone: d.showPhone,
           contactInfo: d.contact,
         }),
@@ -134,6 +138,15 @@ export function EditListingForm({
           ))}
         </Select>
       </div>
+
+      {/* Product features — buyers see the details (not applicable to services). */}
+      {!isService && (
+        <SpecsEditor
+          value={d.specs}
+          onChange={(v) => set({ specs: v })}
+          suggestions={specSuggestionsFor(categories.find((c) => c.id === d.categoryId)?.slug)}
+        />
+      )}
 
       <div className="space-y-1.5">
         <Label>{t('locationLabel')}</Label>

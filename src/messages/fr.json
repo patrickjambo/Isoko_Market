@@ -203,7 +203,8 @@
     "serviceBadge": "Service",
     "products": "Produits",
     "services": "Services",
-    "requestService": "Demander ce service"
+    "requestService": "Demander ce service",
+    "specifications": "Caractéristiques"
   },
   "jobs": {
     "title": "Emplois & missions",
@@ -853,7 +854,16 @@
     "service1Title": "Montrez votre travail",
     "service1Hint": "Ajoutez jusqu’à 6 photos de votre travail ou de vous — même une photo claire inspire confiance. Facultatif mais recommandé.",
     "servicePhotoNudge": "Une photo de vos réalisations aide les clients à vous choisir.",
-    "servicePriceLabel": "Votre tarif (RWF)"
+    "servicePriceLabel": "Votre tarif (RWF)",
+    "specsLabel": "Caractéristiques (facultatif)",
+    "specsHint": "Ajoutez les détails importants — ex. RAM, stockage, année. Touchez une suggestion ou ajoutez la vôtre.",
+    "specLabelPlaceholder": "Caractéristique (ex. RAM)",
+    "specValuePlaceholder": "Valeur (ex. 8 Go)",
+    "addSpec": "Ajouter une caractéristique",
+    "addCategory": "Introuvable ? Ajouter une catégorie",
+    "categoryAdded": "Catégorie ajoutée",
+    "newCategoryPlaceholder": "Nom de la nouvelle catégorie",
+    "saveCategory": "Enregistrer la catégorie"
   },
   "orders": {
     "title": "Commandes",

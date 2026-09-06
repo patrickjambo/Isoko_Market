@@ -30,7 +30,7 @@ export default async function SellPage({
         kind={isService ? 'SERVICE' : 'PRODUCT'}
         categories={categories
           .filter((c) => c.kind === wantKind)
-          .map((c) => ({ id: c.id, name: categoryName(c, params.locale) }))}
+          .map((c) => ({ id: c.id, name: categoryName(c, params.locale), slug: c.slug }))}
       />
     </div>
   );

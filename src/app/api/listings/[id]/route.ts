@@ -43,6 +43,9 @@ export const PUT = route(async (req: NextRequest, ctx: { params: { id: string } 
         condition: input.condition,
         location: input.location,
         tags: input.tags,
+        // Only touch specs when the edit actually sends the field: undefined =>
+        // leave as-is; [] => clear; non-empty => replace.
+        specs: input.specs === undefined ? undefined : input.specs.length ? input.specs : Prisma.DbNull,
         showPhone: input.showPhone,
         contactInfo: contact ?? Prisma.DbNull,
         images: { create: input.images.map((url, position) => ({ url, position })) },
