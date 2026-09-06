@@ -20,6 +20,17 @@ export const metadata: Metadata = {
   // Use the validated env (empty/whitespace already normalized to the default)
   // so an unset/blank NEXT_PUBLIC_APP_URL can't crash the build via new URL('').
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
+  manifest: '/manifest.webmanifest',
+  // Installable-app polish: home-screen icon + full-screen iOS launch.
+  icons: {
+    icon: '/icon.svg',
+    apple: '/icon.svg',
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Isoko',
+  },
 };
 
 export const viewport: Viewport = {

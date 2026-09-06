@@ -37,7 +37,10 @@
     "locationCaptured": "Location captured",
     "geoDenied": "Location permission denied. Enable it to use this.",
     "geoError": "Couldn't get your location. Try again.",
-    "geoUnsupported": "Location is not supported on this device."
+    "geoUnsupported": "Location is not supported on this device.",
+    "installApp": "Install",
+    "installBannerText": "Add Isoko to your home screen for faster access.",
+    "dismiss": "Dismiss"
   },
   "nav": {
     "home": "Home",

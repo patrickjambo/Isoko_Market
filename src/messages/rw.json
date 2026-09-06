@@ -37,7 +37,10 @@
     "locationCaptured": "Aho uri hafashwe",
     "geoDenied": "Uruhushya rw'aho uri rwanzwe. Rwemere kugira ngo ubikoreshe.",
     "geoError": "Ntibishoboye kubona aho uri. Ongera ugerageze.",
-    "geoUnsupported": "Aho uri ntibishyigikiwe kuri iyi telefoni."
+    "geoUnsupported": "Aho uri ntibishyigikiwe kuri iyi telefoni.",
+    "installApp": "Shyiraho",
+    "installBannerText": "Shyira Isoko ku rupapuro rwawe rwibanze kugira ngo ubone vuba.",
+    "dismiss": "Funga"
   },
   "nav": {
     "home": "Ahabanza",

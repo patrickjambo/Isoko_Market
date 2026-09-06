@@ -37,7 +37,10 @@
     "locationCaptured": "Position enregistrée",
     "geoDenied": "Permission de localisation refusée. Activez-la pour l'utiliser.",
     "geoError": "Impossible d'obtenir votre position. Réessayez.",
-    "geoUnsupported": "La localisation n'est pas prise en charge sur cet appareil."
+    "geoUnsupported": "La localisation n'est pas prise en charge sur cet appareil.",
+    "installApp": "Installer",
+    "installBannerText": "Ajoutez Isoko à votre écran d'accueil pour un accès rapide.",
+    "dismiss": "Ignorer"
   },
   "nav": {
     "home": "Accueil",

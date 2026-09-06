@@ -3,6 +3,7 @@ import { Header } from '@/components/nav/header';
 import { Footer } from '@/components/nav/footer';
 import { BottomNav } from '@/components/nav/bottom-nav';
 import { BackButton } from '@/components/nav/back-button';
+import { InstallBanner } from '@/components/shared/install-banner';
 
 /**
  * Authenticated/app chrome: persistent top nav (desktop) + bottom tab bar
@@ -20,6 +21,7 @@ export default function AppLayout({
   return (
     <div className="flex min-h-dvh flex-col">
       <Header />
+      <InstallBanner />
       <BackButton />
       <main className="flex-1 pb-24 md:pb-0">{children}</main>
       <Footer />
