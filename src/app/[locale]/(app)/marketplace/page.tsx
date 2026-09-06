@@ -8,6 +8,7 @@ import { SaveSearchButton } from '@/components/marketplace/save-search-button';
 import { CategoryChips } from '@/components/marketplace/category-chips';
 import { KindTabs } from '@/components/marketplace/kind-tabs';
 import { SpecFilters } from '@/components/marketplace/spec-filters';
+import { NearMeButton } from '@/components/marketplace/near-me-button';
 import { ViewToggle } from '@/components/marketplace/view-toggle';
 import { MapView } from '@/components/marketplace/map-view';
 import { SearchBar } from '@/components/nav/search-bar';
@@ -103,6 +104,7 @@ export default async function MarketplacePage({
           {total} {t('title').toLowerCase()}
         </span>
         <div className="flex items-center gap-2">
+          <NearMeButton params={searchParams} />
           <SaveSearchButton
             current={{
               q: searchParams.q,

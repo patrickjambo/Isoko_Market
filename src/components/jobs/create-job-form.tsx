@@ -12,6 +12,7 @@ import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
 import { SkillPicker } from '@/components/jobs/skill-picker';
 import { ContactFields } from '@/components/shared/contact-fields';
+import { LocationButton } from '@/components/shared/location-button';
 import { suggestSkillsFromText, draftJobDescription, labelForSkill } from '@/lib/skills';
 import type { ContactChannels } from '@/lib/contact';
 
@@ -34,6 +35,7 @@ export function CreateJobForm({ partners = [] }: { partners?: { id: string; name
   const [title, setTitle] = useState('');
   const [type, setType] = useState<'JOB' | 'GIG'>('JOB');
   const [location, setLocation] = useState('');
+  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [payMin, setPayMin] = useState('');
   const [payMax, setPayMax] = useState('');
   const [payPeriod, setPayPeriod] = useState('month');
@@ -112,6 +114,8 @@ export function CreateJobForm({ partners = [] }: { partners?: { id: string; name
           payMax: payMax ? Number(payMax) : null,
           payPeriod,
           location,
+          latitude: coords?.latitude ?? null,
+          longitude: coords?.longitude ?? null,
           contactInfo: contact,
           skills,
           partnerId: partnerId || null,
@@ -237,6 +241,15 @@ export function CreateJobForm({ partners = [] }: { partners?: { id: string; name
       {/* Location (§3 Step 4) */}
       <Field label={t('form.locationLabel')} error={errors.location}>
         <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Kigali" required />
+        <div className="mt-1.5">
+          <LocationButton
+            done={coords != null}
+            onLocated={(g) => {
+              setCoords({ latitude: g.latitude, longitude: g.longitude });
+              if (!location.trim() && g.label) setLocation(g.label);
+            }}
+          />
+        </div>
       </Field>
 
       <ContactFields value={contact} onChange={setContact} />

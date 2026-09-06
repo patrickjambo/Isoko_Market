@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { MapPin, Tag, Phone } from 'lucide-react';
+import { MapPin, Tag, Phone, Navigation } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { ImageGallery } from '@/components/marketplace/image-gallery';
@@ -131,6 +131,16 @@ export default async function ListingDetailPage({
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-4 w-4" /> {listing.location}
               </span>
+              {listing.latitude != null && listing.longitude != null && (
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${listing.latitude},${listing.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                >
+                  <Navigation className="h-4 w-4" /> {t('getDirections')}
+                </a>
+              )}
               {listing.category && (
                 <span className="inline-flex items-center gap-1">
                   <Tag className="h-4 w-4" /> {categoryName(listing.category, params.locale)}

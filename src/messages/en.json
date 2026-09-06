@@ -32,7 +32,12 @@
     "noResults": "No results found",
     "poweredByTrust": "Every profile shows a verification status",
     "deleted": "Deleted",
-    "clear": "Clear"
+    "clear": "Clear",
+    "useMyLocation": "Use my location",
+    "locationCaptured": "Location captured",
+    "geoDenied": "Location permission denied. Enable it to use this.",
+    "geoError": "Couldn't get your location. Try again.",
+    "geoUnsupported": "Location is not supported on this device."
   },
   "nav": {
     "home": "Home",
@@ -206,7 +211,9 @@
     "requestService": "Request this service",
     "specifications": "Specifications",
     "filterByFeatures": "Filter by features",
-    "clearFeatures": "Clear"
+    "clearFeatures": "Clear",
+    "nearMe": "Near me",
+    "getDirections": "Get directions"
   },
   "jobs": {
     "title": "Jobs & Gigs",
@@ -875,7 +882,8 @@
     "addCategory": "Can't find it? Add a category",
     "categoryAdded": "Category added",
     "newCategoryPlaceholder": "New category name",
-    "saveCategory": "Save category"
+    "saveCategory": "Save category",
+    "locationPinned": "Location pinned"
   },
   "orders": {
     "title": "Orders",

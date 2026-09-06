@@ -42,6 +42,9 @@ export const PUT = route(async (req: NextRequest, ctx: { params: { id: string } 
         kind: input.kind, // undefined leaves the stored kind unchanged
         condition: input.condition,
         location: input.location,
+        // undefined => keep the stored coords (edit form may not re-capture them).
+        latitude: input.latitude,
+        longitude: input.longitude,
         tags: input.tags,
         // Only touch specs when the edit actually sends the field: undefined =>
         // leave as-is; [] => clear; non-empty => replace.

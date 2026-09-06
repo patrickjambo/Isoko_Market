@@ -29,6 +29,8 @@ export const createListingSchema = z.object({
   kind: z.enum(listingKinds).optional(),
   condition: z.enum(listingConditions).default('GOOD'),
   location: z.string().trim().min(2, 'Add a location.').max(80),
+  latitude: z.coerce.number().min(-90).max(90).optional().nullable(),
+  longitude: z.coerce.number().min(-180).max(180).optional().nullable(),
   images: z.array(z.string().url()).max(6).default([]),
   tags: z.array(z.string().trim().min(1).max(40)).max(10).default([]),
   // Structured product features (RAM, processor, year, …) shown to buyers.
@@ -48,6 +50,8 @@ export const draftDataSchema = z.object({
   condition: z.enum(listingConditions).optional(),
   specs: z.array(listingSpecSchema).max(20).optional(),
   location: z.string().trim().max(80).optional(),
+  latitude: z.coerce.number().min(-90).max(90).optional().nullable(),
+  longitude: z.coerce.number().min(-180).max(180).optional().nullable(),
   images: z.array(z.string().url()).max(6).optional(),
   tags: z.array(z.string().trim().max(40)).max(10).optional(),
   showPhone: z.boolean().optional(),
@@ -59,6 +63,9 @@ export const listingFilterSchema = z.object({
   kind: z.enum(listingKinds).optional(),
   // JSON array of [label, value] tuples — category-scoped spec facet filters.
   specs: z.string().max(1000).optional(),
+  // Buyer's coordinates for "near me" (bounding-box proximity filter).
+  lat: z.coerce.number().min(-90).max(90).optional(),
+  lng: z.coerce.number().min(-180).max(180).optional(),
   minPrice: z.coerce.number().int().min(0).optional(),
   maxPrice: z.coerce.number().int().min(0).optional(),
   location: z.string().trim().max(80).optional(),

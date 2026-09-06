@@ -32,7 +32,12 @@
     "noResults": "Nta bisubizo byabonetse",
     "poweredByTrust": "Buri mwirondoro werekana ko wemejwe",
     "deleted": "Byasibwe",
-    "clear": "Siba"
+    "clear": "Siba",
+    "useMyLocation": "Koresha aho ndi",
+    "locationCaptured": "Aho uri hafashwe",
+    "geoDenied": "Uruhushya rw'aho uri rwanzwe. Rwemere kugira ngo ubikoreshe.",
+    "geoError": "Ntibishoboye kubona aho uri. Ongera ugerageze.",
+    "geoUnsupported": "Aho uri ntibishyigikiwe kuri iyi telefoni."
   },
   "nav": {
     "home": "Ahabanza",
@@ -206,7 +211,9 @@
     "requestService": "Saba iyi serivisi",
     "specifications": "Ibiranga",
     "filterByFeatures": "Shungura ku biranga",
-    "clearFeatures": "Siba"
+    "clearFeatures": "Siba",
+    "nearMe": "Hafi yanjye",
+    "getDirections": "Fata inzira"
   },
   "jobs": {
     "title": "Akazi & Imirimo",
@@ -875,7 +882,8 @@
     "addCategory": "Ntabwo urabibona? Ongeraho icyiciro",
     "categoryAdded": "Icyiciro cyongewemo",
     "newCategoryPlaceholder": "Izina ry'icyiciro gishya",
-    "saveCategory": "Bika icyiciro"
+    "saveCategory": "Bika icyiciro",
+    "locationPinned": "Aho uri hashyizweho"
   },
   "orders": {
     "title": "Amateka y'ubugure",

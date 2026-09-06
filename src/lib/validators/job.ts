@@ -13,6 +13,8 @@ export const createJobSchema = z
     payMax: z.coerce.number().int().min(0).max(1_000_000_000).optional().nullable(),
     payPeriod: z.enum(['hour', 'day', 'month', 'fixed']).default('month'),
     location: z.string().trim().min(2, 'Add a location.').max(80),
+    latitude: z.coerce.number().min(-90).max(90).optional().nullable(),
+    longitude: z.coerce.number().min(-180).max(180).optional().nullable(),
     // Structured, clickable contact channels (phone / WhatsApp / email / Instagram).
     contactInfo: contactSchema.optional(),
     // Required skills — drives match-quality scoring against seeker CVs (§5/§10).

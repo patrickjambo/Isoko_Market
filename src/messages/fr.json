@@ -32,7 +32,12 @@
     "noResults": "Aucun résultat trouvé",
     "poweredByTrust": "Chaque profil affiche un statut de vérification",
     "deleted": "Supprimé",
-    "clear": "Effacer"
+    "clear": "Effacer",
+    "useMyLocation": "Utiliser ma position",
+    "locationCaptured": "Position enregistrée",
+    "geoDenied": "Permission de localisation refusée. Activez-la pour l'utiliser.",
+    "geoError": "Impossible d'obtenir votre position. Réessayez.",
+    "geoUnsupported": "La localisation n'est pas prise en charge sur cet appareil."
   },
   "nav": {
     "home": "Accueil",
@@ -206,7 +211,9 @@
     "requestService": "Demander ce service",
     "specifications": "Caractéristiques",
     "filterByFeatures": "Filtrer par caractéristiques",
-    "clearFeatures": "Effacer"
+    "clearFeatures": "Effacer",
+    "nearMe": "Près de moi",
+    "getDirections": "Itinéraire"
   },
   "jobs": {
     "title": "Emplois & missions",
@@ -875,7 +882,8 @@
     "addCategory": "Introuvable ? Ajouter une catégorie",
     "categoryAdded": "Catégorie ajoutée",
     "newCategoryPlaceholder": "Nom de la nouvelle catégorie",
-    "saveCategory": "Enregistrer la catégorie"
+    "saveCategory": "Enregistrer la catégorie",
+    "locationPinned": "Position ajoutée"
   },
   "orders": {
     "title": "Commandes",

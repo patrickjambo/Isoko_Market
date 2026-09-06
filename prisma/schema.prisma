@@ -297,6 +297,10 @@ model Listing {
   kind        ListingKind      @default(PRODUCT) // product for sale vs. service offered
   condition   ListingCondition @default(GOOD) // meaningful for PRODUCT only
   location    String
+  // Optional precise GPS (from "Use my location") — powers "near me" and
+  // turn-by-turn directions to the seller/service provider.
+  latitude    Float?
+  longitude   Float?
   status      ListingStatus    @default(ACTIVE)
   isFeatured  Boolean          @default(false)
   featuredUntil DateTime?
@@ -422,6 +426,9 @@ model Job {
   payMax      Int?
   payPeriod   String?   @default("month") // hour | day | month | fixed
   location    String
+  // Optional precise GPS (from "Use my location") for "near me" + directions.
+  latitude    Float?
+  longitude   Float?
   contactInfo Json? // structured, clickable contact: { phone?, whatsapp?, email?, instagram? }
   skills      String[]  @default([]) // required skills — canonical keys from the shared taxonomy (src/lib/skills.ts)
   viewCount   Int       @default(0) // powers the employer performance rule engine (§2)

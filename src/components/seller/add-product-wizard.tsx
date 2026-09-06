@@ -23,6 +23,7 @@ import { ImageUploader } from '@/components/shared/image-uploader';
 import { ContactFields } from '@/components/shared/contact-fields';
 import { SpecsEditor } from '@/components/seller/specs-editor';
 import { CategoryPicker } from '@/components/seller/category-picker';
+import { LocationButton } from '@/components/shared/location-button';
 import type { ContactChannels } from '@/lib/contact';
 import { useToast } from '@/components/ui/toast';
 import { listingConditions, type ListingSpec } from '@/lib/validators/listing';
@@ -39,6 +40,8 @@ type Data = {
   kind: ListingKind;
   condition: string;
   location: string;
+  latitude: number | null;
+  longitude: number | null;
   price: number | '';
   description: string;
   tags: string[];
@@ -54,6 +57,8 @@ const EMPTY: Data = {
   kind: 'PRODUCT',
   condition: 'GOOD',
   location: '',
+  latitude: null,
+  longitude: null,
   price: '',
   description: '',
   tags: [],
@@ -135,6 +140,8 @@ export function AddProductWizard({
           kind: data.kind,
           condition: data.condition,
           location: data.location,
+          latitude: data.latitude,
+          longitude: data.longitude,
           images: data.images,
           tags: data.tags,
           specs: isService ? [] : data.specs.filter((s) => s.label.trim() && s.value.trim()),
@@ -308,6 +315,22 @@ export function AddProductWizard({
                   <option key={d} value={d} />
                 ))}
               </datalist>
+            </div>
+            <div className="flex items-center gap-2">
+              <LocationButton
+                done={data.latitude != null}
+                onLocated={(g) =>
+                  setData((d) => ({
+                    ...d,
+                    latitude: g.latitude,
+                    longitude: g.longitude,
+                    location: d.location.trim() || g.label || d.location,
+                  }))
+                }
+              />
+              {data.latitude != null && (
+                <span className="text-xs text-success">{t('locationPinned')}</span>
+              )}
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm font-medium">

@@ -45,6 +45,8 @@ export const POST = route(async (req: NextRequest) => {
       payMax: input.payMax != null ? francsToMinor(input.payMax) : null,
       payPeriod: input.payPeriod,
       location: input.location,
+      latitude: input.latitude ?? null,
+      longitude: input.longitude ?? null,
       ...(cleanContact(input.contactInfo) ? { contactInfo: cleanContact(input.contactInfo)! } : {}),
       skills,
       partnerId,

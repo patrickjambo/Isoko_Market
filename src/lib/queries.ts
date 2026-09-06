@@ -172,6 +172,15 @@ export async function searchListings(filter: ListingFilter) {
     }));
   }
   if (filter.location) where.location = { contains: filter.location, mode: 'insensitive' };
+  // "Near me": bounding box around the buyer's coords (~25 km). Only geo-tagged
+  // listings match — new ones captured via "Use my location".
+  if (filter.lat != null && filter.lng != null) {
+    const R_KM = 25;
+    const dLat = R_KM / 111;
+    const dLng = R_KM / (111 * Math.max(0.1, Math.cos((filter.lat * Math.PI) / 180)));
+    where.latitude = { gte: filter.lat - dLat, lte: filter.lat + dLat };
+    where.longitude = { gte: filter.lng - dLng, lte: filter.lng + dLng };
+  }
   if (filter.verifiedOnly) where.seller = { isVerified: true };
   if (filter.minPrice != null || filter.maxPrice != null) {
     where.price = {};

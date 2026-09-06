@@ -32,6 +32,8 @@ export const POST = route(async (req: NextRequest) => {
       kind: input.kind ?? 'PRODUCT',
       condition: input.condition,
       location: input.location,
+      latitude: input.latitude ?? null,
+      longitude: input.longitude ?? null,
       ...(cleanContact(input.contactInfo) ? { contactInfo: cleanContact(input.contactInfo)! } : {}),
       ...(input.specs?.length ? { specs: input.specs } : {}),
       images: {
