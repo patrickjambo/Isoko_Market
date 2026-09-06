@@ -52,6 +52,9 @@ export function MarketplaceFilters({
     if (state.condition) sp.set('condition', state.condition);
     if (state.verifiedOnly) sp.set('verifiedOnly', 'true');
     if (state.sort && state.sort !== 'newest') sp.set('sort', state.sort);
+    // Keep the buyer's feature (spec) filters — but only while they stay in the
+    // same category, since specs are category-scoped.
+    if (current.specs && state.categoryId === current.categoryId) sp.set('specs', current.specs);
     router.push(`/marketplace?${sp.toString()}`);
     setOpen(false);
   }

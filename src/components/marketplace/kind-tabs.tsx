@@ -22,7 +22,8 @@ export function KindTabs({
 
   // Category and condition are kind-specific, so switching tab clears them —
   // otherwise a product category carried onto the Services tab matches nothing.
-  const DROP = new Set(['kind', 'page', 'categoryId', 'condition']);
+  // specs are category-scoped, so they go when the category does.
+  const DROP = new Set(['kind', 'page', 'categoryId', 'condition', 'specs']);
   const go = (kind?: string) => {
     const sp = new URLSearchParams(
       Object.entries(params).filter(([k, v]) => v && !DROP.has(k)) as [string, string][]
