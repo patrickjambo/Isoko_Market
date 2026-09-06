@@ -49,6 +49,8 @@ export default async function EditListingPage({
           kind: listing.kind,
           condition: listing.condition,
           location: listing.location,
+          latitude: listing.latitude,
+          longitude: listing.longitude,
           description: listing.description,
           images: listing.images.map((i) => i.url),
           contact: asContact(listing.contactInfo) ?? {},

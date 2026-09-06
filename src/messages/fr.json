@@ -306,7 +306,8 @@
     "coverNoteSuggested": "Je suis intéressé(e) et disponible immédiatement.",
     "snapshotNote": "Une copie de votre CV est enregistrée avec cette candidature.",
     "gateApply": "Inscrivez-vous pour postuler — ça prend 30 secondes et protège votre identité.",
-    "filters": "Filtres"
+    "filters": "Filtres",
+    "getDirections": "Itinéraire"
   },
   "cv": {
     "title": "Créateur de CV",

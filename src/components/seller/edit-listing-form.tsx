@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toast';
 import { ImageUploader } from '@/components/shared/image-uploader';
 import { ContactFields } from '@/components/shared/contact-fields';
 import { SpecsEditor } from '@/components/seller/specs-editor';
+import { LocationButton } from '@/components/shared/location-button';
 import { listingConditions, type ListingSpec } from '@/lib/validators/listing';
 import { specSuggestionsFor } from '@/lib/specs';
 import type { ContactChannels } from '@/lib/contact';
@@ -26,6 +27,8 @@ export type EditListingInitial = {
   kind: string; // 'PRODUCT' | 'SERVICE' — hides Condition for services
   condition: string;
   location: string;
+  latitude: number | null;
+  longitude: number | null;
   description: string;
   images: string[];
   contact: ContactChannels;
@@ -71,6 +74,8 @@ export function EditListingForm({
           categoryId: d.categoryId || null,
           condition: d.condition,
           location: d.location,
+          latitude: d.latitude,
+          longitude: d.longitude,
           images: d.images,
           tags: d.tags,
           specs: isService ? [] : d.specs.filter((s) => s.label.trim() && s.value.trim()),
@@ -151,6 +156,19 @@ export function EditListingForm({
       <div className="space-y-1.5">
         <Label>{t('locationLabel')}</Label>
         <Input value={d.location} onChange={(e) => set({ location: e.target.value })} placeholder="Kigali, Nyarugenge" />
+        <div className="flex items-center gap-2">
+          <LocationButton
+            done={d.latitude != null}
+            onLocated={(g) =>
+              set({
+                latitude: g.latitude,
+                longitude: g.longitude,
+                location: d.location.trim() || g.label || d.location,
+              })
+            }
+          />
+          {d.latitude != null && <span className="text-xs text-success">{ts('locationPinned')}</span>}
+        </div>
       </div>
 
       <div className="space-y-1.5">

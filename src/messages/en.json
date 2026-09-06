@@ -306,7 +306,8 @@
     "coverNoteSuggested": "I'm interested and available immediately.",
     "snapshotNote": "A copy of your CV is saved with this application.",
     "gateApply": "Sign up to apply — it takes 30 seconds and keeps your identity safe.",
-    "filters": "Filters"
+    "filters": "Filters",
+    "getDirections": "Get directions"
   },
   "cv": {
     "title": "CV builder",

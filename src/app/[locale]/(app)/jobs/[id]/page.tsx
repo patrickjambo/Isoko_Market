@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale, getLocale } from 'next-intl/server';
-import { MapPin, Users, Wallet, Sparkles } from 'lucide-react';
+import { MapPin, Users, Wallet, Sparkles, Navigation } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -84,6 +84,16 @@ export default async function JobDetailPage({
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-4 w-4" /> {job.location}
               </span>
+              {job.latitude != null && job.longitude != null && (
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${job.latitude},${job.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                >
+                  <Navigation className="h-4 w-4" /> {t('getDirections')}
+                </a>
+              )}
               <span className="inline-flex items-center gap-1">
                 <Users className="h-4 w-4" /> {t('applicants', { count: job._count.applications })}
               </span>
