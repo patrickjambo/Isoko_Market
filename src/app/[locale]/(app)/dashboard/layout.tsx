@@ -1,7 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { redirect } from '@/i18n/routing';
 import { getCurrentUser } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { getUnreadMessageCount } from '@/lib/queries';
 import { SellerShell } from '@/components/seller/seller-shell';
 
 export const dynamic = 'force-dynamic';
@@ -22,13 +22,7 @@ export default async function DashboardLayout({
     return null;
   }
 
-  const unread = await prisma.message.count({
-    where: {
-      conversation: { participants: { some: { userId: user.id } } },
-      senderId: { not: user.id },
-      readAt: null,
-    },
-  });
+  const unread = await getUnreadMessageCount(user.id);
 
   return <SellerShell unread={unread}>{children}</SellerShell>;
 }

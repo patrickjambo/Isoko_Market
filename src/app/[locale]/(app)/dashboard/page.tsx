@@ -12,7 +12,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { requireWorkspace } from '@/lib/workspace-guard';
-import { prisma } from '@/lib/prisma';
+import { getUnreadMessageCount } from '@/lib/queries';
 import { getSellerInsights } from '@/lib/seller-insights';
 import { getSellerSales } from '@/lib/orders';
 import { formatRWF } from '@/lib/utils';
@@ -30,13 +30,7 @@ export default async function SellerHome({ params }: { params: { locale: string 
   const user = await requireWorkspace('seller', params.locale);
   const [insights, unread, sales] = await Promise.all([
     getSellerInsights(user.id),
-    prisma.message.count({
-      where: {
-        conversation: { participants: { some: { userId: user.id } } },
-        senderId: { not: user.id },
-        readAt: null,
-      },
-    }),
+    getUnreadMessageCount(user.id),
     getSellerSales(user.id),
   ]);
 

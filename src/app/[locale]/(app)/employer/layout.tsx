@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { redirect } from '@/i18n/routing';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getUnreadMessageCount } from '@/lib/queries';
 import { EmployerShell } from '@/components/employer/employer-shell';
 
 export const dynamic = 'force-dynamic';
@@ -23,13 +24,7 @@ export default async function EmployerLayout({
   }
 
   const [unread, newApplicants] = await Promise.all([
-    prisma.message.count({
-      where: {
-        conversation: { participants: { some: { userId: user.id } } },
-        senderId: { not: user.id },
-        readAt: null,
-      },
-    }),
+    getUnreadMessageCount(user.id),
     prisma.application.count({
       where: { job: { employerId: user.id, status: 'OPEN' }, status: 'APPLIED' },
     }),

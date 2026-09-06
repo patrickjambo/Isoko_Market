@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import type { Prisma } from '@prisma/client';
 import { prisma } from './prisma';
@@ -56,6 +57,21 @@ export const getFeaturedListings = unstable_cache(
     }),
   ['home-featured-listings'],
   { revalidate: 30 }
+);
+
+/**
+ * Unread messages for a user (the sidebar/badge count). `cache()`-wrapped so the
+ * identical query used by both a workspace layout AND its page runs once per
+ * request instead of twice.
+ */
+export const getUnreadMessageCount = cache((userId: string) =>
+  prisma.message.count({
+    where: {
+      conversation: { participants: { some: { userId } } },
+      senderId: { not: userId },
+      readAt: null,
+    },
+  })
 );
 
 /** Recent active services for the homepage "Services" strip. */
