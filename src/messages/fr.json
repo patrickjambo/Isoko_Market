@@ -699,7 +699,17 @@
     "latency": "Latence",
     "connections": "En ligne",
     "errorRate": "Erreurs",
-    "adminRole_none": "Aucun rôle attribué"
+    "adminRole_none": "Aucun rôle attribué",
+    "categoriesTitle": "Catégories",
+    "categoriesSubtitle": "Gérez la taxonomie du marché. Les catégories ajoutées par les vendeurs apparaissent d'abord pour révision.",
+    "categoriesEmpty": "Aucune catégorie.",
+    "categoryEditTitle": "Modifier la catégorie",
+    "categoryKind": "Type",
+    "categoryProduct": "Produit",
+    "categoryService": "Service",
+    "categorySellerAdded": "Ajoutée par un vendeur",
+    "categoryListingCount": "{count} annonces",
+    "categoryDeleteConfirm": "Supprimer cette catégorie ? {count} annonce(s) seront sans catégorie. Action irréversible."
   },
   "trust": {
     "verifiedSeller": "Vendeur vérifié",

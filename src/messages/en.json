@@ -699,7 +699,17 @@
     "latency": "Latency",
     "connections": "Live",
     "errorRate": "Errors",
-    "adminRole_none": "No role assigned"
+    "adminRole_none": "No role assigned",
+    "categoriesTitle": "Categories",
+    "categoriesSubtitle": "Curate the marketplace taxonomy. Seller-added categories appear first for review.",
+    "categoriesEmpty": "No categories yet.",
+    "categoryEditTitle": "Edit category",
+    "categoryKind": "Type",
+    "categoryProduct": "Product",
+    "categoryService": "Service",
+    "categorySellerAdded": "Seller-added",
+    "categoryListingCount": "{count} listings",
+    "categoryDeleteConfirm": "Delete this category? {count} listing(s) will become uncategorised. This cannot be undone."
   },
   "trust": {
     "verifiedSeller": "Verified seller",

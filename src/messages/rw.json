@@ -699,7 +699,17 @@
     "latency": "Umuvuduko",
     "connections": "Bahari",
     "errorRate": "Amakosa",
-    "adminRole_none": "Nta ruhare rwahawe"
+    "adminRole_none": "Nta ruhare rwahawe",
+    "categoriesTitle": "Ibyiciro",
+    "categoriesSubtitle": "Genzura ibyiciro by'isoko. Ibyiciro byongewemo n'abacuruzi biza mbere kugira ngo bisuzumwe.",
+    "categoriesEmpty": "Nta byiciro birahari.",
+    "categoryEditTitle": "Hindura icyiciro",
+    "categoryKind": "Ubwoko",
+    "categoryProduct": "Igicuruzwa",
+    "categoryService": "Serivisi",
+    "categorySellerAdded": "Cyongewemo n'umucuruzi",
+    "categoryListingCount": "ibicuruzwa {count}",
+    "categoryDeleteConfirm": "Gusiba iki cyiciro? Ibicuruzwa {count} bizasigara nta cyiciro. Ntibisubirwaho."
   },
   "trust": {
     "verifiedSeller": "Umucuruzi wemejwe",
