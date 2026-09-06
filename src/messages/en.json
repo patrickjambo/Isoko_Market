@@ -40,7 +40,13 @@
     "geoUnsupported": "Location is not supported on this device.",
     "installApp": "Install",
     "installBannerText": "Add Isoko to your home screen for faster access.",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "share": "Share",
+    "shareWhatsApp": "Share to WhatsApp",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied",
+    "shareMore": "Share…",
+    "shareVia": "on"
   },
   "nav": {
     "home": "Home",

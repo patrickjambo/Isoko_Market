@@ -12,6 +12,7 @@ import { asContact } from '@/lib/contact';
 import { FavoriteButton } from '@/components/marketplace/favorite-button';
 import { BuyNowButton } from '@/components/orders/buy-now-button';
 import { ReportDialog } from '@/components/trust/report-dialog';
+import { ShareButton } from '@/components/shared/share-button';
 import { ListingOwnerActions } from '@/components/marketplace/listing-owner-actions';
 import { LiveItemStatus } from '@/components/shared/live-item-status';
 import { getListing, getSimilarListings } from '@/lib/queries';
@@ -31,9 +32,10 @@ export default async function ListingDetailPage({
   params: { locale: string; id: string };
 }) {
   setRequestLocale(params.locale);
-  const [t, tt, listing, user] = await Promise.all([
+  const [t, tt, tc, listing, user] = await Promise.all([
     getTranslations('marketplace'),
     getTranslations('trust'),
+    getTranslations('common'),
     getListing(params.id),
     getCurrentUser(),
   ]);
@@ -181,6 +183,7 @@ export default async function ListingDetailPage({
                 />
               </>
             )}
+            <ShareButton title={listing.title} label={tc('share')} />
             {!isOwner && (
               <ReportDialog targetType="LISTING" targetId={listing.id} label={tt('reportListing')} />
             )}

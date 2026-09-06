@@ -40,7 +40,13 @@
     "geoUnsupported": "La localisation n'est pas prise en charge sur cet appareil.",
     "installApp": "Installer",
     "installBannerText": "Ajoutez Isoko à votre écran d'accueil pour un accès rapide.",
-    "dismiss": "Ignorer"
+    "dismiss": "Ignorer",
+    "share": "Partager",
+    "shareWhatsApp": "Partager sur WhatsApp",
+    "copyLink": "Copier le lien",
+    "linkCopied": "Lien copié",
+    "shareMore": "Partager…",
+    "shareVia": "sur"
   },
   "nav": {
     "home": "Accueil",

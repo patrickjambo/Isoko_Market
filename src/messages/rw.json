@@ -40,7 +40,13 @@
     "geoUnsupported": "Aho uri ntibishyigikiwe kuri iyi telefoni.",
     "installApp": "Shyiraho",
     "installBannerText": "Shyira Isoko ku rupapuro rwawe rwibanze kugira ngo ubone vuba.",
-    "dismiss": "Funga"
+    "dismiss": "Funga",
+    "share": "Sangiza",
+    "shareWhatsApp": "Sangiza kuri WhatsApp",
+    "copyLink": "Koporora link",
+    "linkCopied": "Link yakoporowe",
+    "shareMore": "Sangiza…",
+    "shareVia": "kuri"
   },
   "nav": {
     "home": "Ahabanza",

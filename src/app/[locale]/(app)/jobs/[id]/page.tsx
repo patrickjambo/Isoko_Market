@@ -10,6 +10,7 @@ import { LiveItemStatus } from '@/components/shared/live-item-status';
 import { MessageSellerButton } from '@/components/messaging/message-seller-button';
 import { ContactLinks } from '@/components/shared/contact-links';
 import { ReportDialog } from '@/components/trust/report-dialog';
+import { ShareButton } from '@/components/shared/share-button';
 import { formatPay } from '@/components/jobs/job-card';
 import { getJob, getCvSkills } from '@/lib/queries';
 import { asContact } from '@/lib/contact';
@@ -28,6 +29,7 @@ export default async function JobDetailPage({
   setRequestLocale(params.locale);
   const t = await getTranslations('jobs');
   const tt = await getTranslations('trust');
+  const tc = await getTranslations('common');
   const tContact = await getTranslations('contact');
   const locale = await getLocale();
 
@@ -123,6 +125,7 @@ export default async function JobDetailPage({
                 <ReportDialog targetType="JOB" targetId={job.id} label={tt('reportJob')} />
               </>
             )}
+            <ShareButton title={job.title} label={tc('share')} />
           </div>
 
           {/* Why you match — surfaces the specific overlapping skills (§5). */}
