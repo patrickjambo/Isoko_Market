@@ -1058,7 +1058,8 @@
     "interviewMessage": "Tuzahurire mu kiganiro ku wa {time}.",
     "hireMessage": "Amakuru meza — wahawe akazi ka \"{job}\"! Reka duteganye ibisigaye.",
     "alreadyHired": "Uyu mukandida yahawe akazi.",
-    "applicationClosed": "Ubu busabe bwafunzwe."
+    "applicationClosed": "Ubu busabe bwafunzwe.",
+    "requiredDocsCheck": "Inyandiko zisabwa"
   },
   "onboarding": {
     "forkTitle": "Ni iki cyakuzanye kuri Isoko Market?",

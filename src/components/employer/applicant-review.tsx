@@ -25,17 +25,10 @@ import { useToast } from '@/components/ui/toast';
 import { CvPreview } from '@/components/cv/cv-preview';
 import { cvDataSchema, type CvData } from '@/lib/validators/cv';
 import type { ApplicantItem } from '@/lib/employer-applicants';
+import { docTypeKey } from '@/lib/documents';
 import { initials, timeAgo } from '@/lib/utils';
 
 type Sort = 'match' | 'newest' | 'verified';
-
-const DOC_TYPE_KEY: Record<string, string> = {
-  CV: 'typeCv',
-  COVER_LETTER: 'typeCoverLetter',
-  CERTIFICATE: 'typeCertificate',
-  ID_DOCUMENT: 'typeId',
-  OTHER: 'typeOther',
-};
 
 /**
  * Scan-fast applicant triage (§4): match-scored, sortable/filterable cards with
@@ -184,6 +177,49 @@ export function ApplicantReview({
                 </div>
               </div>
 
+              {/* Required-documents check — did this applicant provide what the job
+                  asked for? Provided ones link straight to the file. */}
+              {a.requiredDocuments.length > 0 && (
+                <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {t('requiredDocsCheck')}:
+                  </span>
+                  {a.requiredDocuments.map((reqType) => {
+                    const doc = a.documents.find((d) => d.type === reqType);
+                    // A structured CV counts as a provided "CV".
+                    const provided = Boolean(doc) || (reqType === 'CV' && a.snapshot != null);
+                    const cls = provided
+                      ? 'border-success/40 bg-success/10 text-success'
+                      : 'border-accent/40 bg-accent/5 text-accent';
+                    const inner = (
+                      <>
+                        {provided ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}{' '}
+                        {tcv(docTypeKey(reqType))}
+                      </>
+                    );
+                    return doc ? (
+                      <a
+                        key={reqType}
+                        href={`/api/documents/${doc.id}/file`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={doc.label}
+                        className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium hover:underline ${cls}`}
+                      >
+                        {inner}
+                      </a>
+                    ) : (
+                      <span
+                        key={reqType}
+                        className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${cls}`}
+                      >
+                        {inner}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+
               {/* Uploaded documents (CV, cover letter, certificates, ID) — gated download */}
               {a.documents.length > 0 && (
                 <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
@@ -197,7 +233,7 @@ export function ApplicantReview({
                       title={doc.label}
                       className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary/40 px-2.5 py-1 text-xs font-medium transition-colors hover:border-primary hover:text-primary"
                     >
-                      <FileText className="h-3 w-3" /> {tcv(DOC_TYPE_KEY[doc.type] ?? 'typeOther')}
+                      <FileText className="h-3 w-3" /> {tcv(docTypeKey(doc.type))}
                     </a>
                   ))}
                 </div>

@@ -19,6 +19,8 @@ export type ApplicantItem = {
   summary: string;
   snapshot: CvData | null;
   documents: { id: string; type: string; label: string; sizeBytes: number }[];
+  // Documents this job asked for — so the review can flag which are provided.
+  requiredDocuments: string[];
 };
 
 /** One-line CV summary for fast scanning (§4) from the immutable snapshot. */
@@ -52,7 +54,7 @@ export async function getEmployerApplicants(
       appliedAt: true,
       coverNote: true,
       cvSnapshot: true,
-      job: { select: { id: true, title: true, skills: true } },
+      job: { select: { id: true, title: true, skills: true, requiredDocuments: true } },
       applicant: {
         select: {
           fullName: true,
@@ -86,6 +88,7 @@ export async function getEmployerApplicants(
       summary,
       snapshot: (a.cvSnapshot ?? null) as CvData | null,
       documents: a.applicant.documents,
+      requiredDocuments: a.job.requiredDocuments,
     };
   });
 }

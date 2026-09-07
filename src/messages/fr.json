@@ -1058,7 +1058,8 @@
     "interviewMessage": "Retrouvons-nous pour un entretien le {time}.",
     "hireMessage": "Bonne nouvelle — vous êtes recruté(e) pour « {job} » ! Organisons les détails.",
     "alreadyHired": "Ce candidat est recruté.",
-    "applicationClosed": "Cette candidature est clôturée."
+    "applicationClosed": "Cette candidature est clôturée.",
+    "requiredDocsCheck": "Documents requis"
   },
   "onboarding": {
     "forkTitle": "Qu'est-ce qui vous amène sur Isoko Market ?",

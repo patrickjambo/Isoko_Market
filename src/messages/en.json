@@ -1058,7 +1058,8 @@
     "interviewMessage": "Let's meet for an interview on {time}.",
     "hireMessage": "Good news — you're hired for \"{job}\"! Let's arrange the details.",
     "alreadyHired": "This candidate is hired.",
-    "applicationClosed": "This application is closed."
+    "applicationClosed": "This application is closed.",
+    "requiredDocsCheck": "Required documents"
   },
   "onboarding": {
     "forkTitle": "What brings you to Isoko Market?",
