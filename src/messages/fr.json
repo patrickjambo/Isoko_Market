@@ -275,7 +275,12 @@
       "suggestDescription": "Suggérer une description",
       "contactLabel": "Contact (facultatif)",
       "contactPlaceholder": "Téléphone, e-mail, WhatsApp…",
-      "contactHint": "Comment les candidats peuvent vous joindre directement (facultatif)."
+      "contactHint": "Comment les candidats peuvent vous joindre directement (facultatif).",
+      "requirementsLabel": "Exigences (qui peut postuler)",
+      "requirementsHint": "Décrivez qui doit postuler — ex. diplôme, niveau, expérience, être étudiant.",
+      "requirementsPlaceholder": "ex. Diplôme en comptabilité, 2+ ans d'expérience, anglais courant…",
+      "requiredDocsLabel": "Documents requis",
+      "requiredDocsHint": "Choisissez les documents qu'un candidat doit fournir."
     },
     "status": {
       "APPLIED": "Envoyée",
@@ -316,7 +321,11 @@
     "snapshotNote": "Une copie de votre CV est enregistrée avec cette candidature.",
     "gateApply": "Inscrivez-vous pour postuler — ça prend 30 secondes et protège votre identité.",
     "filters": "Filtres",
-    "getDirections": "Itinéraire"
+    "getDirections": "Itinéraire",
+    "requirementsTitle": "Exigences",
+    "requiredDocsTitle": "Documents requis",
+    "docMissing": "non téléversé",
+    "uploadMissingDocs": "Téléverser les documents manquants"
   },
   "cv": {
     "title": "Créateur de CV",
@@ -438,7 +447,10 @@
     "tabBuild": "Créer un CV",
     "tabBuildHint": "Remplissez un formulaire guidé — aucun fichier requis.",
     "tabUpload": "Téléverser mon CV",
-    "tabUploadHint": "Vous avez déjà un CV ou des documents ? Téléversez-les depuis votre appareil."
+    "tabUploadHint": "Vous avez déjà un CV ou des documents ? Téléversez-les depuis votre appareil.",
+    "docSaved": "Enregistré",
+    "docsSavedReassure": "{count} document(s) enregistré(s). Les employeurs auxquels vous postulez peuvent les voir.",
+    "typeDrivingLicense": "Permis de conduire"
   },
   "messages": {
     "title": "Messages",

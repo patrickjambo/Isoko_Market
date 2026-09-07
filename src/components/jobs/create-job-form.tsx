@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toast';
 import { SkillPicker } from '@/components/jobs/skill-picker';
 import { ContactFields } from '@/components/shared/contact-fields';
 import { LocationButton } from '@/components/shared/location-button';
+import { SEEKER_DOC_TYPES, docTypeKey } from '@/lib/documents';
 import { suggestSkillsFromText, draftJobDescription, labelForSkill } from '@/lib/skills';
 import type { ContactChannels } from '@/lib/contact';
 
@@ -30,6 +31,7 @@ export function CreateJobForm({
   defaultLocation?: { location: string; latitude: number | null; longitude: number | null };
 }) {
   const t = useTranslations('jobs');
+  const tcv = useTranslations('cv');
   const te = useTranslations('errors');
   const locale = useLocale();
   const router = useRouter();
@@ -51,6 +53,8 @@ export function CreateJobForm({
   const [payPeriod, setPayPeriod] = useState('month');
   const [contact, setContact] = useState<ContactChannels>({});
   const [description, setDescription] = useState('');
+  const [requirements, setRequirements] = useState('');
+  const [requiredDocs, setRequiredDocs] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [partnerId, setPartnerId] = useState('');
 
@@ -126,6 +130,8 @@ export function CreateJobForm({
           location,
           latitude: coords?.latitude ?? null,
           longitude: coords?.longitude ?? null,
+          requirements,
+          requiredDocuments: requiredDocs,
           contactInfo: contact,
           skills,
           partnerId: partnerId || null,
@@ -284,6 +290,45 @@ export function CreateJobForm({
           rows={6}
           required
         />
+      </Field>
+
+      {/* Who qualifies — free text (degree, level, experience …). */}
+      <Field label={t('form.requirementsLabel')} hint={t('form.requirementsHint')}>
+        <Textarea
+          value={requirements}
+          onChange={(e) => setRequirements(e.target.value)}
+          placeholder={t('form.requirementsPlaceholder')}
+          rows={4}
+          maxLength={2000}
+        />
+      </Field>
+
+      {/* Documents an applicant must have. */}
+      <Field label={t('form.requiredDocsLabel')} hint={t('form.requiredDocsHint')}>
+        <div className="flex flex-wrap gap-2">
+          {SEEKER_DOC_TYPES.map((docType) => {
+            const active = requiredDocs.includes(docType);
+            return (
+              <button
+                key={docType}
+                type="button"
+                onClick={() =>
+                  setRequiredDocs((prev) =>
+                    prev.includes(docType) ? prev.filter((x) => x !== docType) : [...prev, docType]
+                  )
+                }
+                className={
+                  'rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ' +
+                  (active
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-input text-muted-foreground hover:bg-secondary')
+                }
+              >
+                {tcv(docTypeKey(docType))}
+              </button>
+            );
+          })}
+        </div>
       </Field>
 
       {partners.length > 0 && (

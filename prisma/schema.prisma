@@ -435,6 +435,10 @@ model Job {
   longitude   Float?
   contactInfo Json? // structured, clickable contact: { phone?, whatsapp?, email?, instagram? }
   skills      String[]  @default([]) // required skills — canonical keys from the shared taxonomy (src/lib/skills.ts)
+  // Who qualifies (free text: degree, level, experience …) and which documents
+  // an applicant must have, so seekers know exactly what's expected.
+  requirements      String?
+  requiredDocuments SeekerDocumentType[] @default([])
   viewCount   Int       @default(0) // powers the employer performance rule engine (§2)
   status      JobStatus @default(OPEN)
   partnerId   String? // optional: posted under a partner's white-label board
@@ -457,6 +461,7 @@ enum SeekerDocumentType {
   COVER_LETTER
   CERTIFICATE
   ID_DOCUMENT
+  DRIVING_LICENSE
   OTHER
 }
 

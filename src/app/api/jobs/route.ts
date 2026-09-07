@@ -40,6 +40,8 @@ export const POST = route(async (req: NextRequest) => {
       employerId: user.id,
       title: input.title,
       description: input.description,
+      requirements: input.requirements?.trim() || null,
+      requiredDocuments: input.requiredDocuments,
       type: input.type,
       payMin: input.payMin != null ? francsToMinor(input.payMin) : null,
       payMax: input.payMax != null ? francsToMinor(input.payMax) : null,

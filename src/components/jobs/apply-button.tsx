@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, Send, Check, FileText } from 'lucide-react';
+import { Loader2, Send, Check, FileText, AlertCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
@@ -17,19 +17,26 @@ import {
 import { useToast } from '@/components/ui/toast';
 import { useSession } from '@/components/providers';
 import { SignUpPrompt } from '@/components/auth/sign-up-prompt';
+import { docTypeKey } from '@/lib/documents';
 
 export function ApplyButton({
   jobId,
   canApply,
   alreadyApplied,
+  requiredDocs = [],
+  missingDocs = [],
 }: {
   jobId: string;
   /** True when the seeker has a structured CV OR at least one uploaded document. */
   canApply: boolean;
   alreadyApplied: boolean;
+  /** Documents this job asks for, and which of them the seeker still lacks. */
+  requiredDocs?: string[];
+  missingDocs?: string[];
 }) {
   const t = useTranslations('jobs');
   const tc = useTranslations('common');
+  const tcv = useTranslations('cv');
   const router = useRouter();
   const { toast } = useToast();
   const user = useSession();
@@ -109,6 +116,38 @@ export function ApplyButton({
         <div className="flex items-center gap-2 rounded-lg border border-border bg-secondary/40 p-2.5 text-xs text-muted-foreground">
           <FileText className="h-4 w-4 shrink-0" /> {t('snapshotNote')}
         </div>
+
+        {/* Required-documents checklist — show what the job asks for and flag
+            anything the seeker hasn't uploaded, with a shortcut to add it. */}
+        {requiredDocs.length > 0 && (
+          <div className="space-y-1.5 rounded-lg border border-border p-3">
+            <p className="text-xs font-semibold">{t('requiredDocsTitle')}</p>
+            <ul className="space-y-1">
+              {requiredDocs.map((d) => {
+                const missing = missingDocs.includes(d);
+                return (
+                  <li key={d} className="flex items-center gap-2 text-sm">
+                    {missing ? (
+                      <AlertCircle className="h-4 w-4 shrink-0 text-accent" />
+                    ) : (
+                      <Check className="h-4 w-4 shrink-0 text-success" />
+                    )}
+                    <span className={missing ? 'text-foreground' : 'text-muted-foreground'}>
+                      {tcv(docTypeKey(d))}
+                    </span>
+                    {missing && <span className="text-xs text-accent">{t('docMissing')}</span>}
+                  </li>
+                );
+              })}
+            </ul>
+            {missingDocs.length > 0 && (
+              <Link href="/cv" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                <FileText className="h-3.5 w-3.5" /> {t('uploadMissingDocs')}
+              </Link>
+            )}
+          </div>
+        )}
+
         <div className="space-y-1.5">
           <label className="text-sm font-medium">{t('coverNoteLabel')}</label>
           <Textarea

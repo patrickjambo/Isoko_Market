@@ -275,7 +275,12 @@
       "suggestDescription": "Nyibwira ibisobanuro",
       "contactLabel": "Aho bakugeraho (si itegeko)",
       "contactPlaceholder": "Telefoni, imeri, WhatsApp…",
-      "contactHint": "Uko abashaka akazi bakugeraho (si itegeko)."
+      "contactHint": "Uko abashaka akazi bakugeraho (si itegeko).",
+      "requirementsLabel": "Ibisabwa (abemerewe)",
+      "requirementsHint": "Sobanura abakwiye gusaba — urugero: impamyabumenyi, urwego, uburambe, kuba umunyeshuri.",
+      "requirementsPlaceholder": "urugero: Diploma mu ibaruramari, uburambe bw'imyaka 2+, Icyongereza…",
+      "requiredDocsLabel": "Inyandiko zisabwa",
+      "requiredDocsHint": "Hitamo inyandiko usaba akazi agomba gutanga."
     },
     "status": {
       "APPLIED": "Wasabye",
@@ -316,7 +321,11 @@
     "snapshotNote": "Kopi ya CV yawe ibikwa kuri ubu busabe.",
     "gateApply": "Iyandikishe kugira ngo usabe — bitwara amasegonda 30 kandi birinda umwirondoro wawe.",
     "filters": "Muyunguruzi",
-    "getDirections": "Fata inzira"
+    "getDirections": "Fata inzira",
+    "requirementsTitle": "Ibisabwa",
+    "requiredDocsTitle": "Inyandiko zisabwa",
+    "docMissing": "ntiwohereje",
+    "uploadMissingDocs": "Ohereza inyandiko zibura"
   },
   "cv": {
     "title": "Kubaka CV",
@@ -438,7 +447,10 @@
     "tabBuild": "Kora CV",
     "tabBuildHint": "Uzuza ifishi iyobowe — nta dosiye ya CV ikenewe.",
     "tabUpload": "Ohereza CV yanjye",
-    "tabUploadHint": "Usanganywe CV cyangwa inyandiko? Zohereze uzivanye kuri telefoni yawe."
+    "tabUploadHint": "Usanganywe CV cyangwa inyandiko? Zohereze uzivanye kuri telefoni yawe.",
+    "docSaved": "Byabitswe",
+    "docsSavedReassure": "Inyandiko {count} zabitswe. Abakoresha usaba akazi barazibona.",
+    "typeDrivingLicense": "Uruhushya rwo gutwara"
   },
   "messages": {
     "title": "Ubutumwa",

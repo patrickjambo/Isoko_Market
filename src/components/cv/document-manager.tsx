@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Upload, Trash2, Loader2, FileText } from 'lucide-react';
+import { Upload, Trash2, Loader2, FileText, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
+import { SEEKER_DOC_TYPES, docTypeKey } from '@/lib/documents';
 
 type Doc = {
   id: string;
@@ -15,15 +16,6 @@ type Doc = {
   mimeType: string;
   sizeBytes: number;
   createdAt: string;
-};
-
-const TYPES = ['CV', 'COVER_LETTER', 'CERTIFICATE', 'ID_DOCUMENT', 'OTHER'] as const;
-const TYPE_KEY: Record<string, string> = {
-  CV: 'typeCv',
-  COVER_LETTER: 'typeCoverLetter',
-  CERTIFICATE: 'typeCertificate',
-  ID_DOCUMENT: 'typeId',
-  OTHER: 'typeOther',
 };
 
 function humanSize(bytes: number): string {
@@ -100,9 +92,9 @@ export function DocumentManager() {
         <div className="space-y-1.5">
           <Label htmlFor="doc-type">{t('documentType')}</Label>
           <Select id="doc-type" value={type} onChange={(e) => setType(e.target.value)} className="sm:w-52">
-            {TYPES.map((ty) => (
+            {SEEKER_DOC_TYPES.map((ty) => (
               <option key={ty} value={ty}>
-                {t(TYPE_KEY[ty]!)}
+                {t(docTypeKey(ty))}
               </option>
             ))}
           </Select>
@@ -126,6 +118,15 @@ export function DocumentManager() {
         />
       </div>
       <p className="mt-1.5 text-xs text-muted-foreground">{t('documentFormats')}</p>
+
+      {/* Reassure the seeker their files are stored — no separate "save" needed;
+          uploading IS saving, and employers they apply to can review them. */}
+      {!loading && docs.length > 0 && (
+        <div className="mt-4 flex items-start gap-2 rounded-lg border border-success/30 bg-success/5 p-3 text-sm">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+          <span>{t('docsSavedReassure', { count: docs.length })}</span>
+        </div>
+      )}
 
       <ul className="mt-4 space-y-2">
         {loading ? (
@@ -155,9 +156,12 @@ export function DocumentManager() {
                   {d.label}
                 </a>
                 <p className="text-xs text-muted-foreground">
-                  {t(TYPE_KEY[d.type] ?? 'typeOther')} · {humanSize(d.sizeBytes)}
+                  {t(docTypeKey(d.type))} · {humanSize(d.sizeBytes)}
                 </p>
               </div>
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success">
+                <CheckCircle2 className="h-3.5 w-3.5" /> {t('docSaved')}
+              </span>
               <Button
                 variant="ghost"
                 size="icon"

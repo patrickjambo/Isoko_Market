@@ -275,7 +275,12 @@
       "suggestDescription": "Suggest description",
       "contactLabel": "Contact (optional)",
       "contactPlaceholder": "Phone, email, WhatsApp…",
-      "contactHint": "How applicants can reach you directly (optional)."
+      "contactHint": "How applicants can reach you directly (optional).",
+      "requirementsLabel": "Requirements (who qualifies)",
+      "requirementsHint": "Describe who should apply — e.g. degree, level, experience, must be a student.",
+      "requirementsPlaceholder": "e.g. Diploma in accounting, 2+ years experience, fluent in English…",
+      "requiredDocsLabel": "Documents required",
+      "requiredDocsHint": "Pick the documents an applicant must provide."
     },
     "status": {
       "APPLIED": "Applied",
@@ -316,7 +321,11 @@
     "snapshotNote": "A copy of your CV is saved with this application.",
     "gateApply": "Sign up to apply — it takes 30 seconds and keeps your identity safe.",
     "filters": "Filters",
-    "getDirections": "Get directions"
+    "getDirections": "Get directions",
+    "requirementsTitle": "Requirements",
+    "requiredDocsTitle": "Documents required",
+    "docMissing": "not uploaded",
+    "uploadMissingDocs": "Upload missing documents"
   },
   "cv": {
     "title": "CV builder",
@@ -438,7 +447,10 @@
     "tabBuild": "Build a CV",
     "tabBuildHint": "Fill in a guided form — no CV file needed.",
     "tabUpload": "Upload my CV",
-    "tabUploadHint": "Already have a CV or documents? Upload them from your device."
+    "tabUploadHint": "Already have a CV or documents? Upload them from your device.",
+    "docSaved": "Saved",
+    "docsSavedReassure": "{count} document(s) saved. Employers you apply to can view them.",
+    "typeDrivingLicense": "Driving license"
   },
   "messages": {
     "title": "Messages",

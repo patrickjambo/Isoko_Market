@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale, getLocale } from 'next-intl/server';
-import { MapPin, Users, Wallet, Sparkles, Navigation } from 'lucide-react';
+import { MapPin, Users, Wallet, Sparkles, Navigation, FileText } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { ReportDialog } from '@/components/trust/report-dialog';
 import { ShareButton } from '@/components/shared/share-button';
 import { formatPay } from '@/components/jobs/job-card';
 import { getJob, getCvSkills } from '@/lib/queries';
+import { docTypeKey } from '@/lib/documents';
 import { asContact } from '@/lib/contact';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -30,6 +31,7 @@ export default async function JobDetailPage({
   const t = await getTranslations('jobs');
   const tt = await getTranslations('trust');
   const tc = await getTranslations('common');
+  const tcv = await getTranslations('cv');
   const tContact = await getTranslations('contact');
   const locale = await getLocale();
 
@@ -38,13 +40,16 @@ export default async function JobDetailPage({
 
   const isOwner = user?.id === job.employer.id;
 
-  const [hasCv, docCount, existingApplication, ratingAgg, cvSkills] = await Promise.all([
+  const [hasCv, myDocs, existingApplication, ratingAgg, cvSkills] = await Promise.all([
     user
       ? prisma.cV.findUnique({ where: { userId: user.id }, select: { id: true } })
       : Promise.resolve(null),
     // Seekers can also apply with an uploaded document (CV/letter) — not only the
-    // structured builder.
-    user ? prisma.seekerDocument.count({ where: { userId: user.id } }) : Promise.resolve(0),
+    // structured builder. Fetch the types they hold to check against what the job
+    // requires.
+    user
+      ? prisma.seekerDocument.findMany({ where: { userId: user.id }, select: { type: true } })
+      : Promise.resolve([] as { type: string }[]),
     user
       ? prisma.application.findUnique({
           where: { jobId_applicantId: { jobId: job.id, applicantId: user.id } },
@@ -54,7 +59,12 @@ export default async function JobDetailPage({
     prisma.review.aggregate({ where: { revieweeId: job.employer.id }, _avg: { rating: true } }),
     user && !isOwner ? getCvSkills(user.id) : Promise.resolve([]),
   ]);
-  const canApply = Boolean(hasCv) || docCount > 0;
+  const canApply = Boolean(hasCv) || myDocs.length > 0;
+  // Which required documents the seeker is still missing (a CV counts if they
+  // built the structured one). Drives the apply checklist.
+  const haveTypes = new Set(myDocs.map((d) => d.type));
+  if (hasCv) haveTypes.add('CV');
+  const missingDocs = job.requiredDocuments.filter((d) => !haveTypes.has(d));
 
   const pay = formatPay(job, locale, t('payNegotiable'), (p) => t(`form.period${cap(p)}`));
   // "Why you match" — real overlap between the seeker's CV and this posting (§5).
@@ -116,6 +126,8 @@ export default async function JobDetailPage({
                   jobId={job.id}
                   canApply={canApply}
                   alreadyApplied={Boolean(existingApplication)}
+                  requiredDocs={job.requiredDocuments}
+                  missingDocs={missingDocs}
                 />
                 <MessageSellerButton
                   jobId={job.id}
@@ -164,6 +176,35 @@ export default async function JobDetailPage({
           <div className="whitespace-pre-wrap rounded-xl border border-border bg-card p-4 text-sm leading-relaxed">
             {job.description}
           </div>
+
+          {/* Who qualifies — the employer's stated requirements. */}
+          {job.requirements && (
+            <div className="mt-3 rounded-xl border border-border bg-card p-4">
+              <h2 className="mb-2 text-sm font-semibold">{t('requirementsTitle')}</h2>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                {job.requirements}
+              </p>
+            </div>
+          )}
+
+          {/* Documents an applicant must provide. */}
+          {job.requiredDocuments.length > 0 && (
+            <div className="mt-3 rounded-xl border border-border bg-card p-4">
+              <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold">
+                <FileText className="h-4 w-4 text-primary" /> {t('requiredDocsTitle')}
+              </h2>
+              <ul className="flex flex-wrap gap-2">
+                {job.requiredDocuments.map((d) => (
+                  <li
+                    key={d}
+                    className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary/40 px-2.5 py-1 text-xs font-medium"
+                  >
+                    <FileText className="h-3.5 w-3.5 text-muted-foreground" /> {tcv(docTypeKey(d))}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Extra contact the employer added — tap-to-call / WhatsApp / email / IG. */}
           {asContact(job.contactInfo) && (

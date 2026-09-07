@@ -4,10 +4,23 @@ import { contactSchema } from '../contact';
 // Canonical skill tokens from the shared taxonomy (src/lib/skills.ts).
 const skillList = z.array(z.string().trim().min(1).max(48)).max(20).default([]);
 
+// Documents an applicant may be required to have (matches SeekerDocumentType).
+export const seekerDocumentTypes = [
+  'CV',
+  'COVER_LETTER',
+  'CERTIFICATE',
+  'ID_DOCUMENT',
+  'DRIVING_LICENSE',
+  'OTHER',
+] as const;
+
 export const createJobSchema = z
   .object({
     title: z.string().trim().min(3, 'Add a job title.').max(120),
     description: z.string().trim().min(10, 'Describe the role.').max(6000),
+    // Who qualifies (degree, level, experience …) + which documents are needed.
+    requirements: z.string().trim().max(2000).optional(),
+    requiredDocuments: z.array(z.enum(seekerDocumentTypes)).max(6).default([]),
     type: z.enum(['JOB', 'GIG']).default('JOB'),
     payMin: z.coerce.number().int().min(0).max(1_000_000_000).optional().nullable(),
     payMax: z.coerce.number().int().min(0).max(1_000_000_000).optional().nullable(),
