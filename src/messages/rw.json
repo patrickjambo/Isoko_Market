@@ -49,7 +49,8 @@
     "shareVia": "kuri",
     "locationApprox": "Aho uri hafashwe — ariko birasa nk'ibigereranyo. Kugira ngo hanoze, funguza GPS ugerageze hanze.",
     "geoInsecure": "Aho uri hasaba umuyoboro utekanye (https). Fungura urubuga kuri https wongere ugerageze.",
-    "geoTimeout": "Ntibyashobotse kubona ahantu nyaho ku gihe. Funguza GPS, sohoka hanze, wongere ugerageze."
+    "geoTimeout": "Ntibyashobotse kubona ahantu nyaho ku gihe. Funguza GPS, sohoka hanze, wongere ugerageze.",
+    "mapPickerHint": "Kurura akamenyetso ku hantu nyaho — ni ho abaguzi baza."
   },
   "nav": {
     "home": "Ahabanza",

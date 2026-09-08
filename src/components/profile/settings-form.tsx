@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/components/ui/toast';
-import { LocationButton } from '@/components/shared/location-button';
+import { LocationField } from '@/components/shared/location-field';
 import { initials } from '@/lib/utils';
 
 export function SettingsForm({
@@ -131,16 +131,14 @@ export function SettingsForm({
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Kigali"
         />
-        <div className="flex items-center gap-2">
-          <LocationButton
-            done={coords != null}
-            onLocated={(g) => {
-              setCoords({ latitude: g.latitude, longitude: g.longitude });
-              if (!location.trim() && g.label) setLocation(g.label);
-            }}
-          />
-          {coords != null && <span className="text-xs text-success">{ts('locationPinned')}</span>}
-        </div>
+        <LocationField
+          latitude={coords?.latitude ?? null}
+          longitude={coords?.longitude ?? null}
+          onChange={(g) => {
+            setCoords({ latitude: g.latitude, longitude: g.longitude });
+            if (!location.trim() && g.label) setLocation(g.label);
+          }}
+        />
         <p className="text-xs text-muted-foreground">{t('locationSavedHint')}</p>
       </div>
       <div className="space-y-1.5">

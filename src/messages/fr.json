@@ -49,7 +49,8 @@
     "shareVia": "sur",
     "locationApprox": "Position enregistrée — mais approximative. Pour un lieu exact, activez le GPS et réessayez à l'extérieur.",
     "geoInsecure": "La localisation nécessite une connexion sécurisée (https). Ouvrez le site en https et réessayez.",
-    "geoTimeout": "Impossible d'obtenir une position précise à temps. Activez le GPS, sortez et réessayez."
+    "geoTimeout": "Impossible d'obtenir une position précise à temps. Activez le GPS, sortez et réessayez.",
+    "mapPickerHint": "Déplacez le repère sur votre emplacement exact — c'est là que les acheteurs se rendent."
   },
   "nav": {
     "home": "Accueil",

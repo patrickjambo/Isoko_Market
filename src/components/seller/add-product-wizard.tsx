@@ -23,7 +23,7 @@ import { ImageUploader } from '@/components/shared/image-uploader';
 import { ContactFields } from '@/components/shared/contact-fields';
 import { SpecsEditor } from '@/components/seller/specs-editor';
 import { CategoryPicker } from '@/components/seller/category-picker';
-import { LocationButton } from '@/components/shared/location-button';
+import { LocationField } from '@/components/shared/location-field';
 import type { ContactChannels } from '@/lib/contact';
 import { useToast } from '@/components/ui/toast';
 import { listingConditions, type ListingSpec } from '@/lib/validators/listing';
@@ -350,22 +350,18 @@ export function AddProductWizard({
                 ))}
               </datalist>
             </div>
-            <div className="flex items-center gap-2">
-              <LocationButton
-                done={data.latitude != null}
-                onLocated={(g) =>
-                  setData((d) => ({
-                    ...d,
-                    latitude: g.latitude,
-                    longitude: g.longitude,
-                    location: d.location.trim() || g.label || d.location,
-                  }))
-                }
-              />
-              {data.latitude != null && (
-                <span className="text-xs text-success">{t('locationPinned')}</span>
-              )}
-            </div>
+            <LocationField
+              latitude={data.latitude}
+              longitude={data.longitude}
+              onChange={(g) =>
+                setData((d) => ({
+                  ...d,
+                  latitude: g.latitude,
+                  longitude: g.longitude,
+                  location: d.location.trim() || g.label || d.location,
+                }))
+              }
+            />
           </div>
           <label className="flex items-center gap-2 text-sm font-medium">
             <input

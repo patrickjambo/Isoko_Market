@@ -12,7 +12,7 @@ import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
 import { SkillPicker } from '@/components/jobs/skill-picker';
 import { ContactFields } from '@/components/shared/contact-fields';
-import { LocationButton } from '@/components/shared/location-button';
+import { LocationField } from '@/components/shared/location-field';
 import { SEEKER_DOC_TYPES, docTypeKey } from '@/lib/documents';
 import { suggestSkillsFromText, draftJobDescription, labelForSkill } from '@/lib/skills';
 import type { ContactChannels } from '@/lib/contact';
@@ -281,9 +281,10 @@ export function CreateJobForm({
       <Field label={t('form.locationLabel')} error={errors.location}>
         <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Kigali" required />
         <div className="mt-1.5">
-          <LocationButton
-            done={coords != null}
-            onLocated={(g) => {
+          <LocationField
+            latitude={coords?.latitude ?? null}
+            longitude={coords?.longitude ?? null}
+            onChange={(g) => {
               setCoords({ latitude: g.latitude, longitude: g.longitude });
               if (!location.trim() && g.label) setLocation(g.label);
             }}
