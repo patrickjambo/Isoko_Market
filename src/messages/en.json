@@ -912,7 +912,19 @@
     "categoryAdded": "Category added",
     "newCategoryPlaceholder": "New category name",
     "saveCategory": "Save category",
-    "locationPinned": "Location pinned"
+    "locationPinned": "Location pinned",
+    "service2Title": "What service do you offer?",
+    "service2Hint": "Start typing — e.g. plumbing, tutoring, cleaning.",
+    "servicePlaceholder": "e.g. House cleaning, Phone repair, Tutoring",
+    "service3Title": "Category & rate",
+    "service3Hint": "Pick a category and set your rate.",
+    "service4Title": "Describe your service",
+    "service4Hint": "What you do, your experience — or let us draft it.",
+    "serviceDescriptionPlaceholder": "e.g. I offer reliable home cleaning. 3 years experience, my own supplies…",
+    "service5Title": "Where do you work?",
+    "service5Hint": "Where you're based or serve clients, and how they reach you.",
+    "service6Title": "Review & publish",
+    "service6Hint": "Check your service looks right."
   },
   "orders": {
     "title": "Orders",

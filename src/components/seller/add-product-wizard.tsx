@@ -232,7 +232,10 @@ export function AddProductWizard({
       )}
 
       {step === 2 && (
-        <Step title={t('step2Title')} hint={t('step2Hint')}>
+        <Step
+          title={isService ? t('service2Title') : t('step2Title')}
+          hint={isService ? t('service2Hint') : t('step2Hint')}
+        >
           <TitleAutocomplete
             value={data.title}
             onChange={(v) => set('title', v)}
@@ -241,13 +244,16 @@ export function AddProductWizard({
               if (match) set('categoryId', match.id);
             }}
             locale={locale}
-            placeholder={t('titlePlaceholder')}
+            placeholder={isService ? t('servicePlaceholder') : t('titlePlaceholder')}
           />
         </Step>
       )}
 
       {step === 3 && (
-        <Step title={t('step3Title')} hint={t('step3Hint')}>
+        <Step
+          title={isService ? t('service3Title') : t('step3Title')}
+          hint={isService ? t('service3Hint') : t('step3Hint')}
+        >
           <CategoryPicker
             categories={cats}
             value={data.categoryId}
@@ -307,12 +313,15 @@ export function AddProductWizard({
       )}
 
       {step === 4 && (
-        <Step title={t('step4Title')} hint={t('step4Hint')}>
+        <Step
+          title={isService ? t('service4Title') : t('step4Title')}
+          hint={isService ? t('service4Hint') : t('step4Hint')}
+        >
           <SuggestDescription data={data} categoryName={categoryName} onDraft={(d) => set('description', d)} />
           <Textarea
             value={data.description}
             onChange={(e) => set('description', e.target.value)}
-            placeholder={t('descriptionPlaceholder')}
+            placeholder={isService ? t('serviceDescriptionPlaceholder') : t('descriptionPlaceholder')}
             rows={5}
           />
           <p className="text-xs text-muted-foreground">{t('charCount', { count: data.description.length })}</p>
@@ -320,7 +329,10 @@ export function AddProductWizard({
       )}
 
       {step === 5 && (
-        <Step title={t('step5Title')} hint={t('step5Hint')}>
+        <Step
+          title={isService ? t('service5Title') : t('step5Title')}
+          hint={isService ? t('service5Hint') : t('step5Hint')}
+        >
           <div className="space-y-1.5">
             <Label>{tc('form.locationLabel')}</Label>
             <div className="relative">
@@ -373,7 +385,10 @@ export function AddProductWizard({
       )}
 
       {step === 6 && (
-        <Step title={t('step6Title')} hint={t('step6Hint')}>
+        <Step
+          title={isService ? t('service6Title') : t('step6Title')}
+          hint={isService ? t('service6Hint') : t('step6Hint')}
+        >
           <Review data={data} categoryName={categoryName} locale={locale} isService={isService} conditionLabel={(c) => tc(`condition.${c}`)} />
           {duplicate && (
             <div className="flex items-start gap-2 rounded-lg border border-accent/40 bg-accent/5 p-3 text-sm">

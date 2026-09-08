@@ -912,7 +912,19 @@
     "categoryAdded": "Catégorie ajoutée",
     "newCategoryPlaceholder": "Nom de la nouvelle catégorie",
     "saveCategory": "Enregistrer la catégorie",
-    "locationPinned": "Position ajoutée"
+    "locationPinned": "Position ajoutée",
+    "service2Title": "Quel service proposez-vous ?",
+    "service2Hint": "Commencez à taper — ex. plomberie, cours, nettoyage.",
+    "servicePlaceholder": "ex. Ménage à domicile, Réparation de téléphone, Cours",
+    "service3Title": "Catégorie & tarif",
+    "service3Hint": "Choisissez une catégorie et fixez votre tarif.",
+    "service4Title": "Décrivez votre service",
+    "service4Hint": "Ce que vous faites, votre expérience — ou laissez-nous rédiger.",
+    "serviceDescriptionPlaceholder": "ex. Je propose un ménage à domicile fiable. 3 ans d'expérience, mon matériel…",
+    "service5Title": "Où travaillez-vous ?",
+    "service5Hint": "Où vous êtes basé ou servez les clients, et comment vous joindre.",
+    "service6Title": "Vérifier & publier",
+    "service6Hint": "Vérifiez que votre service est correct."
   },
   "orders": {
     "title": "Commandes",

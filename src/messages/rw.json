@@ -912,7 +912,19 @@
     "categoryAdded": "Icyiciro cyongewemo",
     "newCategoryPlaceholder": "Izina ry'icyiciro gishya",
     "saveCategory": "Bika icyiciro",
-    "locationPinned": "Aho uri hashyizweho"
+    "locationPinned": "Aho uri hashyizweho",
+    "service2Title": "Ni serivisi ki utanga?",
+    "service2Hint": "Tangira wandika — urugero: gukora amazi, kwigisha, isuku.",
+    "servicePlaceholder": "urugero: Isuku y'urugo, Gukora telefone, Kwigisha",
+    "service3Title": "Icyiciro n'igiciro",
+    "service3Hint": "Hitamo icyiciro ushyireho igiciro cyawe.",
+    "service4Title": "Sobanura serivisi yawe",
+    "service4Hint": "Icyo ukora, uburambe bwawe — cyangwa tuyandike.",
+    "serviceDescriptionPlaceholder": "urugero: Ntanga isuku y'urugo yizewe. Uburambe bw'imyaka 3, mfite ibikoresho byanjye…",
+    "service5Title": "Ukorera he?",
+    "service5Hint": "Aho uherereye cyangwa ukorera abakiriya, n'uko bakugeraho.",
+    "service6Title": "Reba & tangaza",
+    "service6Hint": "Suzuma niba serivisi yawe imeze neza."
   },
   "orders": {
     "title": "Amateka y'ubugure",
