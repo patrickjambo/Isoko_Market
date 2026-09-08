@@ -286,7 +286,7 @@ export function CreateJobForm({
             longitude={coords?.longitude ?? null}
             onChange={(g) => {
               setCoords({ latitude: g.latitude, longitude: g.longitude });
-              if (!location.trim() && g.label) setLocation(g.label);
+              if (g.label) setLocation(g.label); // name follows the pin
             }}
           />
         </div>

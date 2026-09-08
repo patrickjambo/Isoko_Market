@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { MapPin, Loader2, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/ui/toast';
-import { getAccuratePosition, geoErrorKey } from '@/lib/geolocation';
+import { getAccuratePosition, geoErrorKey, reverseGeocode } from '@/lib/geolocation';
 
 export type GeoResult = { latitude: number; longitude: number; label?: string };
 
@@ -31,23 +31,7 @@ export function LocationButton({
     try {
       // Watches the GPS and returns the most accurate fix (see getAccuratePosition).
       const { latitude, longitude, accuracy } = await getAccuratePosition();
-      let label: string | undefined;
-      try {
-        const res = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-        );
-        if (res.ok) {
-          const j = await res.json();
-          // Most specific place first, then region and country — deduped so we
-          // don't get "Kigali, Kigali". Works anywhere in the world.
-          label =
-            [...new Set(
-              [j.locality || j.city, j.principalSubdivision, j.countryName].filter(Boolean)
-            )].join(', ') || undefined;
-        }
-      } catch {
-        /* label is best-effort — coordinates are what matter */
-      }
+      const label = await reverseGeocode(latitude, longitude);
       onLocated({ latitude, longitude, label });
       // A very coarse fix (hundreds of metres+) is usually "wrong": tell the user.
       toast(accuracy > 500 ? t('locationApprox') : t('locationCaptured'), accuracy > 500 ? 'info' : 'success');

@@ -91,6 +91,28 @@ export function getAccuratePosition({
   });
 }
 
+/**
+ * Best-effort human label for coordinates (free, keyless, works worldwide).
+ * Most specific place first, then region and country, de-duped. Used by BOTH
+ * "Use my location" and the map pin so the shown name always matches the pin.
+ */
+export async function reverseGeocode(lat: number, lng: number): Promise<string | undefined> {
+  try {
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+    );
+    if (!res.ok) return undefined;
+    const j = await res.json();
+    return (
+      [...new Set([j.locality || j.city, j.principalSubdivision, j.countryName].filter(Boolean))].join(
+        ', '
+      ) || undefined
+    );
+  } catch {
+    return undefined;
+  }
+}
+
 /** Map a GeoError reason to a `common` i18n key. */
 export function geoErrorKey(err: unknown): string {
   const reason = err instanceof GeoError ? err.reason : 'unavailable';

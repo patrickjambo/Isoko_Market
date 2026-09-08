@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import 'leaflet/dist/leaflet.css';
 import type { Map as LeafletMap, Marker } from 'leaflet';
+import { reverseGeocode } from '@/lib/geolocation';
 
 const KIGALI = { lat: -1.9536, lng: 30.0606 };
 
@@ -20,7 +21,8 @@ export function MapPicker({
   onChange,
 }: {
   value: { lat: number; lng: number } | null;
-  onChange: (lat: number, lng: number) => void;
+  /** Fires with a fresh reverse-geocoded label so the location name follows the pin. */
+  onChange: (lat: number, lng: number, label?: string) => void;
 }) {
   const t = useTranslations('common');
   const el = useRef<HTMLDivElement>(null);
@@ -59,13 +61,20 @@ export function MapPicker({
       });
       const mk = L.marker([start.lat, start.lng], { draggable: true, icon: pin }).addTo(m);
 
+      // Moving the pin is the authoritative location — re-geocode so the shown
+      // place name matches the new spot (fixes "still says Kanazi after I moved").
+      const moved = async (lat: number, lng: number) => {
+        onChangeRef.current(lat, lng); // coordinates update instantly
+        const label = await reverseGeocode(lat, lng);
+        if (label) onChangeRef.current(lat, lng, label);
+      };
       mk.on('dragend', () => {
         const p = mk.getLatLng();
-        onChangeRef.current(p.lat, p.lng);
+        void moved(p.lat, p.lng);
       });
       m.on('click', (e) => {
         mk.setLatLng(e.latlng);
-        onChangeRef.current(e.latlng.lat, e.latlng.lng);
+        void moved(e.latlng.lat, e.latlng.lng);
       });
 
       map.current = m;

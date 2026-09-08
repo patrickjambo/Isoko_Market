@@ -35,7 +35,7 @@ export function LocationField({
       />
       <MapPicker
         value={latitude != null && longitude != null ? { lat: latitude, lng: longitude } : null}
-        onChange={(lat, lng) => onChange({ latitude: lat, longitude: lng })}
+        onChange={(lat, lng, label) => onChange({ latitude: lat, longitude: lng, label })}
       />
     </div>
   );

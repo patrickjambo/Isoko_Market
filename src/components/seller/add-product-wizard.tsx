@@ -358,7 +358,8 @@ export function AddProductWizard({
                   ...d,
                   latitude: g.latitude,
                   longitude: g.longitude,
-                  location: d.location.trim() || g.label || d.location,
+                  // The name follows the pin when we have one; otherwise keep it.
+                  location: g.label ?? d.location,
                 }))
               }
             />

@@ -163,7 +163,7 @@ export function EditListingForm({
             set({
               latitude: g.latitude,
               longitude: g.longitude,
-              location: d.location.trim() || g.label || d.location,
+              location: g.label ?? d.location, // name follows the pin
             })
           }
         />
