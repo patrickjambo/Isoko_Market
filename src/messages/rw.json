@@ -325,7 +325,9 @@
     "requirementsTitle": "Ibisabwa",
     "requiredDocsTitle": "Inyandiko zisabwa",
     "docMissing": "ntiwohereje",
-    "uploadMissingDocs": "Ohereza inyandiko zibura"
+    "uploadMissingDocs": "Ohereza inyandiko zibura",
+    "editTitle": "Hindura akazi",
+    "editSubtitle": "Vugurura amakuru, ibisabwa cyangwa inyandiko. Impinduka zibikwa kuri iri tangazo."
   },
   "cv": {
     "title": "Kubaka CV",

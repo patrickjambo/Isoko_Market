@@ -325,7 +325,9 @@
     "requirementsTitle": "Requirements",
     "requiredDocsTitle": "Documents required",
     "docMissing": "not uploaded",
-    "uploadMissingDocs": "Upload missing documents"
+    "uploadMissingDocs": "Upload missing documents",
+    "editTitle": "Edit job",
+    "editSubtitle": "Update the details, requirements or documents. Changes are saved to this posting."
   },
   "cv": {
     "title": "CV builder",

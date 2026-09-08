@@ -325,7 +325,9 @@
     "requirementsTitle": "Exigences",
     "requiredDocsTitle": "Documents requis",
     "docMissing": "non téléversé",
-    "uploadMissingDocs": "Téléverser les documents manquants"
+    "uploadMissingDocs": "Téléverser les documents manquants",
+    "editTitle": "Modifier l’offre",
+    "editSubtitle": "Mettez à jour les détails, exigences ou documents. Les modifications sont enregistrées."
   },
   "cv": {
     "title": "Créateur de CV",

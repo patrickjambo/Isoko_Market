@@ -23,15 +23,38 @@ import type { ContactChannels } from '@/lib/contact';
  * comparable postings, and a one-tap description draft — so posting stays under
  * 90 seconds (DoD §1) and feels like one consistent platform tool.
  */
+export type EditJobInitial = {
+  title: string;
+  type: 'JOB' | 'GIG';
+  location: string;
+  latitude: number | null;
+  longitude: number | null;
+  payMin: string;
+  payMax: string;
+  payPeriod: string;
+  contact: ContactChannels;
+  description: string;
+  requirements: string;
+  requiredDocuments: string[];
+  skills: string[];
+  partnerId: string;
+};
+
 export function CreateJobForm({
   partners = [],
   defaultLocation,
+  jobId,
+  initial,
 }: {
   partners?: { id: string; name: string }[];
   defaultLocation?: { location: string; latitude: number | null; longitude: number | null };
+  /** When set, the form edits this job (PUT) instead of creating one (POST). */
+  jobId?: string;
+  initial?: EditJobInitial;
 }) {
   const t = useTranslations('jobs');
   const tcv = useTranslations('cv');
+  const tc = useTranslations('common');
   const te = useTranslations('errors');
   const locale = useLocale();
   const router = useRouter();
@@ -40,23 +63,23 @@ export function CreateJobForm({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [title, setTitle] = useState('');
-  const [type, setType] = useState<'JOB' | 'GIG'>('JOB');
-  const [location, setLocation] = useState(defaultLocation?.location ?? '');
-  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(
-    defaultLocation?.latitude != null && defaultLocation?.longitude != null
-      ? { latitude: defaultLocation.latitude, longitude: defaultLocation.longitude }
-      : null
-  );
-  const [payMin, setPayMin] = useState('');
-  const [payMax, setPayMax] = useState('');
-  const [payPeriod, setPayPeriod] = useState('month');
-  const [contact, setContact] = useState<ContactChannels>({});
-  const [description, setDescription] = useState('');
-  const [requirements, setRequirements] = useState('');
-  const [requiredDocs, setRequiredDocs] = useState<string[]>([]);
-  const [skills, setSkills] = useState<string[]>([]);
-  const [partnerId, setPartnerId] = useState('');
+  const [title, setTitle] = useState(initial?.title ?? '');
+  const [type, setType] = useState<'JOB' | 'GIG'>(initial?.type ?? 'JOB');
+  const [location, setLocation] = useState(initial?.location ?? defaultLocation?.location ?? '');
+  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(() => {
+    const lat = initial?.latitude ?? defaultLocation?.latitude ?? null;
+    const lng = initial?.longitude ?? defaultLocation?.longitude ?? null;
+    return lat != null && lng != null ? { latitude: lat, longitude: lng } : null;
+  });
+  const [payMin, setPayMin] = useState(initial?.payMin ?? '');
+  const [payMax, setPayMax] = useState(initial?.payMax ?? '');
+  const [payPeriod, setPayPeriod] = useState(initial?.payPeriod ?? 'month');
+  const [contact, setContact] = useState<ContactChannels>(initial?.contact ?? {});
+  const [description, setDescription] = useState(initial?.description ?? '');
+  const [requirements, setRequirements] = useState(initial?.requirements ?? '');
+  const [requiredDocs, setRequiredDocs] = useState<string[]>(initial?.requiredDocuments ?? []);
+  const [skills, setSkills] = useState<string[]>(initial?.skills ?? []);
+  const [partnerId, setPartnerId] = useState(initial?.partnerId ?? '');
 
   // Title autocomplete (job context — converges with seeker search vocabulary).
   const [titleSug, setTitleSug] = useState<{ value: string }[]>([]);
@@ -117,8 +140,8 @@ export function CreateJobForm({
     setErrors({});
     setLoading(true);
     try {
-      const res = await fetch('/api/jobs', {
-        method: 'POST',
+      const res = await fetch(jobId ? `/api/jobs/${jobId}` : '/api/jobs', {
+        method: jobId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title,
@@ -142,8 +165,8 @@ export function CreateJobForm({
         if (data.error?.fields) setErrors(data.error.fields);
         throw new Error(data.error?.message ?? te('generic'));
       }
-      toast(t('form.publish'), 'success');
-      router.push(`/jobs/${data.data?.id ?? data.id}`);
+      toast(jobId ? tc('save') : t('form.publish'), 'success');
+      router.push(`/jobs/${jobId ?? data.data?.id ?? data.id}`);
     } catch (err) {
       toast(err instanceof Error ? err.message : te('generic'), 'error');
       setLoading(false);
@@ -346,7 +369,7 @@ export function CreateJobForm({
 
       <Button type="submit" size="lg" variant="accent" className="w-full" disabled={loading}>
         {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-        {loading ? t('form.publishing') : t('form.publish')}
+        {loading ? t('form.publishing') : jobId ? tc('save') : t('form.publish')}
       </Button>
     </form>
   );

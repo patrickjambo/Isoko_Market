@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale, getLocale } from 'next-intl/server';
-import { MapPin, Users, Wallet, Sparkles, Navigation, FileText } from 'lucide-react';
+import { MapPin, Users, Wallet, Sparkles, Navigation, FileText, Pencil } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -115,11 +115,18 @@ export default async function JobDetailPage({
 
           <div className="flex flex-wrap gap-2">
             {isOwner ? (
-              <Button asChild>
-                <Link href={`/jobs/${job.id}/applicants`}>
-                  <Users className="h-4 w-4" /> {t('manageApplicants')}
-                </Link>
-              </Button>
+              <>
+                <Button asChild>
+                  <Link href={`/jobs/${job.id}/applicants`}>
+                    <Users className="h-4 w-4" /> {t('manageApplicants')}
+                  </Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href={`/jobs/${job.id}/edit`}>
+                    <Pencil className="h-4 w-4" /> {tc('edit')}
+                  </Link>
+                </Button>
+              </>
             ) : (
               <>
                 <ApplyButton
