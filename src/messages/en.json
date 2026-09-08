@@ -46,7 +46,8 @@
     "copyLink": "Copy link",
     "linkCopied": "Link copied",
     "shareMore": "Share…",
-    "shareVia": "on"
+    "shareVia": "on",
+    "locationApprox": "Location captured — but it looks approximate. For an exact spot, turn on GPS and try outdoors."
   },
   "nav": {
     "home": "Home",

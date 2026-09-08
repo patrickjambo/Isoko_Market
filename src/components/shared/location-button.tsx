@@ -33,7 +33,7 @@ export function LocationButton({
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const { latitude, longitude } = pos.coords;
+        const { latitude, longitude, accuracy } = pos.coords;
         let label: string | undefined;
         try {
           const res = await fetch(
@@ -41,21 +41,29 @@ export function LocationButton({
           );
           if (res.ok) {
             const j = await res.json();
+            // Most specific place first, then region and country — deduped so we
+            // don't get "Kigali, Kigali". Works anywhere in the world.
             label =
-              [j.locality || j.city, j.principalSubdivision].filter(Boolean).join(', ') || undefined;
+              [...new Set(
+                [j.locality || j.city, j.principalSubdivision, j.countryName].filter(Boolean)
+              )].join(', ') || undefined;
           }
         } catch {
           /* label is best-effort — coordinates are what matter */
         }
         onLocated({ latitude, longitude, label });
         setLoading(false);
-        toast(t('locationCaptured'), 'success');
+        // A very coarse fix (network/IP, hundreds of metres+) is usually "wrong":
+        // tell the user so they can retry outdoors / with GPS on.
+        toast(accuracy != null && accuracy > 500 ? t('locationApprox') : t('locationCaptured'), accuracy != null && accuracy > 500 ? 'info' : 'success');
       },
       (err) => {
         setLoading(false);
         toast(err.code === err.PERMISSION_DENIED ? t('geoDenied') : t('geoError'), 'error');
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      // maximumAge:0 forces a FRESH reading (no cached/coarse position — the main
+      // cause of a "wrong" location); a longer timeout lets the GPS actually fix.
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
     );
   }
 

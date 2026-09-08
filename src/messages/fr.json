@@ -46,7 +46,8 @@
     "copyLink": "Copier le lien",
     "linkCopied": "Lien copié",
     "shareMore": "Partager…",
-    "shareVia": "sur"
+    "shareVia": "sur",
+    "locationApprox": "Position enregistrée — mais approximative. Pour un lieu exact, activez le GPS et réessayez à l'extérieur."
   },
   "nav": {
     "home": "Accueil",

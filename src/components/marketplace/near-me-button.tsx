@@ -46,7 +46,8 @@ export function NearMeButton({ params }: { params: Record<string, string | undef
         setLoading(false);
         toast(err.code === err.PERMISSION_DENIED ? tc('geoDenied') : tc('geoError'), 'error');
       },
-      { timeout: 10000, maximumAge: 60000 }
+      // Fresh, accurate reading — no stale/cached (often coarse) position.
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
     );
   }
 
