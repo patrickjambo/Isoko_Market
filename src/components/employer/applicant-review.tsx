@@ -52,21 +52,34 @@ export function ApplicantReview({
   const { toast } = useToast();
   const [sort, setSort] = useState<Sort>('match');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [docsCompleteOnly, setDocsCompleteOnly] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [cv, setCv] = useState<ApplicantItem | null>(null);
   // Optimistic status overrides so a triaged card updates instantly.
   const [overrides, setOverrides] = useState<Record<string, string>>({});
 
+  // Did the applicant provide EVERY document the job asked for? (A structured CV
+  // counts as a "CV".)
+  const hasAllRequired = (a: ApplicantItem) =>
+    a.requiredDocuments.every(
+      (reqType) =>
+        a.documents.some((d) => d.type === reqType) || (reqType === 'CV' && a.snapshot != null)
+    );
+  // Only offer the "complete documents" filter when a job actually requires some.
+  const anyRequiresDocs = applicants.some((a) => a.requiredDocuments.length > 0);
+
   const view = useMemo(() => {
     let list = applicants.map((a) => ({ ...a, status: (overrides[a.id] as ApplicantItem['status']) ?? a.status }));
     if (verifiedOnly) list = list.filter((a) => a.verified);
+    if (docsCompleteOnly) list = list.filter(hasAllRequired);
     list.sort((a, b) => {
       if (sort === 'newest') return b.appliedAt.localeCompare(a.appliedAt);
       if (sort === 'verified') return Number(b.verified) - Number(a.verified) || b.match.score - a.match.score;
       return b.match.score - a.match.score || b.appliedAt.localeCompare(a.appliedAt);
     });
     return list;
-  }, [applicants, sort, verifiedOnly, overrides]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [applicants, sort, verifiedOnly, docsCompleteOnly, overrides]);
 
   async function setStatus(a: ApplicantItem, status: string) {
     // Hiring is significant and hard to reverse (closes the job, fills the rest) —
@@ -132,6 +145,16 @@ export function ApplicantReview({
         >
           <ShieldCheck className="h-4 w-4" /> {t('verifiedOnly')}
         </Button>
+        {anyRequiresDocs && (
+          <Button
+            type="button"
+            variant={docsCompleteOnly ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setDocsCompleteOnly((v) => !v)}
+          >
+            <FileText className="h-4 w-4" /> {t('docsCompleteFilter')}
+          </Button>
+        )}
         <span className="ml-auto text-xs text-muted-foreground">
           {t('applicantCount', { count: view.length })}
         </span>

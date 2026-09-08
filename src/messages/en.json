@@ -1059,7 +1059,8 @@
     "hireMessage": "Good news — you're hired for \"{job}\"! Let's arrange the details.",
     "alreadyHired": "This candidate is hired.",
     "applicationClosed": "This application is closed.",
-    "requiredDocsCheck": "Required documents"
+    "requiredDocsCheck": "Required documents",
+    "docsCompleteFilter": "Has all documents"
   },
   "onboarding": {
     "forkTitle": "What brings you to Isoko Market?",
