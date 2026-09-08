@@ -47,7 +47,9 @@
     "linkCopied": "Link copied",
     "shareMore": "Share…",
     "shareVia": "on",
-    "locationApprox": "Location captured — but it looks approximate. For an exact spot, turn on GPS and try outdoors."
+    "locationApprox": "Location captured — but it looks approximate. For an exact spot, turn on GPS and try outdoors.",
+    "geoInsecure": "Location needs a secure (https) connection. Open the site over https and try again.",
+    "geoTimeout": "Couldn't get an accurate location in time. Turn on GPS, go outdoors, and try again."
   },
   "nav": {
     "home": "Home",

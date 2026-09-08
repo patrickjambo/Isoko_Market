@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { MapPin, Loader2, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/ui/toast';
+import { getAccuratePosition, geoErrorKey } from '@/lib/geolocation';
 
 export type GeoResult = { latitude: number; longitude: number; label?: string };
 
@@ -25,46 +26,36 @@ export function LocationButton({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  function locate() {
-    if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      toast(t('geoUnsupported'), 'error');
-      return;
-    }
+  async function locate() {
     setLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude, accuracy } = pos.coords;
-        let label: string | undefined;
-        try {
-          const res = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-          );
-          if (res.ok) {
-            const j = await res.json();
-            // Most specific place first, then region and country — deduped so we
-            // don't get "Kigali, Kigali". Works anywhere in the world.
-            label =
-              [...new Set(
-                [j.locality || j.city, j.principalSubdivision, j.countryName].filter(Boolean)
-              )].join(', ') || undefined;
-          }
-        } catch {
-          /* label is best-effort — coordinates are what matter */
+    try {
+      // Watches the GPS and returns the most accurate fix (see getAccuratePosition).
+      const { latitude, longitude, accuracy } = await getAccuratePosition();
+      let label: string | undefined;
+      try {
+        const res = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+        );
+        if (res.ok) {
+          const j = await res.json();
+          // Most specific place first, then region and country — deduped so we
+          // don't get "Kigali, Kigali". Works anywhere in the world.
+          label =
+            [...new Set(
+              [j.locality || j.city, j.principalSubdivision, j.countryName].filter(Boolean)
+            )].join(', ') || undefined;
         }
-        onLocated({ latitude, longitude, label });
-        setLoading(false);
-        // A very coarse fix (network/IP, hundreds of metres+) is usually "wrong":
-        // tell the user so they can retry outdoors / with GPS on.
-        toast(accuracy != null && accuracy > 500 ? t('locationApprox') : t('locationCaptured'), accuracy != null && accuracy > 500 ? 'info' : 'success');
-      },
-      (err) => {
-        setLoading(false);
-        toast(err.code === err.PERMISSION_DENIED ? t('geoDenied') : t('geoError'), 'error');
-      },
-      // maximumAge:0 forces a FRESH reading (no cached/coarse position — the main
-      // cause of a "wrong" location); a longer timeout lets the GPS actually fix.
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
-    );
+      } catch {
+        /* label is best-effort — coordinates are what matter */
+      }
+      onLocated({ latitude, longitude, label });
+      // A very coarse fix (hundreds of metres+) is usually "wrong": tell the user.
+      toast(accuracy > 500 ? t('locationApprox') : t('locationCaptured'), accuracy > 500 ? 'info' : 'success');
+    } catch (err) {
+      toast(t(geoErrorKey(err)), 'error');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

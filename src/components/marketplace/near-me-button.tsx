@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
+import { getAccuratePosition, geoErrorKey } from '@/lib/geolocation';
 
 /**
  * "Near me" — one tap grabs the buyer's GPS and filters the feed to listings
@@ -30,25 +31,18 @@ export function NearMeButton({ params }: { params: Record<string, string | undef
     router.push(`/marketplace${qs ? `?${qs}` : ''}`);
   }
 
-  function toggle() {
+  async function toggle() {
     if (active) return go({}); // turn off
-    if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      toast(tc('geoUnsupported'), 'error');
-      return;
-    }
     setLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLoading(false);
-        go({ lat: String(pos.coords.latitude), lng: String(pos.coords.longitude) });
-      },
-      (err) => {
-        setLoading(false);
-        toast(err.code === err.PERMISSION_DENIED ? tc('geoDenied') : tc('geoError'), 'error');
-      },
-      // Fresh, accurate reading — no stale/cached (often coarse) position.
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
-    );
+    try {
+      // Same robust GPS reading as "Use my location" — accurate across devices.
+      const { latitude, longitude } = await getAccuratePosition();
+      go({ lat: String(latitude), lng: String(longitude) });
+    } catch (err) {
+      toast(tc(geoErrorKey(err)), 'error');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
