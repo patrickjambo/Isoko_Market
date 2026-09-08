@@ -27,9 +27,15 @@ export default async function CvPage({ params }: { params: { locale: string } })
 
   return (
     <div className="container max-w-5xl py-6">
-      <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
-      <p className="mb-6 text-sm text-muted-foreground">{t('choiceHint')}</p>
-      <CvChoice initial={initial} fullName={user.fullName} initialMode={initialMode} />
+      <h1 className="text-2xl font-bold tracking-tight">{t('cvAndDocsTitle')}</h1>
+      <p className="mb-6 text-sm text-muted-foreground">{t('cvAndDocsSubtitle')}</p>
+      <CvChoice
+        initial={initial}
+        fullName={user.fullName}
+        initialMode={initialMode}
+        hasCv={Boolean(initial)}
+        docCount={docCount}
+      />
     </div>
   );
 }

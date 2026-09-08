@@ -431,7 +431,7 @@
     "refRelationship": "Relationship",
     "refPhone": "Phone",
     "documentsTitle": "My documents",
-    "documentsHint": "Upload an existing CV, cover letter, certificate or ID from your device. Employers you apply to can view these.",
+    "documentsHint": "Upload an existing CV, cover letter, certificate or ID. Stored in your profile and reused for every job you apply to — you never upload the same file twice.",
     "documentType": "Document type",
     "uploadFromDevice": "Upload from device",
     "documentFormats": "PDF, Word or image · up to 10 MB",
@@ -449,8 +449,12 @@
     "tabUpload": "Upload my CV",
     "tabUploadHint": "Already have a CV or documents? Upload them from your device.",
     "docSaved": "Saved",
-    "docsSavedReassure": "{count} document(s) saved. Employers you apply to can view them.",
-    "typeDrivingLicense": "Driving license"
+    "docsSavedReassure": "{count} document(s) saved to your profile. Attached automatically to every job you apply to — no need to upload again.",
+    "typeDrivingLicense": "Driving license",
+    "cvAndDocsTitle": "Your CV & documents",
+    "cvAndDocsSubtitle": "Build a quick CV, upload your own, or both. Everything here is saved to your profile and shown to employers you apply to — upload once, use for every job.",
+    "cvCreated": "Created",
+    "docsUploadedCount": "{count} uploaded"
   },
   "messages": {
     "title": "Messages",

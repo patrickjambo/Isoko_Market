@@ -431,7 +431,7 @@
     "refRelationship": "Isano",
     "refPhone": "Telefone",
     "documentsTitle": "Inyandiko zanjye",
-    "documentsHint": "Ohereza CV, ibaruwa isaba akazi, impamyabushobozi cyangwa indangamuntu bivuye kuri telefoni yawe. Abakoresha usaba akazi barabibona.",
+    "documentsHint": "Ohereza CV, ibaruwa, impamyabumenyi cyangwa indangamuntu usanganywe. Bibikwa muri profil yawe kandi bikoreshwa ku kazi kose usaba — nta na rimwe wongera kohereza dosiye imwe.",
     "documentType": "Ubwoko bw'inyandiko",
     "uploadFromDevice": "Ohereza bivuye kuri telefoni",
     "documentFormats": "PDF, Word cyangwa ifoto · ntarengwa 10 MB",
@@ -449,8 +449,12 @@
     "tabUpload": "Ohereza CV yanjye",
     "tabUploadHint": "Usanganywe CV cyangwa inyandiko? Zohereze uzivanye kuri telefoni yawe.",
     "docSaved": "Byabitswe",
-    "docsSavedReassure": "Inyandiko {count} zabitswe. Abakoresha usaba akazi barazibona.",
-    "typeDrivingLicense": "Uruhushya rwo gutwara"
+    "docsSavedReassure": "Inyandiko {count} zabitswe muri profil yawe. Zomekwa ku kazi kose usaba — nta mpamvu yo kongera kohereza.",
+    "typeDrivingLicense": "Uruhushya rwo gutwara",
+    "cvAndDocsTitle": "CV n’inyandiko zawe",
+    "cvAndDocsSubtitle": "Kora CV yihuse, ohereza iyawe, cyangwa byombi. Byose bibikwa muri profil yawe kandi bigaragarira abakoresha usaba akazi — ohereza rimwe, ukoreshe ku kazi kose.",
+    "cvCreated": "Byakozwe",
+    "docsUploadedCount": "{count} zoherejwe"
   },
   "messages": {
     "title": "Ubutumwa",

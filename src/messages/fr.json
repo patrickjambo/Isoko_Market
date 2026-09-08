@@ -431,7 +431,7 @@
     "refRelationship": "Relation",
     "refPhone": "Téléphone",
     "documentsTitle": "Mes documents",
-    "documentsHint": "Téléversez un CV, une lettre de motivation, un certificat ou une pièce d'identité depuis votre appareil. Les employeurs auxquels vous postulez peuvent les consulter.",
+    "documentsHint": "Téléversez un CV, une lettre, un certificat ou une pièce d’identité. Conservés dans votre profil et réutilisés pour chaque candidature.",
     "documentType": "Type de document",
     "uploadFromDevice": "Téléverser depuis l'appareil",
     "documentFormats": "PDF, Word ou image · jusqu'à 10 Mo",
@@ -449,8 +449,12 @@
     "tabUpload": "Téléverser mon CV",
     "tabUploadHint": "Vous avez déjà un CV ou des documents ? Téléversez-les depuis votre appareil.",
     "docSaved": "Enregistré",
-    "docsSavedReassure": "{count} document(s) enregistré(s). Les employeurs auxquels vous postulez peuvent les voir.",
-    "typeDrivingLicense": "Permis de conduire"
+    "docsSavedReassure": "{count} document(s) enregistré(s) dans votre profil. Joints automatiquement à chaque candidature — pas besoin de re-téléverser.",
+    "typeDrivingLicense": "Permis de conduire",
+    "cvAndDocsTitle": "Votre CV et documents",
+    "cvAndDocsSubtitle": "Créez un CV rapide, téléversez le vôtre, ou les deux. Tout est enregistré dans votre profil et visible par les employeurs — téléversez une fois, utilisez pour chaque offre.",
+    "cvCreated": "Créé",
+    "docsUploadedCount": "{count} téléversé(s)"
   },
   "messages": {
     "title": "Messages",
