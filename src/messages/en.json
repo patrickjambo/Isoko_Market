@@ -50,7 +50,10 @@
     "locationApprox": "Location captured — but it looks approximate. For an exact spot, turn on GPS and try outdoors.",
     "geoInsecure": "Location needs a secure (https) connection. Open the site over https and try again.",
     "geoTimeout": "Couldn't get an accurate location in time. Turn on GPS, go outdoors, and try again.",
-    "mapPickerHint": "Drag the pin to your exact spot — this is what buyers navigate to."
+    "mapPickerHint": "The pin is where buyers will navigate to. Drag it if it's not exact.",
+    "searchPlacePlaceholder": "Search your area — e.g. Kimironko, Nyabugogo",
+    "orSearchArea": "or search your area below",
+    "confirmOnMap": "Confirm on the map (drag the pin only if it's not exact)"
   },
   "nav": {
     "home": "Home",

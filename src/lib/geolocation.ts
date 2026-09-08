@@ -113,6 +113,56 @@ export async function reverseGeocode(lat: number, lng: number): Promise<string |
   }
 }
 
+export type PlaceResult = { latitude: number; longitude: number; label: string };
+
+/** Join parts into a place label, dropping blanks and case-insensitive repeats. */
+function dedupeLabel(parts: (string | undefined)[]): string {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const part of parts) {
+    const v = part?.trim();
+    if (!v) continue;
+    const key = v.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(v);
+  }
+  return out.join(', ');
+}
+
+/**
+ * Search a place by name (forward geocoding) so users who can't read a map just
+ * TYPE their area — "Kimironko", "Nyabugogo" — and pick it. Photon (OpenStreetMap)
+ * is free, keyless, typo-tolerant and CORS-friendly. Biased toward Rwanda but not
+ * restricted, so someone abroad still finds their place.
+ */
+export async function searchPlaces(query: string): Promise<PlaceResult[]> {
+  const q = query.trim();
+  if (q.length < 3) return [];
+  try {
+    const res = await fetch(
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6&lang=en&lat=-1.94&lon=29.87`
+    );
+    if (!res.ok) return [];
+    const j = await res.json();
+    const feats: Array<{ geometry?: { coordinates?: [number, number] }; properties?: Record<string, string> }> =
+      j.features ?? [];
+    return feats
+      .map((f) => {
+        const coords = f.geometry?.coordinates;
+        if (!coords) return null;
+        const [lng, lat] = coords;
+        const p = f.properties ?? {};
+        // Case-insensitive de-dupe (Photon often repeats the country in two fields).
+        const label = dedupeLabel([p.name, p.district || p.city || p.county, p.state, p.country]);
+        return label ? { latitude: lat, longitude: lng, label } : null;
+      })
+      .filter((r): r is PlaceResult => r !== null);
+  } catch {
+    return [];
+  }
+}
+
 /** Map a GeoError reason to a `common` i18n key. */
 export function geoErrorKey(err: unknown): string {
   const reason = err instanceof GeoError ? err.reason : 'unavailable';

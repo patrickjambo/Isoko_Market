@@ -50,7 +50,10 @@
     "locationApprox": "Aho uri hafashwe — ariko birasa nk'ibigereranyo. Kugira ngo hanoze, funguza GPS ugerageze hanze.",
     "geoInsecure": "Aho uri hasaba umuyoboro utekanye (https). Fungura urubuga kuri https wongere ugerageze.",
     "geoTimeout": "Ntibyashobotse kubona ahantu nyaho ku gihe. Funguza GPS, sohoka hanze, wongere ugerageze.",
-    "mapPickerHint": "Kurura akamenyetso ku hantu nyaho — ni ho abaguzi baza."
+    "mapPickerHint": "Akamenyetso ni aho abaguzi bazerekeza. Gakurure niba hatari neza.",
+    "searchPlacePlaceholder": "Shakisha ahantu uherereye — urugero: Kimironko, Nyabugogo",
+    "orSearchArea": "cyangwa shakisha ahantu uherereye hepfo",
+    "confirmOnMap": "Emeza ku ikarita (kurura akamenyetso gusa niba hatariho neza)"
   },
   "nav": {
     "home": "Ahabanza",
