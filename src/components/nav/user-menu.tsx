@@ -1,6 +1,6 @@
 'use client';
 
-import { User, Wallet, ShieldCheck, LayoutDashboard, LogOut, FileText, Gift, Store, Heart, Package, Briefcase, MessageCircle, Send, BellRing } from 'lucide-react';
+import { User, Wallet, ShieldCheck, LayoutDashboard, LogOut, FileText, Gift, Store, Heart, Package, Briefcase, MessageCircle, Send, BellRing, ClipboardList } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
@@ -117,6 +117,13 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link href="/orders">
             <Package /> {t('orders.title')}
+          </Link>
+        </DropdownMenuItem>
+        {/* Service requests are the service-side analog of orders — a seeker
+            reaches their sent requests here (and a provider their received). */}
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard/requests">
+            <ClipboardList /> {t('marketplace.requestsTitle')}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
