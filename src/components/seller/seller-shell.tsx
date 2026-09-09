@@ -30,9 +30,11 @@ type NavItem = { href: string; label: string; icon: LucideIcon; exact?: boolean;
  */
 export function SellerShell({
   unread,
+  pendingRequests = 0,
   children,
 }: {
   unread: number;
+  pendingRequests?: number;
   children: React.ReactNode;
 }) {
   const t = useTranslations('seller');
@@ -62,7 +64,7 @@ export function SellerShell({
   const items: NavItem[] = [
     { href: '/dashboard', label: t('home'), icon: LayoutDashboard, exact: true },
     { href: '/dashboard/listings', label: t('myListings'), icon: Package },
-    { href: '/dashboard/requests', label: t('requests'), icon: ClipboardList },
+    { href: '/dashboard/requests', label: t('requests'), icon: ClipboardList, badge: pendingRequests },
     { href: '/messages', label: tn('messages'), icon: MessageCircle, badge: unread },
     { href: '/wallet', label: tn('wallet'), icon: Wallet },
     { href: '/profile', label: tn('profile'), icon: User },
