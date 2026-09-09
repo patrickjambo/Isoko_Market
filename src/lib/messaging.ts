@@ -157,4 +157,16 @@ export async function markConversationRead(conversationId: string, userId: strin
     where: { conversationId, senderId: { not: userId }, readAt: null },
     data: { readAt: new Date() },
   });
+  // Clear the matching bell notifications too, otherwise the header count stays
+  // lit after the user has already read the conversation. Message notifications
+  // are keyed by their href (see sendMessage).
+  await prisma.notification.updateMany({
+    where: {
+      userId,
+      type: 'MESSAGE',
+      href: `/messages/${conversationId}`,
+      readAt: null,
+    },
+    data: { readAt: new Date() },
+  });
 }
