@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline · Isoko Market</title>
+    <link rel="icon" href="/icon.svg" />
+    <style>
+      :root {
+        --brand: #0b6b62;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      body {
+        display: flex;
+        min-height: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.25rem;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        background: #f8f7f4;
+        color: #1c1c1c;
+        font-family:
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+      }
+      .icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background: var(--brand);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      h1 {
+        margin: 0;
+        font-size: 1.35rem;
+      }
+      p {
+        margin: 0;
+        max-width: 30rem;
+        color: #555;
+        line-height: 1.5;
+      }
+      .sub {
+        font-size: 0.9rem;
+        color: #777;
+      }
+      button {
+        margin-top: 0.5rem;
+        border: 0;
+        border-radius: 10px;
+        background: var(--brand);
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 0.7rem 1.4rem;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #095a52;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="icon" aria-hidden="true">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    </div>
+    <h1>You're offline</h1>
+    <p>Isoko can't reach the internet right now. Check your connection and try again.</p>
+    <p class="sub">Nta murandasi uhari · Vous êtes hors ligne</p>
+    <button type="button" onclick="location.reload()">Try again</button>
+  </body>
+</html>

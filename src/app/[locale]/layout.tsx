@@ -7,6 +7,7 @@ import { getCurrentUser, touchLastActive } from '@/lib/auth';
 import { toSessionUser } from '@/lib/serialize';
 import { env } from '@/lib/env';
 import { Providers } from '@/components/providers';
+import { ServiceWorkerRegister } from '@/components/shared/service-worker-register';
 import '../globals.css';
 
 export const metadata: Metadata = {
@@ -69,6 +70,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <Providers user={user ? toSessionUser(user) : null}>{children}</Providers>
         </NextIntlClientProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
