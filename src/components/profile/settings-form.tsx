@@ -124,19 +124,18 @@ export function SettingsForm({
         <Input name="fullName" defaultValue={initial.fullName} required />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="location">{t('title')}</Label>
-        <Input
-          name="location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Kigali"
-        />
+        <Label>{t('title')}</Label>
         <LocationField
+          location={location}
           latitude={coords?.latitude ?? null}
           longitude={coords?.longitude ?? null}
           onChange={(g) => {
-            setCoords({ latitude: g.latitude, longitude: g.longitude });
-            if (g.label) setLocation(g.label); // name follows the pin
+            setLocation(g.location);
+            setCoords(
+              g.latitude != null && g.longitude != null
+                ? { latitude: g.latitude, longitude: g.longitude }
+                : null
+            );
           }}
         />
         <p className="text-xs text-muted-foreground">{t('locationSavedHint')}</p>

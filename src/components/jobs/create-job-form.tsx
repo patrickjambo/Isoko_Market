@@ -279,17 +279,19 @@ export function CreateJobForm({
 
       {/* Location (§3 Step 4) */}
       <Field label={t('form.locationLabel')} error={errors.location}>
-        <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Kigali" required />
-        <div className="mt-1.5">
-          <LocationField
-            latitude={coords?.latitude ?? null}
-            longitude={coords?.longitude ?? null}
-            onChange={(g) => {
-              setCoords({ latitude: g.latitude, longitude: g.longitude });
-              if (g.label) setLocation(g.label); // name follows the pin
-            }}
-          />
-        </div>
+        <LocationField
+          location={location}
+          latitude={coords?.latitude ?? null}
+          longitude={coords?.longitude ?? null}
+          onChange={(g) => {
+            setLocation(g.location);
+            setCoords(
+              g.latitude != null && g.longitude != null
+                ? { latitude: g.latitude, longitude: g.longitude }
+                : null
+            );
+          }}
+        />
       </Field>
 
       <ContactFields value={contact} onChange={setContact} />

@@ -10,7 +10,6 @@ import {
   Check,
   Tag as TagIcon,
   CircleAlert,
-  MapPin,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
@@ -28,7 +27,6 @@ import type { ContactChannels } from '@/lib/contact';
 import { useToast } from '@/components/ui/toast';
 import { listingConditions, type ListingSpec } from '@/lib/validators/listing';
 import { specSuggestionsFor } from '@/lib/specs';
-import { RWANDA_DISTRICTS } from '@/lib/rwanda';
 import { formatRWF, cn } from '@/lib/utils';
 
 type Category = { id: string; name: string; slug?: string };
@@ -335,32 +333,12 @@ export function AddProductWizard({
         >
           <div className="space-y-1.5">
             <Label>{tc('form.locationLabel')}</Label>
-            <div className="relative">
-              <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                list="rw-districts"
-                value={data.location}
-                onChange={(e) => set('location', e.target.value)}
-                placeholder="Kigali, Nyarugenge"
-                className="pl-9"
-              />
-              <datalist id="rw-districts">
-                {RWANDA_DISTRICTS.map((d) => (
-                  <option key={d} value={d} />
-                ))}
-              </datalist>
-            </div>
             <LocationField
+              location={data.location}
               latitude={data.latitude}
               longitude={data.longitude}
               onChange={(g) =>
-                setData((d) => ({
-                  ...d,
-                  latitude: g.latitude,
-                  longitude: g.longitude,
-                  // The name follows the pin when we have one; otherwise keep it.
-                  location: g.label ?? d.location,
-                }))
+                setData((d) => ({ ...d, location: g.location, latitude: g.latitude, longitude: g.longitude }))
               }
             />
           </div>

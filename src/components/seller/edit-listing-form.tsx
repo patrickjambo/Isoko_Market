@@ -155,17 +155,11 @@ export function EditListingForm({
 
       <div className="space-y-1.5">
         <Label>{t('locationLabel')}</Label>
-        <Input value={d.location} onChange={(e) => set({ location: e.target.value })} placeholder="Kigali, Nyarugenge" />
         <LocationField
+          location={d.location}
           latitude={d.latitude}
           longitude={d.longitude}
-          onChange={(g) =>
-            set({
-              latitude: g.latitude,
-              longitude: g.longitude,
-              location: g.label ?? d.location, // name follows the pin
-            })
-          }
+          onChange={(g) => set({ location: g.location, latitude: g.latitude, longitude: g.longitude })}
         />
       </div>
 
