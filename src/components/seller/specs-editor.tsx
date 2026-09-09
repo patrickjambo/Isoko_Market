@@ -1,26 +1,63 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { ListingSpec } from '@/lib/validators/listing';
+import { suggestSpecs } from '@/lib/specs';
 
 /**
- * Editable product feature list (RAM, processor, year, …). Category-suggested
- * labels appear as one-tap chips; the seller can also add fully custom rows. So
- * a buyer sees the real details of what they're buying.
+ * Editable product feature list whose suggested labels adapt to the item the
+ * seller is entering — instant keyword/category guess, refined by AI from the
+ * title (so a phone gets RAM/Storage, a car Year/Mileage, rice Weight/Type…).
+ * The seller can always add fully custom rows.
  */
 export function SpecsEditor({
   value,
   onChange,
-  suggestions,
+  title,
+  categorySlug,
+  categoryName,
 }: {
   value: ListingSpec[];
   onChange: (v: ListingSpec[]) => void;
-  suggestions: string[];
+  title: string;
+  categorySlug?: string;
+  categoryName?: string;
 }) {
   const t = useTranslations('sell');
+
+  // Start with the deterministic guess so chips appear instantly; refine with
+  // AI as the seller types the title / picks a category.
+  const [suggestions, setSuggestions] = useState<string[]>(() => suggestSpecs(title, categorySlug));
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    // Instant local guess first (keyword/category) so it's never empty or stale.
+    setSuggestions(suggestSpecs(title, categorySlug));
+    if (timer.current) clearTimeout(timer.current);
+    if (title.trim().length < 3) return;
+    timer.current = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/suggestions/specs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, category: categoryName, categorySlug }),
+        });
+        if (!res.ok) return;
+        const j = await res.json();
+        const specs = j.data?.specs ?? j.specs;
+        if (Array.isArray(specs) && specs.length) setSuggestions(specs);
+      } catch {
+        /* keep the instant guess */
+      }
+    }, 500);
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, [title, categorySlug, categoryName]);
 
   const update = (i: number, patch: Partial<ListingSpec>) =>
     onChange(value.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));

@@ -52,6 +52,40 @@ export async function generateText(opts: {
   }
 }
 
+/**
+ * Suggest the FEATURE LABELS a seller should fill in for THIS specific product,
+ * so buyers see the details that matter for it (a phone's RAM, a car's mileage,
+ * a shoe's size…). Labels only — the seller fills the values. Returns null when
+ * AI isn't configured/available so the caller can fall back to the keyword map.
+ */
+export async function aiSuggestSpecs(input: {
+  title: string;
+  category?: string;
+}): Promise<string[] | null> {
+  const text = await generateText({
+    maxTokens: 120,
+    system:
+      'You help a seller list an item on a Rwandan marketplace. Given the item, ' +
+      'output the FEATURE LABELS a buyer would want to know — the fields the seller ' +
+      'should fill in. Rules: 4–8 labels, each 1–3 words, specific to THAT product ' +
+      'type, most important first. Examples — phone: Brand, Model, Storage, RAM, ' +
+      'Battery, Color; car: Make, Model, Year, Mileage, Fuel, Transmission; shoes: ' +
+      'Brand, Size, Color, Material; rice: Type, Weight, Quantity. Output ONLY the ' +
+      'labels as a comma-separated list. No values, no numbers, no other text.',
+    prompt: `Item: ${input.title}${input.category ? ` (category: ${input.category})` : ''}`,
+  });
+  if (!text) return null;
+  const labels = [
+    ...new Set(
+      text
+        .split(/[,\n]/)
+        .map((s) => s.replace(/^[-*\d.\)\s]+/, '').trim())
+        .filter((s) => s.length > 0 && s.length <= 40)
+    ),
+  ];
+  return labels.length ? labels.slice(0, 8) : null;
+}
+
 const LANG: Record<string, string> = { rw: 'Kinyarwanda', en: 'English', fr: 'French' };
 
 /**

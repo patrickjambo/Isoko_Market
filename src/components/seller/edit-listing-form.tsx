@@ -15,7 +15,6 @@ import { ContactFields } from '@/components/shared/contact-fields';
 import { SpecsEditor } from '@/components/seller/specs-editor';
 import { LocationField } from '@/components/shared/location-field';
 import { listingConditions, type ListingSpec } from '@/lib/validators/listing';
-import { specSuggestionsFor } from '@/lib/specs';
 import type { ContactChannels } from '@/lib/contact';
 
 type Category = { id: string; name: string; slug?: string };
@@ -149,7 +148,9 @@ export function EditListingForm({
         <SpecsEditor
           value={d.specs}
           onChange={(v) => set({ specs: v })}
-          suggestions={specSuggestionsFor(categories.find((c) => c.id === d.categoryId)?.slug)}
+          title={d.title}
+          categorySlug={categories.find((c) => c.id === d.categoryId)?.slug}
+          categoryName={categories.find((c) => c.id === d.categoryId)?.name}
         />
       )}
 

@@ -26,7 +26,6 @@ import { LocationField } from '@/components/shared/location-field';
 import type { ContactChannels } from '@/lib/contact';
 import { useToast } from '@/components/ui/toast';
 import { listingConditions, type ListingSpec } from '@/lib/validators/listing';
-import { specSuggestionsFor } from '@/lib/specs';
 import { formatRWF, cn } from '@/lib/utils';
 
 type Category = { id: string; name: string; slug?: string };
@@ -300,7 +299,9 @@ export function AddProductWizard({
             <SpecsEditor
               value={data.specs}
               onChange={(v) => set('specs', v)}
-              suggestions={specSuggestionsFor(selectedCategory?.slug)}
+              title={data.title}
+              categorySlug={selectedCategory?.slug}
+              categoryName={selectedCategory?.name}
             />
           )}
 
