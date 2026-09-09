@@ -59,6 +59,16 @@ const config: Config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      // Soft, layered shadows tinted with the deep-teal brand hue instead of pure
+      // black — the single biggest lever for a premium, professional surface feel.
+      // Overrides the default scale, so every existing shadow-sm/md/lg upgrades.
+      boxShadow: {
+        sm: '0 1px 2px 0 hsl(185 45% 12% / 0.06)',
+        DEFAULT: '0 1px 3px 0 hsl(185 45% 12% / 0.08), 0 1px 2px -1px hsl(185 45% 12% / 0.05)',
+        md: '0 4px 14px -3px hsl(185 45% 12% / 0.10), 0 2px 6px -2px hsl(185 45% 12% / 0.06)',
+        lg: '0 12px 26px -6px hsl(185 45% 12% / 0.12), 0 4px 10px -4px hsl(185 45% 12% / 0.07)',
+        xl: '0 24px 48px -12px hsl(185 45% 12% / 0.18)',
+      },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
