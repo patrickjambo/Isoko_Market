@@ -70,7 +70,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
 
       {/* Hero */}
       <section className="relative overflow-hidden brand-gradient text-white">
-        {/* soft glow accents for depth */}
+        {/* Layered depth: mesh spotlights + a faint engineered grid + soft glows */}
+        <div className="brand-mesh pointer-events-none absolute inset-0" />
+        <div className="hero-grid pointer-events-none absolute inset-0 opacity-70" />
         <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
 
@@ -123,8 +125,30 @@ export default async function HomePage({ params }: { params: { locale: string } 
               </Button>
             </div>
           </div>
-          <div className="hidden md:block">
-            <TrustPanel title={t('trustTitle')} body={t('trustBody')} />
+          <div className="relative hidden md:block">
+            {/* A composed trust cluster instead of one lonely card — a glass
+                trust panel over a grid of the platform's pillars, so the hero
+                reads designed and full rather than empty. */}
+            <div className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-white/5 blur-2xl" />
+            <div className="relative space-y-4">
+              <TrustPanel title={t('trustTitle')} body={t('trustBody')} />
+              <div className="grid grid-cols-2 gap-3">
+                {pillars.map((p) => {
+                  const Icon = p.icon;
+                  return (
+                    <div
+                      key={p.title}
+                      className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-3 py-3 backdrop-blur transition-colors hover:bg-white/15"
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-accent">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <span className="text-sm font-medium leading-tight">{p.title}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -310,8 +334,8 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 
 function TrustPanel({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-2xl bg-white/10 p-6 backdrop-blur">
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
+    <div className="rounded-2xl border border-white/15 bg-white/10 p-6 shadow-lg backdrop-blur-md">
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/90 text-accent-foreground shadow-sm">
         <ShieldCheck className="h-7 w-7" />
       </div>
       <h3 className="mb-2 text-lg font-bold">{title}</h3>

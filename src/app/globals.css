@@ -150,6 +150,24 @@
       hsl(24 90% 46%) 150%
     );
   }
+  /* A "mesh" spotlight layer for dark hero/CTA bands: a few soft radial glows
+     that give the flat gradient depth and a modern, expensive feel. */
+  .brand-mesh {
+    background-image:
+      radial-gradient(40rem 24rem at 15% 0%, hsl(173 80% 45% / 0.35), transparent 60%),
+      radial-gradient(34rem 22rem at 92% 20%, hsl(24 92% 52% / 0.28), transparent 55%),
+      radial-gradient(30rem 24rem at 60% 110%, hsl(190 90% 40% / 0.25), transparent 55%);
+  }
+  /* Faint grid texture that fades out toward the edges via a mask — the subtle
+     "engineered" look premium SaaS/business heroes use. */
+  .hero-grid {
+    background-image:
+      linear-gradient(hsl(0 0% 100% / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(0 0% 100% / 0.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, #000 35%, transparent 78%);
+    mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, #000 35%, transparent 78%);
+  }
   /* Reusable "premium surface": a card with a whisper of top-down sheen and a
      hairline highlight. Opt-in — apply where a section wants extra polish. */
   .surface {
