@@ -114,7 +114,14 @@
     "liveUpdating": "Updates automatically",
     "newTodaySuffix": "new in the last 24h",
     "trending": "Fresh right now",
-    "services": "Services"
+    "services": "Services",
+    "pillarsEyebrow": "Why Isoko",
+    "pillarsSubtitle": "A safer, simpler way to buy, sell, and find work in Rwanda.",
+    "howItWorksEyebrow": "Simple and fast",
+    "statsListings": "Active listings",
+    "statsHired": "People hired",
+    "ctaBandTitle": "Ready to buy, sell, or get hired?",
+    "ctaBandBody": "Join thousands of Rwandans trading and working on Isoko every day."
   },
   "auth": {
     "loginTitle": "Welcome back",

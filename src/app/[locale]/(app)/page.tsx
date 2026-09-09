@@ -7,7 +7,10 @@ import {
   ArrowRight,
   Store,
   Sparkles,
+  Users,
+  Wallet,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { ListingCard } from '@/components/marketplace/listing-card';
@@ -119,16 +122,6 @@ export default async function HomePage({ params }: { params: { locale: string } 
                 </Link>
               </Button>
             </div>
-
-            {/* Social proof — omit any hollow zero rather than showing it (§2).
-                Numbers tick up on their own as the feed refreshes. */}
-            <dl className="flex gap-8 pt-2">
-              {stats.users > 0 && <Stat value={stats.users} label={t('statsReached')} />}
-              {stats.transactions > 0 && (
-                <Stat value={stats.transactions} label={t('statsTransactions')} />
-              )}
-              {stats.jobs > 0 && <Stat value={stats.jobs} label={t('statsJobs')} />}
-            </dl>
           </div>
           <div className="hidden md:block">
             <TrustPanel title={t('trustTitle')} body={t('trustBody')} />
@@ -156,18 +149,60 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </section>
       )}
 
-      {/* Pillars */}
-      <section className="container py-12">
-        <h2 className="mb-6 text-center text-2xl font-bold tracking-tight">{t('pillarsTitle')}</h2>
+      {/* Stats band — a professional counter strip. Omits any hollow zero and
+          the whole band if the platform is brand new. Numbers tick up live. */}
+      {(() => {
+        const items = [
+          stats.users > 0 && { icon: Users, value: stats.users, label: t('statsReached') },
+          stats.listings > 0 && { icon: Store, value: stats.listings, label: t('statsListings') },
+          stats.transactions > 0 && {
+            icon: Wallet,
+            value: stats.transactions,
+            label: t('statsTransactions'),
+          },
+          stats.filled > 0
+            ? { icon: Briefcase, value: stats.filled, label: t('statsHired') }
+            : stats.jobs > 0 && { icon: Briefcase, value: stats.jobs, label: t('statsJobs') },
+        ].filter(Boolean) as { icon: LucideIcon; value: number; label: string }[];
+        if (items.length === 0) return null;
+        return (
+          <section className="border-b border-border bg-card">
+            <div className="container grid grid-cols-2 gap-6 py-10 sm:grid-cols-4">
+              {items.map((s) => {
+                const Icon = s.icon;
+                return (
+                  <div key={s.label} className="flex flex-col items-center text-center">
+                    <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <div className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+                      <CountUp value={s.value} />
+                    </div>
+                    <div className="mt-1 text-sm text-muted-foreground">{s.label}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })()}
+
+      {/* Pillars — "why choose us" */}
+      <section className="container py-14">
+        <div className="mx-auto mb-8 max-w-2xl text-center">
+          <Eyebrow>{t('pillarsEyebrow')}</Eyebrow>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('pillarsTitle')}</h2>
+          <p className="mt-2 text-muted-foreground">{t('pillarsSubtitle')}</p>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {pillars.map((p) => {
             const Icon = p.icon;
             return (
               <div
                 key={p.title}
-                className="rounded-xl border border-border bg-card p-5 transition-shadow hover:shadow-md"
+                className="group rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
               >
-                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-secondary text-primary">
+                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-secondary text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="mb-1 font-semibold">{p.title}</h3>
@@ -216,14 +251,15 @@ export default async function HomePage({ params }: { params: { locale: string } 
 
       {/* How it works */}
       <section className="border-t border-border bg-secondary/30">
-        <div className="container py-12">
-          <h2 className="mb-8 text-center text-2xl font-bold tracking-tight">
-            {t('howItWorksTitle')}
-          </h2>
+        <div className="container py-14">
+          <div className="mx-auto mb-10 max-w-2xl text-center">
+            <Eyebrow>{t('howItWorksEyebrow')}</Eyebrow>
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('howItWorksTitle')}</h2>
+          </div>
           <ol className="grid gap-6 sm:grid-cols-3">
             {[1, 2, 3].map((n) => (
-              <li key={n} className="relative rounded-xl bg-card p-6">
-                <span className="absolute -top-3 left-6 flex h-8 w-8 items-center justify-center rounded-full bg-accent font-bold text-accent-foreground">
+              <li key={n} className="relative rounded-xl border border-border bg-card p-6 pt-7">
+                <span className="absolute -top-4 left-6 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-base font-bold text-accent-foreground shadow-sm">
                   {n}
                 </span>
                 <h3 className="mb-1 mt-2 font-semibold">{t(`step${n}Title`)}</h3>
@@ -231,9 +267,33 @@ export default async function HomePage({ params }: { params: { locale: string } 
               </li>
             ))}
           </ol>
-          <div className="mt-8 text-center">
-            <Button size="lg" asChild>
-              <Link href="/register">{t('ctaRegister')}</Link>
+        </div>
+      </section>
+
+      {/* Closing CTA band */}
+      <section className="relative overflow-hidden brand-gradient text-white">
+        <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-28 -left-10 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+        <div className="container relative flex flex-col items-center gap-5 py-16 text-center">
+          <h2 className="max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl">
+            {t('ctaBandTitle')}
+          </h2>
+          <p className="max-w-xl text-white/90">{t('ctaBandBody')}</p>
+          <div className="mt-2 flex flex-wrap justify-center gap-3">
+            <Button size="lg" variant="accent" asChild>
+              <Link href={user ? '/marketplace' : '/get-started'}>
+                {user ? t('ctaBrowse') : t('ctaGetStarted')} <ArrowRight className="h-5 w-5" />
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+              asChild
+            >
+              <Link href="/jobs">
+                <Briefcase className="h-5 w-5" /> {t('ctaJobs')}
+              </Link>
             </Button>
           </div>
         </div>
@@ -242,14 +302,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
   );
 }
 
-function Stat({ value, label }: { value: number; label: string }) {
+function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <div>
-      <dt className="text-2xl font-extrabold">
-        <CountUp value={value} />
-      </dt>
-      <dd className="text-xs text-white/80">{label}</dd>
-    </div>
+    <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">{children}</p>
   );
 }
 

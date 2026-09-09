@@ -114,7 +114,14 @@
     "liveUpdating": "Bivugururwa byikora",
     "newTodaySuffix": "bishya mu masaha 24",
     "trending": "Bishya nonaha",
-    "services": "Serivisi"
+    "services": "Serivisi",
+    "pillarsEyebrow": "Kuki Isoko",
+    "pillarsSubtitle": "Uburyo bworoshye kandi bwizewe bwo kugura, kugurisha no gushaka akazi mu Rwanda.",
+    "howItWorksEyebrow": "Byoroshye kandi byihuse",
+    "statsListings": "Ibicuruzwa bihari",
+    "statsHired": "Abahawe akazi",
+    "ctaBandTitle": "Witeguye kugura, kugurisha cyangwa guhabwa akazi?",
+    "ctaBandBody": "Ifatanye n'ibihumbi by'Abanyarwanda bacuruza kandi bakora kuri Isoko buri munsi."
   },
   "auth": {
     "loginTitle": "Murakaza neza",
