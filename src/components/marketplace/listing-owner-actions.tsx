@@ -1,12 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle2, Loader2, Star, Pencil } from 'lucide-react';
+import { CheckCircle2, Loader2, Star, Pencil, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
 import { PaymentButton } from '@/components/payments/payment-button';
 import { PRICING, FEATURE_DURATION_DAYS } from '@/lib/pricing';
 
@@ -28,6 +37,23 @@ export function ListingOwnerActions({
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  async function remove() {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/listings/${listingId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      toast(tc('deleted'), 'success');
+      setConfirmOpen(false);
+      router.push('/dashboard/listings');
+      router.refresh();
+    } catch {
+      toast(tc('error'), 'error');
+      setDeleting(false);
+    }
+  }
 
   async function setStatus(next: 'SOLD' | 'ACTIVE') {
     setLoading(true);
@@ -88,6 +114,32 @@ export function ListingOwnerActions({
             variant="outline"
           />
         ))}
+
+      {/* Delete — behind a confirm dialog so it can't happen by accident. */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" className="text-destructive hover:text-destructive">
+            <Trash2 className="h-4 w-4" /> {tc('delete')}
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('deleteConfirmTitle')}</DialogTitle>
+            <DialogDescription>{t('deleteConfirmBody')}</DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2">
+            <DialogClose asChild>
+              <Button variant="outline" className="flex-1" disabled={deleting}>
+                {tc('cancel')}
+              </Button>
+            </DialogClose>
+            <Button variant="destructive" className="flex-1" onClick={remove} disabled={deleting}>
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              {tc('delete')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

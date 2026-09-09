@@ -229,7 +229,9 @@
     "filterByFeatures": "Filtrer par caractéristiques",
     "clearFeatures": "Effacer",
     "nearMe": "Près de moi",
-    "getDirections": "Itinéraire"
+    "getDirections": "Itinéraire",
+    "deleteConfirmTitle": "Supprimer cette annonce ?",
+    "deleteConfirmBody": "Cela la supprime définitivement — les acheteurs ne la verront plus, et c'est irréversible."
   },
   "jobs": {
     "title": "Emplois & missions",

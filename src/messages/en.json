@@ -229,7 +229,9 @@
     "filterByFeatures": "Filter by features",
     "clearFeatures": "Clear",
     "nearMe": "Near me",
-    "getDirections": "Get directions"
+    "getDirections": "Get directions",
+    "deleteConfirmTitle": "Delete this listing?",
+    "deleteConfirmBody": "This permanently removes it — buyers will no longer see it, and this cannot be undone."
   },
   "jobs": {
     "title": "Jobs & Gigs",

@@ -229,7 +229,9 @@
     "filterByFeatures": "Shungura ku biranga",
     "clearFeatures": "Siba",
     "nearMe": "Hafi yanjye",
-    "getDirections": "Fata inzira"
+    "getDirections": "Fata inzira",
+    "deleteConfirmTitle": "Gusiba iki cyatangajwe?",
+    "deleteConfirmBody": "Iki kibikura burundu — abaguzi ntibazongera kukibona, kandi ntibisubirwaho."
   },
   "jobs": {
     "title": "Akazi & Imirimo",
