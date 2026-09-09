@@ -53,7 +53,11 @@
     "mapPickerHint": "Le repère est l'endroit où les acheteurs se rendront. Déplacez-le si besoin.",
     "searchPlacePlaceholder": "Cherchez votre quartier — ex. Kimironko, Nyabugogo",
     "orSearchArea": "ou cherchez votre quartier ci-dessous",
-    "confirmOnMap": "Confirmez sur la carte (déplacez le repère seulement si nécessaire)"
+    "confirmOnMap": "Confirmez sur la carte (déplacez le repère seulement si nécessaire)",
+    "installIosBefore": "Pour installer Isoko, appuyez sur",
+    "installIosMiddle": "puis",
+    "installIosAdd": "Sur l’écran d’accueil",
+    "installIosAfter": "."
   },
   "nav": {
     "home": "Accueil",

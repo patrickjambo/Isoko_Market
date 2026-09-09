@@ -53,7 +53,11 @@
     "mapPickerHint": "Akamenyetso ni aho abaguzi bazerekeza. Gakurure niba hatari neza.",
     "searchPlacePlaceholder": "Shakisha ahantu uherereye — urugero: Kimironko, Nyabugogo",
     "orSearchArea": "cyangwa shakisha ahantu uherereye hepfo",
-    "confirmOnMap": "Emeza ku ikarita (kurura akamenyetso gusa niba hatariho neza)"
+    "confirmOnMap": "Emeza ku ikarita (kurura akamenyetso gusa niba hatariho neza)",
+    "installIosBefore": "Kugira ngo winjize Isoko, kanda",
+    "installIosMiddle": "hanyuma uhitemo",
+    "installIosAdd": "Shyira ku Ahabanza (Add to Home Screen)",
+    "installIosAfter": "."
   },
   "nav": {
     "home": "Ahabanza",

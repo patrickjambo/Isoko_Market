@@ -21,10 +21,12 @@ export const metadata: Metadata = {
   // so an unset/blank NEXT_PUBLIC_APP_URL can't crash the build via new URL('').
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   manifest: '/manifest.webmanifest',
-  // Installable-app polish: home-screen icon + full-screen iOS launch.
+  // Installable-app polish: home-screen icon + full-screen iOS launch. The Apple
+  // touch icon points at the generated PNG route (src/app/apple-icon.tsx) — iOS
+  // ignores SVG apple-touch-icons, so a raster is required for a clean install.
   icons: {
     icon: '/icon.svg',
-    apple: '/icon.svg',
+    apple: '/apple-icon',
   },
   appleWebApp: {
     capable: true,
