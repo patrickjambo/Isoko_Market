@@ -67,7 +67,7 @@ export default async function MarketplacePage({
           <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Button asChild className="sm:w-auto">
-          <Link href="/marketplace/new">
+          <Link href="/dashboard/sell">
             <Plus className="h-4 w-4" /> {t('createTitle')}
           </Link>
         </Button>

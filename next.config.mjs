@@ -23,6 +23,18 @@ const nextConfig = {
       { protocol: 'https', hostname: '**' },
     ],
   },
+  async redirects() {
+    // The old single-page "new listing" form is retired in favour of the guided
+    // wizard at /dashboard/sell (the one flow used everywhere else). Forward any
+    // old link/bookmark there with a clean server-side redirect, per locale.
+    return [
+      {
+        source: '/:locale/marketplace/new',
+        destination: '/:locale/dashboard/sell',
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     // Baseline security headers (Section 10). HSTS is set at the edge/CDN in prod.
     return [
