@@ -168,6 +168,37 @@ enum OrderStatus {
   PAYMENT_SENT // DORMANT — legacy escrow status, retained for the dormant MoMo/webhook path
 }
 
+enum ServiceRequestStatus {
+  REQUESTED // seeker asked for the service (agreed to terms); awaiting provider
+  CONFIRMED // provider accepted — go ahead
+  DECLINED // provider can't take it
+  COMPLETED // service delivered
+  CANCELLED // seeker withdrew the request
+}
+
+// A formal request for a SERVICE listing (the service-side counterpart of an
+// Order): the seeker requests + agrees to terms, the provider confirms/declines,
+// and both sides track status. Separate from Order — services have no upfront
+// manual-payment flow.
+model ServiceRequest {
+  id          String               @id @default(cuid())
+  listingId   String
+  listing     Listing              @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  requesterId String
+  requester   User                 @relation("ServiceRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  providerId  String
+  provider    User                 @relation("ServiceProvider", fields: [providerId], references: [id], onDelete: Cascade)
+  note        String?
+  status      ServiceRequestStatus @default(REQUESTED)
+  agreedTerms Boolean              @default(false) // the seeker accepted the terms at request time
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@index([requesterId])
+  @@index([providerId, status])
+  @@index([listingId])
+}
+
 // ─────────────────────────── Core ───────────────────────────
 
 model User {
@@ -231,6 +262,8 @@ model User {
   favorites           Favorite[]
   ordersBought        Order[]                   @relation("Buyer")
   ordersSold          Order[]                   @relation("Seller")
+  serviceRequestsMade     ServiceRequest[]      @relation("ServiceRequester")
+  serviceRequestsReceived ServiceRequest[]      @relation("ServiceProvider")
   listingViews        ListingView[]
   savedSearches       SavedSearch[]
 
@@ -322,6 +355,7 @@ model Listing {
   conversations Conversation[]
   favorites     Favorite[]
   orders        Order[]
+  serviceRequests ServiceRequest[]
   views         ListingView[]
 
   @@index([status, createdAt])

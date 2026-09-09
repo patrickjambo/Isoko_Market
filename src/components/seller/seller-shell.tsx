@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import {
   LayoutDashboard,
   Package,
+  ClipboardList,
   MessageCircle,
   Wallet,
   User,
@@ -61,6 +62,7 @@ export function SellerShell({
   const items: NavItem[] = [
     { href: '/dashboard', label: t('home'), icon: LayoutDashboard, exact: true },
     { href: '/dashboard/listings', label: t('myListings'), icon: Package },
+    { href: '/dashboard/requests', label: t('requests'), icon: ClipboardList },
     { href: '/messages', label: tn('messages'), icon: MessageCircle, badge: unread },
     { href: '/wallet', label: tn('wallet'), icon: Wallet },
     { href: '/profile', label: tn('profile'), icon: User },

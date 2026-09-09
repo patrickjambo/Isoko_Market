@@ -231,7 +231,30 @@
     "nearMe": "Près de moi",
     "getDirections": "Itinéraire",
     "deleteConfirmTitle": "Supprimer cette annonce ?",
-    "deleteConfirmBody": "Cela la supprime définitivement — les acheteurs ne la verront plus, et c'est irréversible."
+    "deleteConfirmBody": "Cela la supprime définitivement — les acheteurs ne la verront plus, et c'est irréversible.",
+    "requestServiceTitle": "Demander ce service",
+    "requestServiceBody": "Dites au prestataire ce dont vous avez besoin et acceptez les conditions. Il confirmera.",
+    "requestNoteLabel": "De quoi avez-vous besoin ? (facultatif)",
+    "requestNotePlaceholder": "Décrivez le service, quand et où…",
+    "agreeTerms": "J'accepte les",
+    "termsLink": "conditions générales",
+    "sendRequest": "Envoyer la demande",
+    "requestSent": "Demande envoyée",
+    "requestsTitle": "Demandes de service",
+    "requestsSubtitle": "Les demandes reçues en tant que prestataire, et celles envoyées.",
+    "incomingRequests": "Demandes reçues",
+    "outgoingRequests": "Vos demandes",
+    "noIncomingRequests": "Aucune demande pour le moment.",
+    "noOutgoingRequests": "Vous n'avez encore demandé aucun service.",
+    "confirmRequest": "Confirmer",
+    "declineRequest": "Refuser",
+    "markCompleted": "Terminé",
+    "cancelRequest": "Annuler",
+    "sr_REQUESTED": "En attente",
+    "sr_CONFIRMED": "Confirmé",
+    "sr_DECLINED": "Refusé",
+    "sr_COMPLETED": "Terminé",
+    "sr_CANCELLED": "Annulé"
   },
   "jobs": {
     "title": "Emplois & missions",
@@ -865,7 +888,8 @@
     "deleted": "Supprimé",
     "dashboard": "Tableau vendeur",
     "cardSales": "Ventes",
-    "salesSummary": "{completed} terminées · {pending} en cours"
+    "salesSummary": "{completed} terminées · {pending} en cours",
+    "requests": "Demandes"
   },
   "sell": {
     "title": "Vendre un article",

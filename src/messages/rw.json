@@ -231,7 +231,30 @@
     "nearMe": "Hafi yanjye",
     "getDirections": "Fata inzira",
     "deleteConfirmTitle": "Gusiba iki cyatangajwe?",
-    "deleteConfirmBody": "Iki kibikura burundu — abaguzi ntibazongera kukibona, kandi ntibisubirwaho."
+    "deleteConfirmBody": "Iki kibikura burundu — abaguzi ntibazongera kukibona, kandi ntibisubirwaho.",
+    "requestServiceTitle": "Saba iyi serivisi",
+    "requestServiceBody": "Bwira utanga serivisi icyo ukeneye kandi wemere amabwiriza. Azemeza akubwire.",
+    "requestNoteLabel": "Ni iki ukeneye? (si ngombwa)",
+    "requestNotePlaceholder": "Sobanura serivisi ukeneye, ryari, na aho…",
+    "agreeTerms": "Nemeye",
+    "termsLink": "amabwiriza n'amasezerano",
+    "sendRequest": "Ohereza ubusabe",
+    "requestSent": "Ubusabe bwoherejwe",
+    "requestsTitle": "Ubusabe bwa serivisi",
+    "requestsSubtitle": "Ubusabe wakiriye nk'utanga, n'ubwo wohereje.",
+    "incomingRequests": "Ubusabe bwawe",
+    "outgoingRequests": "Ubusabe wohereje",
+    "noIncomingRequests": "Nta busabe burahari.",
+    "noOutgoingRequests": "Ntabwo urasaba serivisi.",
+    "confirmRequest": "Emeza",
+    "declineRequest": "Anga",
+    "markCompleted": "Byarangiye",
+    "cancelRequest": "Kuraho ubusabe",
+    "sr_REQUESTED": "Bitegereje",
+    "sr_CONFIRMED": "Byemejwe",
+    "sr_DECLINED": "Byanzwe",
+    "sr_COMPLETED": "Byarangiye",
+    "sr_CANCELLED": "Byahagaritswe"
   },
   "jobs": {
     "title": "Akazi & Imirimo",
@@ -865,7 +888,8 @@
     "deleted": "Byasibwe",
     "dashboard": "Ikibaho cy'umucuruzi",
     "cardSales": "Ibyagurishijwe",
-    "salesSummary": "{completed} byarangiye · {pending} birimo gukorwa"
+    "salesSummary": "{completed} byarangiye · {pending} birimo gukorwa",
+    "requests": "Ubusabe"
   },
   "sell": {
     "title": "Gurisha ikintu",

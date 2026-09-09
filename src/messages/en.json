@@ -231,7 +231,30 @@
     "nearMe": "Near me",
     "getDirections": "Get directions",
     "deleteConfirmTitle": "Delete this listing?",
-    "deleteConfirmBody": "This permanently removes it — buyers will no longer see it, and this cannot be undone."
+    "deleteConfirmBody": "This permanently removes it — buyers will no longer see it, and this cannot be undone.",
+    "requestServiceTitle": "Request this service",
+    "requestServiceBody": "Tell the provider what you need and agree to the terms. They'll confirm and reach out.",
+    "requestNoteLabel": "What do you need? (optional)",
+    "requestNotePlaceholder": "Describe the service you need, when, and where…",
+    "agreeTerms": "I agree to the",
+    "termsLink": "terms & conditions",
+    "sendRequest": "Send request",
+    "requestSent": "Request sent",
+    "requestsTitle": "Service requests",
+    "requestsSubtitle": "Requests you received as a provider, and ones you sent.",
+    "incomingRequests": "Requests to you",
+    "outgoingRequests": "Your requests",
+    "noIncomingRequests": "No service requests yet.",
+    "noOutgoingRequests": "You haven't requested any services yet.",
+    "confirmRequest": "Confirm",
+    "declineRequest": "Decline",
+    "markCompleted": "Mark completed",
+    "cancelRequest": "Cancel request",
+    "sr_REQUESTED": "Pending",
+    "sr_CONFIRMED": "Confirmed",
+    "sr_DECLINED": "Declined",
+    "sr_COMPLETED": "Completed",
+    "sr_CANCELLED": "Cancelled"
   },
   "jobs": {
     "title": "Jobs & Gigs",
@@ -865,7 +888,8 @@
     "deleted": "Deleted",
     "dashboard": "Seller dashboard",
     "cardSales": "Sales",
-    "salesSummary": "{completed} completed · {pending} in progress"
+    "salesSummary": "{completed} completed · {pending} in progress",
+    "requests": "Requests"
   },
   "sell": {
     "title": "Sell an item",

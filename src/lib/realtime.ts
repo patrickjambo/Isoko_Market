@@ -22,7 +22,7 @@ export type RealtimeEvent =
   // manually `closed`).
   | {
       type: 'entity_update';
-      entity: 'listing' | 'job' | 'order';
+      entity: 'listing' | 'job' | 'order' | 'serviceRequest';
       id: string;
       status: string;
       reason?: string; // sold | filled | closed | reopened | cancelled | relisted |

@@ -11,6 +11,7 @@ import { ContactLinks } from '@/components/shared/contact-links';
 import { asContact } from '@/lib/contact';
 import { FavoriteButton } from '@/components/marketplace/favorite-button';
 import { BuyNowButton } from '@/components/orders/buy-now-button';
+import { RequestServiceButton } from '@/components/marketplace/request-service-button';
 import { ReportDialog } from '@/components/trust/report-dialog';
 import { ShareButton } from '@/components/shared/share-button';
 import { ListingOwnerActions } from '@/components/marketplace/listing-owner-actions';
@@ -60,7 +61,7 @@ export default async function ListingDetailPage({
     }
   }
 
-  const [ratingAgg, favCount, myFavorite, similar, priceCtx] = await Promise.all([
+  const [ratingAgg, favCount, myFavorite, similar, priceCtx, openRequest] = await Promise.all([
     prisma.review.aggregate({ where: { revieweeId: listing.seller.id }, _avg: { rating: true } }),
     prisma.favorite.count({ where: { listingId: listing.id } }),
     user
@@ -73,7 +74,19 @@ export default async function ListingDetailPage({
     listing.categoryId
       ? suggestPrice(listing.categoryId, listing.location)
       : Promise.resolve({ count: 0, min: null, max: null, median: null }),
+    // Has the viewer already got an open request for this service?
+    user && !isOwner && listing.kind === 'SERVICE'
+      ? prisma.serviceRequest.findFirst({
+          where: {
+            listingId: listing.id,
+            requesterId: user.id,
+            status: { in: ['REQUESTED', 'CONFIRMED'] },
+          },
+          select: { id: true },
+        })
+      : Promise.resolve(null),
   ]);
+  const hasOpenRequest = Boolean(openRequest);
 
   // Price context vs. similar items nearby (Section 4).
   let priceContext: 'below' | 'fair' | 'above' | null = null;
@@ -161,20 +174,29 @@ export default async function ListingDetailPage({
               />
             ) : (
               <>
-                {/* Products use the manual-payment order flow; a service is
-                    arranged by contacting the provider, so it leads with a
-                    prominent "Request this service" instead of Buy Now. */}
-                {listing.status === 'ACTIVE' && listing.kind !== 'SERVICE' && (
-                  <BuyNowButton
+                {/* Products use the manual-payment order flow; a service is a
+                    tracked request the provider confirms — so it leads with a
+                    formal "Request this service" (terms + confirm), not Buy Now. */}
+                {listing.status === 'ACTIVE' && listing.kind === 'SERVICE' ? (
+                  <RequestServiceButton
                     listingId={listing.id}
-                    price={listing.price}
-                    locale={params.locale}
+                    label={t('requestService')}
+                    alreadyRequested={hasOpenRequest}
                   />
+                ) : (
+                  listing.status === 'ACTIVE' &&
+                  listing.kind !== 'SERVICE' && (
+                    <BuyNowButton
+                      listingId={listing.id}
+                      price={listing.price}
+                      locale={params.locale}
+                    />
+                  )
                 )}
                 <MessageSellerButton
                   listingId={listing.id}
-                  label={listing.kind === 'SERVICE' ? t('requestService') : t('messageSeller')}
-                  variant={listing.kind === 'SERVICE' ? 'accent' : 'outline'}
+                  label={t('messageSeller')}
+                  variant="outline"
                 />
                 <FavoriteButton
                   listingId={listing.id}
