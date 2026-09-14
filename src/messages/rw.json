@@ -994,7 +994,10 @@
     "service5Title": "Ukorera he?",
     "service5Hint": "Aho uherereye cyangwa ukorera abakiriya, n'uko bakugeraho.",
     "service6Title": "Reba & tangaza",
-    "service6Hint": "Suzuma niba serivisi yawe imeze neza."
+    "service6Hint": "Suzuma niba serivisi yawe imeze neza.",
+    "resumeTitle": "Rangiza kwandika igicuruzwa",
+    "resumeContinue": "Komeza",
+    "resumeDiscard": "Siba"
   },
   "orders": {
     "title": "Amateka y'ubugure",

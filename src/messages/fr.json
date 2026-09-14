@@ -994,7 +994,10 @@
     "service5Title": "Où travaillez-vous ?",
     "service5Hint": "Où vous êtes basé ou servez les clients, et comment vous joindre.",
     "service6Title": "Vérifier & publier",
-    "service6Hint": "Vérifiez que votre service est correct."
+    "service6Hint": "Vérifiez que votre service est correct.",
+    "resumeTitle": "Terminez votre annonce",
+    "resumeContinue": "Continuer",
+    "resumeDiscard": "Supprimer"
   },
   "orders": {
     "title": "Commandes",

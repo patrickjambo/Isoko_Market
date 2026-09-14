@@ -17,6 +17,7 @@ import { ListingCard } from '@/components/marketplace/listing-card';
 import { JobCard } from '@/components/jobs/job-card';
 import { BuyerStrips } from '@/components/buyer/buyer-strips';
 import { WelcomeNudge } from '@/components/onboarding/welcome-nudge';
+import { ResumeDraft } from '@/components/seller/resume-draft';
 import { PollRefresh } from '@/components/shared/poll-refresh';
 import { CountUp } from '@/components/home/count-up';
 import { HeroSearch } from '@/components/home/hero-search';
@@ -77,6 +78,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
       {user && (
         <WelcomeNudge preferredRole={user.preferredRole} name={user.fullName.split(' ')[0]!} />
       )}
+
+      {/* Resume/discard an unfinished "Add Product" draft (self-hides if none). */}
+      {user && <ResumeDraft />}
 
       {/* Personalized buyer home for signed-in users (Section 2) */}
       {user && <BuyerStrips userId={user.id} location={user.location} locale={params.locale} />}

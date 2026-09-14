@@ -994,7 +994,10 @@
     "service5Title": "Where do you work?",
     "service5Hint": "Where you're based or serve clients, and how they reach you.",
     "service6Title": "Review & publish",
-    "service6Hint": "Check your service looks right."
+    "service6Hint": "Check your service looks right.",
+    "resumeTitle": "Finish your listing",
+    "resumeContinue": "Continue",
+    "resumeDiscard": "Discard"
   },
   "orders": {
     "title": "Orders",
