@@ -1072,10 +1072,11 @@
   },
   "buyer": {
     "activeOrders": "Commandes en cours",
-    "continueViewing": "Reprendre où vous en étiez",
+    "continueViewing": "Consultés récemment",
     "forYou": "Pour vous",
     "trendingNear": "Tendances près de vous",
-    "recommendedSellers": "Vendeurs recommandés"
+    "recommendedSellers": "Vendeurs recommandés",
+    "clearRecent": "Effacer"
   },
   "employer": {
     "dashboard": "Recrutement",

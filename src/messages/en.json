@@ -1072,10 +1072,11 @@
   },
   "buyer": {
     "activeOrders": "Active orders",
-    "continueViewing": "Continue where you left off",
+    "continueViewing": "Recently viewed",
     "forYou": "For you",
     "trendingNear": "Trending near you",
-    "recommendedSellers": "Recommended sellers"
+    "recommendedSellers": "Recommended sellers",
+    "clearRecent": "Clear"
   },
   "employer": {
     "dashboard": "Hiring",

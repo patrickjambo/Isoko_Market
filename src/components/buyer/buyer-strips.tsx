@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { StarRating } from '@/components/trust/star-rating';
 import { ListingCard } from '@/components/marketplace/listing-card';
+import { ClearRecentButton } from '@/components/buyer/clear-recent-button';
 import { OrderStatusBadge } from '@/components/orders/order-status';
 import { getBuyerHome, favoritedSet } from '@/lib/queries';
 import { formatRWF, initials } from '@/lib/utils';
@@ -78,10 +79,10 @@ export async function BuyerStrips({
         </section>
       )}
 
-      {/* Continue where you left off */}
+      {/* Recently viewed (auto browsing history) — clearable. */}
       {recentlyViewed.length > 0 && (
         <section>
-          <SectionHeader icon={Clock} title={t('continueViewing')} />
+          <SectionHeader icon={Clock} title={t('continueViewing')} action={<ClearRecentButton />} />
           <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
             {recentlyViewed.slice(0, 8).map((l) => (
               <div key={l.id} className="w-36 shrink-0">
@@ -161,21 +162,24 @@ function SectionHeader({
   icon: Icon,
   title,
   href,
+  action,
 }: {
   icon: typeof Clock;
   title: string;
   href?: string;
+  action?: React.ReactNode;
 }) {
   return (
     <div className="mb-3 flex items-center justify-between">
       <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight">
         <Icon className="h-5 w-5 text-primary" /> {title}
       </h2>
-      {href && (
-        <Link href={href} className="text-sm font-medium text-primary hover:underline">
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      )}
+      {action ??
+        (href && (
+          <Link href={href} className="text-sm font-medium text-primary hover:underline">
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        ))}
     </div>
   );
 }

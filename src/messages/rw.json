@@ -1072,10 +1072,11 @@
   },
   "buyer": {
     "activeOrders": "Ubugure bukora",
-    "continueViewing": "Komeza aho wari ugeze",
+    "continueViewing": "Ibyo waherukaga kureba",
     "forYou": "Ibyawe",
     "trendingNear": "Bikunzwe hafi yawe",
-    "recommendedSellers": "Abacuruzi bakwiye"
+    "recommendedSellers": "Abacuruzi bakwiye",
+    "clearRecent": "Siba"
   },
   "employer": {
     "dashboard": "Gushaka abakozi",
