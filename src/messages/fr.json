@@ -63,7 +63,8 @@
     "installIosStep1": "Appuyez sur le bouton Partager dans Safari",
     "installIosStep2": "Faites défiler et touchez « Sur l’écran d’accueil »",
     "installIosStep3": "Appuyez sur « Ajouter » — c’est fait",
-    "installIosSafariOnly": "Ouvrez d’abord Isoko dans Safari — l’iPhone ne l’autorise que depuis Safari."
+    "installIosSafariOnly": "Ouvrez d’abord Isoko dans Safari — l’iPhone ne l’autorise que depuis Safari.",
+    "detectingLocation": "Détection de votre position…"
   },
   "nav": {
     "home": "Accueil",

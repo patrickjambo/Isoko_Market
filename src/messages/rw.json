@@ -63,7 +63,8 @@
     "installIosStep1": "Kanda buto yo gusangira (Share) muri Safari",
     "installIosStep2": "Manuka uhitemo “Add to Home Screen”",
     "installIosStep3": "Kanda “Add” — Isoko iri ku Ahabanza",
-    "installIosSafariOnly": "Banza ufungure Isoko muri Safari — iPhone yemera ibi muri Safari gusa, ntabwo ari izindi."
+    "installIosSafariOnly": "Banza ufungure Isoko muri Safari — iPhone yemera ibi muri Safari gusa, ntabwo ari izindi.",
+    "detectingLocation": "Turimo kumenya aho uri…"
   },
   "nav": {
     "home": "Ahabanza",

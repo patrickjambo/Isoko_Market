@@ -1,12 +1,12 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Search, Loader2, MapPin } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { LocationButton, type GeoResult } from '@/components/shared/location-button';
-import { searchPlaces, type PlaceResult } from '@/lib/geolocation';
+import { searchPlaces, getAccuratePosition, reverseGeocode, type PlaceResult } from '@/lib/geolocation';
 
 // Map is client-only + lazy (Leaflet touches window, ~heavy) — loads only when a
 // location has been chosen.
@@ -32,19 +32,52 @@ export function LocationField({
   longitude,
   onChange,
   placeholder,
+  autoLocate = false,
 }: {
   location: string;
   latitude: number | null;
   longitude: number | null;
   onChange: (v: { location: string; latitude: number | null; longitude: number | null }) => void;
   placeholder?: string;
+  /** Attempt to capture the device's precise location on mount (posting flows),
+   *  so listings/jobs get exact coordinates for "near me" + an exact map pin. */
+  autoLocate?: boolean;
 }) {
   const t = useTranslations('common');
   const [results, setResults] = useState<PlaceResult[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [autoLocating, setAutoLocating] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  const autoTried = useRef(false);
   const hasPin = latitude != null && longitude != null;
+
+  // Auto-capture the device location once, when asked and none is set yet. The
+  // browser permission prompt is the consent; if denied/unavailable the manual
+  // search + pin remain, so nothing breaks — we just don't get exact coordinates.
+  useEffect(() => {
+    if (!autoLocate || autoTried.current || hasPin) return;
+    autoTried.current = true;
+    setAutoLocating(true);
+    (async () => {
+      try {
+        const fix = await getAccuratePosition();
+        const label = await reverseGeocode(fix.latitude, fix.longitude);
+        onChangeRef.current({
+          location: label ?? location,
+          latitude: fix.latitude,
+          longitude: fix.longitude,
+        });
+      } catch {
+        /* denied / unavailable — manual search + pin still work */
+      } finally {
+        setAutoLocating(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function onType(v: string) {
     // Keep coordinates until they actually pick a new place (or move the pin).
@@ -72,6 +105,12 @@ export function LocationField({
           onChange({ location: g.label ?? location, latitude: g.latitude, longitude: g.longitude })
         }
       />
+
+      {autoLocating && (
+        <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Loader2 className="h-3 w-3 animate-spin" /> {t('detectingLocation')}
+        </p>
+      )}
 
       {/* Single location box: type to search + pick; also reflects GPS and pin drags. */}
       <div className="relative">

@@ -291,6 +291,7 @@ export function CreateJobForm({
                 : null
             );
           }}
+          autoLocate={!jobId}
         />
       </Field>
 

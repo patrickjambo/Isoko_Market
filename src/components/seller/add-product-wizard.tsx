@@ -341,6 +341,7 @@ export function AddProductWizard({
               onChange={(g) =>
                 setData((d) => ({ ...d, location: g.location, latitude: g.latitude, longitude: g.longitude }))
               }
+              autoLocate
             />
           </div>
           <label className="flex items-center gap-2 text-sm font-medium">
