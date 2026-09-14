@@ -60,6 +60,13 @@ const schema = z.object({
   S3_PUBLIC_URL: z.string().optional().default(''), // e.g. https://cdn.isoko.market
 
   REALTIME_DRIVER: z.enum(['sse', 'pusher', 'ably']).default('sse'),
+
+  // Bootstrap platform staff by email (comma-separated). On login these emails are
+  // auto-provisioned as ADMIN — ADMIN_EMAILS → SUPER_ADMIN, MODERATOR_EMAILS →
+  // MODERATOR — so the first admins can get in without DB access. Existing admins'
+  // sub-roles are then managed in Admin → Roles (env only bootstraps).
+  ADMIN_EMAILS: z.string().optional().default(''),
+  MODERATOR_EMAILS: z.string().optional().default(''),
 }).superRefine((val, ctx) => {
   // Fail fast if an S3/R2 driver is selected without its required config —
   // otherwise public image URLs are built from an empty S3_PUBLIC_URL and silently

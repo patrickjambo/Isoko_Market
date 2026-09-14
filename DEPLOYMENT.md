@@ -93,6 +93,15 @@ Leave `EMAIL_PROVIDER=console` and codes print to the server log (dev only).
 | `CRON_SECRET` | secret Vercel Cron presents to `/api/cron/*` (falls back to `AUTH_SECRET`) |
 | `PAYMENTS_WEBHOOK_SECRET` | secret the payment webhook must present |
 | `ANTHROPIC_API_KEY` | optional — enables AI drafts; without it the rule-based fallback is used |
+| `ADMIN_EMAILS` | comma-separated emails auto-provisioned as **SUPER_ADMIN** on login (bootstrap the first admins) |
+| `MODERATOR_EMAILS` | comma-separated emails auto-provisioned as **MODERATOR** on login |
+
+> Staff bootstrap: put your own email in `ADMIN_EMAILS`, deploy, then log in
+> normally (email code or magic link) — you land in **/admin** as super-admin.
+> From there, manage everyone else's sub-roles in **Admin → Roles**. Env only
+> *promotes* on login; it never demotes and never overrides an existing admin's
+> sub-role, so it can't fight the UI or lock staff out. To revoke, change the
+> sub-role in Admin → Roles (and remove from the env list).
 
 ---
 

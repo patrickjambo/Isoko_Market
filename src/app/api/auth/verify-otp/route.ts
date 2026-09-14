@@ -7,6 +7,7 @@ import { createSession } from '@/lib/session';
 import { toSessionUser } from '@/lib/serialize';
 import { uniqueReferralCode, applyReferral } from '@/lib/referral';
 import { emitAdmin } from '@/lib/admin-realtime';
+import { ensureStaffRole } from '@/lib/staff';
 import { intentToRole, intentHome, landingFor } from '@/lib/onboarding';
 
 export const POST = route(async (req: NextRequest) => {
@@ -30,7 +31,7 @@ export const POST = route(async (req: NextRequest) => {
   // explicit role select, if any, wins (Visitor spec §8).
   const role = input.role ?? (input.intent ? intentToRole(input.intent) : 'BUYER');
 
-  const user =
+  let user =
     existing ??
     (await prisma.user.create({
       data: {
@@ -61,6 +62,10 @@ export const POST = route(async (req: NextRequest) => {
     }
     await emitAdmin('signup', `${user.fullName} joined`);
   }
+
+  // Bootstrap platform staff (ADMIN_EMAILS / MODERATOR_EMAILS) on login so the
+  // first admins can get in without DB access.
+  user = await ensureStaffRole(user);
 
   await createSession({ userId: user.id, role: user.role, v: user.sessionVersion });
 

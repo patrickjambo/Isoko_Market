@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { consumeOtpByToken } from '@/lib/otp-service';
 import { prisma } from '@/lib/prisma';
 import { writeSessionCookie } from '@/lib/session';
+import { ensureStaffRole } from '@/lib/staff';
 import { landingFor } from '@/lib/onboarding';
 import { rateLimit } from '@/lib/rate-limit';
 import { routing } from '@/i18n/routing';
@@ -41,8 +42,11 @@ export async function POST(req: NextRequest) {
     return to('/login?error=link');
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) return to('/get-started');
+  const found = await prisma.user.findUnique({ where: { email } });
+  if (!found) return to('/get-started');
+
+  // Bootstrap platform staff (ADMIN_EMAILS / MODERATOR_EMAILS) on login too.
+  const user = await ensureStaffRole(found);
 
   // Attach the session cookie to THIS redirect — a cookie set via next/headers
   // would be dropped on a response we build ourselves.
