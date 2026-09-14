@@ -4,6 +4,7 @@ import { generateOtp, generateLinkToken, hashOtp, verifyOtp } from './crypto';
 import { sendOtpEmail } from './email';
 import { ApiError } from './api';
 import { env } from './env';
+import { routing } from '@/i18n/routing';
 
 const OTP_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const MAX_VERIFY_ATTEMPTS = 5;
@@ -42,12 +43,13 @@ export async function issueOtp(
 
   let magicUrl: string | undefined;
   if (token) {
-    // → the /api/auth/magic handler (an API route, so no locale prefix); locale
-    // rides along so we can send the user to the right localized home after.
-    const url = new URL('/api/auth/magic', env.NEXT_PUBLIC_APP_URL);
+    // → a confirm PAGE (not the API), so a mail-scanner prefetch that GETs the
+    // link only renders a page and consumes nothing; a button-press POST does the
+    // actual login. Locale sits in the path (the page is localized).
+    const locale = opts?.locale ?? routing.defaultLocale;
+    const url = new URL(`/${locale}/magic-link`, env.NEXT_PUBLIC_APP_URL);
     url.searchParams.set('email', email);
     url.searchParams.set('token', token);
-    if (opts?.locale) url.searchParams.set('locale', opts.locale);
     magicUrl = url.toString();
   }
 

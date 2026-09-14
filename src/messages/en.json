@@ -165,7 +165,13 @@
     "termsNote": "By continuing you agree to our Terms and Privacy Policy.",
     "loggedOut": "You have been logged out.",
     "invitedNote": "You were invited by a friend 🎉",
-    "otpMagicHint": "Or just tap the link in that email — no code needed."
+    "otpMagicHint": "Or just tap the link in that email — no code needed.",
+    "magicTitle": "Log in to Isoko",
+    "magicSubtitle": "Tap the button below to finish signing in as {email}.",
+    "magicButton": "Log in",
+    "magicInvalidTitle": "Link incomplete",
+    "magicInvalidBody": "This login link is missing information. Request a new code to sign in.",
+    "backToLogin": "Back to login"
   },
   "marketplace": {
     "title": "Marketplace",

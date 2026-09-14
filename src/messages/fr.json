@@ -165,7 +165,13 @@
     "termsNote": "En continuant, vous acceptez nos Conditions et notre Politique de confidentialité.",
     "loggedOut": "Vous avez été déconnecté.",
     "invitedNote": "Vous avez été invité par un ami 🎉",
-    "otpMagicHint": "Ou touchez simplement le lien dans cet e-mail — aucun code requis."
+    "otpMagicHint": "Ou touchez simplement le lien dans cet e-mail — aucun code requis.",
+    "magicTitle": "Se connecter à Isoko",
+    "magicSubtitle": "Appuyez sur le bouton ci-dessous pour terminer la connexion en tant que {email}.",
+    "magicButton": "Se connecter",
+    "magicInvalidTitle": "Lien incomplet",
+    "magicInvalidBody": "Ce lien de connexion est incomplet. Demandez un nouveau code pour vous connecter.",
+    "backToLogin": "Retour à la connexion"
   },
   "marketplace": {
     "title": "Marché",

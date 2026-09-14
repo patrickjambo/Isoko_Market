@@ -165,7 +165,13 @@
     "termsNote": "Mu gukomeza wemeye Amabwiriza n'Itegeko ry'Ibanga.",
     "loggedOut": "Wasohotse neza.",
     "invitedNote": "Watumiwe n'inshuti 🎉",
-    "otpMagicHint": "Cyangwa kanda kuri link iri muri iyo email — nta kode ikenewe."
+    "otpMagicHint": "Cyangwa kanda kuri link iri muri iyo email — nta kode ikenewe.",
+    "magicTitle": "Injira kuri Isoko",
+    "magicSubtitle": "Kanda buto iri hasi kugira ngo urangize kwinjira nka {email}.",
+    "magicButton": "Injira",
+    "magicInvalidTitle": "Link ntiyuzuye",
+    "magicInvalidBody": "Iyi link yo kwinjira ibuze amakuru. Saba kode nshya kugira ngo winjire.",
+    "backToLogin": "Subira ku kwinjira"
   },
   "marketplace": {
     "title": "Isoko",
