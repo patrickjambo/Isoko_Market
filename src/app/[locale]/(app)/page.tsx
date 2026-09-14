@@ -86,7 +86,10 @@ export default async function HomePage({ params }: { params: { locale: string } 
       {user && <BuyerStrips userId={user.id} location={user.location} locale={params.locale} />}
 
       {/* Hero — full-bleed looping marketplace photo behind the headline, with a
-          brand scrim fading left→right so the copy stays readable over it. */}
+          brand scrim fading left→right so the copy stays readable over it. Shown
+          to GUESTS only: it's the marketing pitch to convert new visitors. Signed-
+          in users get their personalized home (BuyerStrips) above instead. */}
+      {!user && (
       <section className="relative isolate overflow-hidden text-white">
         {/* Full-bleed backdrop: real photos when we have them, else the brand
             gradient so a brand-new install still looks intentional. */}
@@ -152,6 +155,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
           </div>
         </div>
       </section>
+      )}
 
       {/* Category quick-links */}
       {topCategories.length > 0 && (
@@ -173,9 +177,10 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </section>
       )}
 
-      {/* Stats band — a professional counter strip. Omits any hollow zero and
-          the whole band if the platform is brand new. Numbers tick up live. */}
-      {(() => {
+      {/* Stats band — social proof for new visitors (guests only). Omits any
+          hollow zero and the whole band if the platform is brand new. */}
+      {!user &&
+        (() => {
         const items = [
           stats.users > 0 && { icon: Users, value: stats.users, label: t('statsReached') },
           stats.listings > 0 && { icon: Store, value: stats.listings, label: t('statsListings') },
@@ -211,7 +216,8 @@ export default async function HomePage({ params }: { params: { locale: string } 
         );
       })()}
 
-      {/* Pillars — "why choose us" */}
+      {/* Pillars — "why choose us" (guests only: it's a conversion pitch) */}
+      {!user && (
       <section className="container py-14">
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <Eyebrow>{t('pillarsEyebrow')}</Eyebrow>
@@ -236,6 +242,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
           })}
         </div>
       </section>
+      )}
 
       {/* Featured listings — live */}
       {listings.length > 0 && (
@@ -273,6 +280,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </section>
       )}
 
+      {/* How it works + closing CTA — conversion sections for guests only. */}
+      {!user && (
+      <>
       {/* How it works */}
       <section className="border-t border-border bg-secondary/30">
         <div className="container py-14">
@@ -322,6 +332,8 @@ export default async function HomePage({ params }: { params: { locale: string } 
           </div>
         </div>
       </section>
+      </>
+      )}
     </div>
   );
 }
