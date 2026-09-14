@@ -143,6 +143,38 @@ async function persistBytes(
   throw new Error(`Storage driver "${env.STORAGE_DRIVER}" not implemented.`);
 }
 
+/**
+ * Mint a presigned PUT URL so the BROWSER can upload the image binary DIRECTLY to
+ * S3/R2 — bypassing Vercel's 4.5 MB serverless body limit and function time (the
+ * app only ever stores the returned URL string). Returns null for drivers that
+ * don't support direct upload (local/blob), so the caller falls back to the
+ * server route. Signs only ContentType (client must send a matching header);
+ * short 5-minute TTL; authorized + rate-limited at the route.
+ *
+ * NOTE: the bucket needs a CORS policy allowing PUT from the app origin, else the
+ * browser PUT is blocked and the caller falls back gracefully.
+ */
+export async function presignUpload(
+  contentType: string,
+  isPrivate: boolean
+): Promise<{ uploadUrl: string; publicUrl: string; key: string } | null> {
+  if (!isS3()) return null;
+  if (!ALLOWED.has(contentType)) throw new Error('Unsupported file type.');
+  const ext = contentType.split('/')[1]?.replace('jpeg', 'jpg') ?? 'bin';
+  const key = `${isPrivate ? 'private' : 'public'}/${randomUUID()}.${ext}`;
+
+  const { PutObjectCommand } = await import('@aws-sdk/client-s3');
+  const { getSignedUrl: presign } = await import('@aws-sdk/s3-request-presigner');
+  const client = await s3Client();
+  const uploadUrl = await presign(
+    client,
+    new PutObjectCommand({ Bucket: env.S3_BUCKET, Key: key, ContentType: contentType }),
+    { expiresIn: 300 }
+  );
+  const publicUrl = isPrivate ? key : `${env.S3_PUBLIC_URL.replace(/\/$/, '')}/${key}`;
+  return { uploadUrl, publicUrl, key };
+}
+
 type FetchedImage = { type: string; bytes: Buffer; url: string };
 
 /**

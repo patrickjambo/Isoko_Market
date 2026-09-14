@@ -31,6 +31,44 @@ async function compressImage(file: File, maxSize = 1280, quality = 0.8): Promise
   );
 }
 
+/**
+ * Upload one compressed blob. Prefers a DIRECT browser→S3/R2 PUT (via a presigned
+ * URL) so large images bypass Vercel's 4.5 MB serverless body limit; falls back
+ * to streaming through /api/upload for the local/Blob drivers or if the direct
+ * PUT is blocked (e.g. bucket CORS not set). Either way we end with a stored URL.
+ */
+async function uploadBlob(blob: Blob, privateUpload: boolean): Promise<string> {
+  const contentType = blob.type || 'image/webp';
+
+  try {
+    const presRes = await fetch('/api/upload/presign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contentType, private: privateUpload }),
+    });
+    const pres = await presRes.json();
+    if (presRes.ok && pres.supported) {
+      const put = await fetch(pres.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': contentType },
+        body: blob,
+      });
+      if (put.ok) return pres.publicUrl as string;
+      // else: direct PUT blocked (CORS/policy) → fall through to the server route.
+    }
+  } catch {
+    // Presign unavailable → server route below.
+  }
+
+  const form = new FormData();
+  form.append('file', new File([blob], 'photo.webp', { type: contentType }));
+  if (privateUpload) form.append('private', 'true');
+  const res = await fetch('/api/upload', { method: 'POST', body: form });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message ?? 'upload failed');
+  return data.url as string;
+}
+
 export function ImageUploader({
   value,
   onChange,
@@ -58,13 +96,7 @@ export function ImageUploader({
       const uploaded: string[] = [];
       for (const file of toUpload) {
         const blob = await compressImage(file);
-        const form = new FormData();
-        form.append('file', new File([blob], 'photo.webp', { type: 'image/webp' }));
-        if (privateUpload) form.append('private', 'true');
-        const res = await fetch('/api/upload', { method: 'POST', body: form });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error?.message ?? 'upload failed');
-        uploaded.push(data.url);
+        uploaded.push(await uploadBlob(blob, privateUpload));
       }
       onChange([...value, ...uploaded]);
     } catch (err) {
