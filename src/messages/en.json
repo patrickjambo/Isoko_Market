@@ -171,7 +171,9 @@
     "magicButton": "Log in",
     "magicInvalidTitle": "Link incomplete",
     "magicInvalidBody": "This login link is missing information. Request a new code to sign in.",
-    "backToLogin": "Back to login"
+    "backToLogin": "Back to login",
+    "linkExpired": "That login link has expired or was already used. Request a new code below.",
+    "tooManyAttempts": "Too many attempts. Please wait a few minutes, then request a new code."
   },
   "marketplace": {
     "title": "Marketplace",

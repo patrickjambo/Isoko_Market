@@ -171,7 +171,9 @@
     "magicButton": "Se connecter",
     "magicInvalidTitle": "Lien incomplet",
     "magicInvalidBody": "Ce lien de connexion est incomplet. Demandez un nouveau code pour vous connecter.",
-    "backToLogin": "Retour à la connexion"
+    "backToLogin": "Retour à la connexion",
+    "linkExpired": "Ce lien de connexion a expiré ou a déjà été utilisé. Demandez un nouveau code ci-dessous.",
+    "tooManyAttempts": "Trop de tentatives. Patientez quelques minutes, puis demandez un nouveau code."
   },
   "marketplace": {
     "title": "Marché",

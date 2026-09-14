@@ -171,7 +171,9 @@
     "magicButton": "Injira",
     "magicInvalidTitle": "Link ntiyuzuye",
     "magicInvalidBody": "Iyi link yo kwinjira ibuze amakuru. Saba kode nshya kugira ngo winjire.",
-    "backToLogin": "Subira ku kwinjira"
+    "backToLogin": "Subira ku kwinjira",
+    "linkExpired": "Iyo link yo kwinjira yararengeje igihe cyangwa yamaze gukoreshwa. Saba kode nshya hepfo.",
+    "tooManyAttempts": "Wagerageje kenshi cyane. Tegereza iminota mike, hanyuma usabe kode nshya."
   },
   "marketplace": {
     "title": "Isoko",
