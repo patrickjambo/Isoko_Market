@@ -48,10 +48,20 @@ export async function createOrder(params: {
   const provider = listing.seller.paymentProvider ?? null;
   const hasPayout = Boolean(payoutNumber);
 
-  // Reserve the listing + create the order atomically, snapshotting the payout number.
-  const [, order] = await prisma.$transaction([
-    prisma.listing.update({ where: { id: listing.id }, data: { status: 'SOLD' } }),
-    prisma.order.create({
+  // Reserve the listing + create the order atomically, snapshotting the payout
+  // number. The status check above is advisory; the RESERVATION is the CONDITIONAL
+  // update inside the transaction — it only flips ACTIVE→SOLD and the DB row lock
+  // guarantees exactly one concurrent buyer wins. If two people tap Buy at once,
+  // the loser updates 0 rows and the whole transaction rolls back (no double-sell).
+  const order = await prisma.$transaction(async (tx) => {
+    const reserved = await tx.listing.updateMany({
+      where: { id: listing.id, status: 'ACTIVE' },
+      data: { status: 'SOLD' },
+    });
+    if (reserved.count !== 1) {
+      throw new ApiError('CONFLICT', 'This item is no longer available.');
+    }
+    return tx.order.create({
       data: {
         listingId: listing.id,
         buyerId: params.buyerId,
@@ -63,8 +73,8 @@ export async function createOrder(params: {
         deliveryMethod: params.deliveryMethod,
       },
       select: { id: true },
-    }),
-  ]);
+    });
+  });
 
   // Propagate to anyone viewing the listing (Section 10).
   publishTopic(`listing:${listing.id}`, { type: 'entity_update', entity: 'listing', id: listing.id, status: 'SOLD', reason: 'sold' });
