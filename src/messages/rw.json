@@ -121,7 +121,10 @@
     "statsListings": "Ibicuruzwa bihari",
     "statsHired": "Abahawe akazi",
     "ctaBandTitle": "Witeguye kugura, kugurisha cyangwa guhabwa akazi?",
-    "ctaBandBody": "Ifatanye n'ibihumbi by'Abanyarwanda bacuruza kandi bakora kuri Isoko buri munsi."
+    "ctaBandBody": "Ifatanye n'ibihumbi by'Abanyarwanda bacuruza kandi bakora kuri Isoko buri munsi.",
+    "showcaseTag": "Kuri Isoko",
+    "showcaseSale": "Kigurishwa",
+    "showcaseService": "Serivisi"
   },
   "auth": {
     "loginTitle": "Murakaza neza",

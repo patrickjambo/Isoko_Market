@@ -121,7 +121,10 @@
     "statsListings": "Active listings",
     "statsHired": "People hired",
     "ctaBandTitle": "Ready to buy, sell, or get hired?",
-    "ctaBandBody": "Join thousands of Rwandans trading and working on Isoko every day."
+    "ctaBandBody": "Join thousands of Rwandans trading and working on Isoko every day.",
+    "showcaseTag": "Live on Isoko",
+    "showcaseSale": "For sale",
+    "showcaseService": "Service"
   },
   "auth": {
     "loginTitle": "Welcome back",

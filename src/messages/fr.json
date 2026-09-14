@@ -121,7 +121,10 @@
     "statsListings": "Annonces actives",
     "statsHired": "Personnes recrutées",
     "ctaBandTitle": "Prêt à acheter, vendre ou être recruté ?",
-    "ctaBandBody": "Rejoignez des milliers de Rwandais qui échangent et travaillent sur Isoko chaque jour."
+    "ctaBandBody": "Rejoignez des milliers de Rwandais qui échangent et travaillent sur Isoko chaque jour.",
+    "showcaseTag": "En direct sur Isoko",
+    "showcaseSale": "À vendre",
+    "showcaseService": "Service"
   },
   "auth": {
     "loginTitle": "Bon retour",

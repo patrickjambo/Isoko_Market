@@ -174,4 +174,18 @@
     @apply border border-border bg-card;
     background-image: linear-gradient(180deg, hsl(0 0% 100% / 0.6), transparent 40%);
   }
+  /* Slow "Ken Burns" zoom for the looping hero showcase — gives still photos a
+     gentle video-like motion. Disabled under prefers-reduced-motion (base). */
+  .animate-kenburns {
+    animation: kenburns 7s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
 }

@@ -20,6 +20,7 @@ import { WelcomeNudge } from '@/components/onboarding/welcome-nudge';
 import { PollRefresh } from '@/components/shared/poll-refresh';
 import { CountUp } from '@/components/home/count-up';
 import { HeroSearch } from '@/components/home/hero-search';
+import { HeroShowcase, type HeroSlide } from '@/components/home/hero-showcase';
 import { LiveBadge } from '@/components/home/live-badge';
 import {
   getFeaturedListings,
@@ -52,6 +53,18 @@ export default async function HomePage({ params }: { params: { locale: string } 
   ];
 
   const topCategories = categories.filter((c) => c.kind === 'PRODUCT').slice(0, 8);
+
+  // Hero showcase — a looping frame of REAL marketplace photos (our own live
+  // content), mixing products and services so it shows the platform in action.
+  const heroSlides: HeroSlide[] = [...listings, ...services]
+    .filter((l) => l.images[0]?.url)
+    .slice(0, 6)
+    .map((l) => ({
+      src: l.images[0]!.url,
+      title: l.title,
+      label: l.kind === 'SERVICE' ? t('showcaseService') : t('showcaseSale'),
+      href: `/marketplace/${l.id}`,
+    }));
 
   return (
     <div>
@@ -126,29 +139,35 @@ export default async function HomePage({ params }: { params: { locale: string } 
             </div>
           </div>
           <div className="relative hidden md:block">
-            {/* A composed trust cluster instead of one lonely card — a glass
-                trust panel over a grid of the platform's pillars, so the hero
+            {/* A looping showcase of real marketplace photos when we have them;
+                otherwise a composed trust cluster so a brand-new install still
                 reads designed and full rather than empty. */}
-            <div className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-white/5 blur-2xl" />
-            <div className="relative space-y-4">
-              <TrustPanel title={t('trustTitle')} body={t('trustBody')} />
-              <div className="grid grid-cols-2 gap-3">
-                {pillars.map((p) => {
-                  const Icon = p.icon;
-                  return (
-                    <div
-                      key={p.title}
-                      className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-3 py-3 backdrop-blur transition-colors hover:bg-white/15"
-                    >
+            {heroSlides.length > 0 ? (
+              <HeroShowcase slides={heroSlides} />
+            ) : (
+              <>
+                <div className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-white/5 blur-2xl" />
+                <div className="relative space-y-4">
+                  <TrustPanel title={t('trustTitle')} body={t('trustBody')} />
+                  <div className="grid grid-cols-2 gap-3">
+                    {pillars.map((p) => {
+                      const Icon = p.icon;
+                      return (
+                        <div
+                          key={p.title}
+                          className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-3 py-3 backdrop-blur transition-colors hover:bg-white/15"
+                        >
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-accent">
                         <Icon className="h-4 w-4" />
                       </span>
-                      <span className="text-sm font-medium leading-tight">{p.title}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+                          <span className="text-sm font-medium leading-tight">{p.title}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
