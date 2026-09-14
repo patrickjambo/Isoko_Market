@@ -3,6 +3,7 @@ import { consumeOtpByToken } from '@/lib/otp-service';
 import { prisma } from '@/lib/prisma';
 import { writeSessionCookie } from '@/lib/session';
 import { landingFor } from '@/lib/onboarding';
+import { rateLimit } from '@/lib/rate-limit';
 import { routing } from '@/i18n/routing';
 import { env } from '@/lib/env';
 
@@ -26,6 +27,13 @@ export async function POST(req: NextRequest) {
   // 303 → the browser turns this form POST into a GET on the target.
   const to = (path: string) =>
     NextResponse.redirect(new URL(`/${locale}${path}`, env.NEXT_PUBLIC_APP_URL), 303);
+
+  // Per-IP flood protection (the token is high-entropy, so this guards the DB
+  // against request storms, not brute force).
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';
+  if (!rateLimit(`magic:ip:${ip}`, 20, 10 * 60 * 1000).success) {
+    return to('/login?error=rate');
+  }
 
   try {
     await consumeOtpByToken(email, token, 'login');

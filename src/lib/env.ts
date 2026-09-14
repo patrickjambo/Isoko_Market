@@ -60,6 +60,21 @@ const schema = z.object({
   S3_PUBLIC_URL: z.string().optional().default(''), // e.g. https://cdn.isoko.market
 
   REALTIME_DRIVER: z.enum(['sse', 'pusher', 'ably']).default('sse'),
+}).superRefine((val, ctx) => {
+  // Fail fast if an S3/R2 driver is selected without its required config —
+  // otherwise public image URLs are built from an empty S3_PUBLIC_URL and silently
+  // saved as broken relative paths.
+  if (val.STORAGE_DRIVER === 's3' || val.STORAGE_DRIVER === 'r2') {
+    for (const key of ['S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'S3_PUBLIC_URL'] as const) {
+      if (!val[key]) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [key],
+          message: `${key} is required when STORAGE_DRIVER=${val.STORAGE_DRIVER}`,
+        });
+      }
+    }
+  }
 });
 
 // Values pasted into a hosting dashboard often carry stray whitespace or a
