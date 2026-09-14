@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { LogIn } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
+import { MagicAutoSubmit } from '@/components/auth/magic-auto-submit';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,9 +44,11 @@ export default async function MagicLinkPage({
         <h1 className="text-2xl font-bold tracking-tight">{t('magicTitle')}</h1>
         <p className="text-sm text-muted-foreground">{t('magicSubtitle', { email })}</p>
       </div>
-      {/* Native form POST — works without JS; the button press is what consumes
-          the token (a prefetch GET of this page does not). */}
-      <form method="POST" action="/api/auth/magic">
+      {/* Native form POST — works without JS; the submit is what consumes the
+          token (a prefetch GET of this page does not). MagicAutoSubmit fires it on
+          load so the emailed button is effectively one-click; scanners don't run
+          JS, so they never auto-submit. */}
+      <form id="magic-form" method="POST" action="/api/auth/magic">
         <input type="hidden" name="email" value={email} />
         <input type="hidden" name="token" value={token} />
         <input type="hidden" name="locale" value={params.locale} />
@@ -53,6 +56,7 @@ export default async function MagicLinkPage({
           <LogIn className="h-5 w-5" /> {t('magicButton')}
         </Button>
       </form>
+      <MagicAutoSubmit formId="magic-form" />
     </div>
   );
 }
