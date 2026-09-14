@@ -10,7 +10,7 @@ import { KindTabs } from '@/components/marketplace/kind-tabs';
 import { SpecFilters } from '@/components/marketplace/spec-filters';
 import { NearMeButton } from '@/components/marketplace/near-me-button';
 import { ViewToggle } from '@/components/marketplace/view-toggle';
-import { MapView } from '@/components/marketplace/map-view';
+import { MarketMap } from '@/components/marketplace/market-map';
 import { SearchBar } from '@/components/nav/search-bar';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -20,7 +20,6 @@ import {
   searchListings,
   getCategories,
   favoritedSet,
-  getDistrictCounts,
   getCategorySpecFacets,
 } from '@/lib/queries';
 import { getCurrentUser } from '@/lib/auth';
@@ -40,7 +39,6 @@ export default async function MarketplacePage({
 
   const filter = listingFilterSchema.parse(searchParams);
   const view = searchParams.view === 'list' ? 'list' : searchParams.view === 'map' ? 'map' : 'grid';
-  const districtCounts = view === 'map' ? await getDistrictCounts() : {};
   // Spec facets are category-scoped — only fetch them once a (product) category
   // is chosen, so a car's features never mix with a phone's.
   const showSpecFacets = Boolean(filter.categoryId) && searchParams.kind !== 'SERVICE';
@@ -126,11 +124,22 @@ export default async function MarketplacePage({
 
       {view === 'map' && (
         <div className="mb-6">
-          <MapView counts={districtCounts} params={searchParams} />
+          <MarketMap
+            markers={items
+              .filter((i) => i.latitude != null && i.longitude != null)
+              .map((i) => ({
+                id: i.id,
+                title: i.title,
+                price: i.price,
+                lat: i.latitude as number,
+                lng: i.longitude as number,
+              }))}
+            locale={params.locale}
+          />
         </div>
       )}
 
-      {view === 'map' && !searchParams.location ? null : items.length === 0 ? (
+      {items.length === 0 ? (
         // No dead-end (Section 3): point back to categories/all instead of blank.
         <EmptyState
           icon={PackageSearch}

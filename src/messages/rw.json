@@ -284,7 +284,9 @@
     "sr_DECLINED": "Byanzwe",
     "sr_COMPLETED": "Byarangiye",
     "sr_CANCELLED": "Byahagaritswe",
-    "eyebrow": "Kugura · Kugurisha · Serivisi"
+    "eyebrow": "Kugura · Kugurisha · Serivisi",
+    "mapNoPins": "Nta bicuruzwa bifite aho biherereye byo kwerekana hano — gerageza urutonde cyangwa wagure ishakisha.",
+    "mapPinHint": "Kanda ku kadomo urebe igicuruzwa."
   },
   "jobs": {
     "title": "Akazi & Imirimo",

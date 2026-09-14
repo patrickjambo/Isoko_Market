@@ -284,7 +284,9 @@
     "sr_DECLINED": "Refusé",
     "sr_COMPLETED": "Terminé",
     "sr_CANCELLED": "Annulé",
-    "eyebrow": "Acheter · Vendre · Services"
+    "eyebrow": "Acheter · Vendre · Services",
+    "mapNoPins": "Aucune annonce géolocalisée à afficher — essayez la grille ou élargissez la recherche.",
+    "mapPinHint": "Touchez un repère pour ouvrir l’annonce."
   },
   "jobs": {
     "title": "Emplois & missions",

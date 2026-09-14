@@ -3,30 +3,8 @@ import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import type { Prisma } from '@prisma/client';
 import { prisma } from './prisma';
-import { RWANDA_DISTRICT_POS } from './rwanda';
 import type { ListingFilter } from './validators/listing';
 import type { JobFilter } from './validators/job';
-
-/** Active-listing counts per district, for the schematic map view (Section 3). */
-export async function getDistrictCounts(): Promise<Record<string, number>> {
-  const rows = await prisma.listing.groupBy({
-    by: ['location'],
-    where: { status: 'ACTIVE' },
-    _count: true,
-  });
-  const counts: Record<string, number> = {};
-  for (const { name } of RWANDA_DISTRICT_POS) counts[name] = 0;
-  for (const r of rows) {
-    const loc = r.location.toLowerCase();
-    for (const { name } of RWANDA_DISTRICT_POS) {
-      if (loc.includes(name.toLowerCase())) {
-        counts[name] = (counts[name] ?? 0) + r._count;
-        break;
-      }
-    }
-  }
-  return counts;
-}
 
 const PAGE_SIZE = 12;
 
