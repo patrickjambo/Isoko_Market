@@ -1,8 +1,10 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { redirect } from '@/i18n/routing';
+import { ClipboardList } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { PollRefresh } from '@/components/shared/poll-refresh';
+import { PageHeader } from '@/components/shared/page-header';
 import {
   ServiceRequestList,
   type ServiceRequestItem,
@@ -65,8 +67,11 @@ export default async function RequestsPage({ params }: { params: { locale: strin
     <div className="container max-w-2xl py-6">
       {/* Confirmations/declines land on their own, no manual reload. */}
       <PollRefresh intervalMs={10000} />
-      <h1 className="mb-1 text-2xl font-bold tracking-tight">{t('requestsTitle')}</h1>
-      <p className="mb-6 text-sm text-muted-foreground">{t('requestsSubtitle')}</p>
+      <PageHeader
+        icon={ClipboardList}
+        title={t('requestsTitle')}
+        subtitle={t('requestsSubtitle')}
+      />
       <ServiceRequestList incoming={incoming} outgoing={outgoing} locale={params.locale} />
     </div>
   );

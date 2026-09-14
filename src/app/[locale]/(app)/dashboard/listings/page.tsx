@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PageHeader } from '@/components/shared/page-header';
 import { SellerListingActions } from '@/components/seller/seller-listing-actions';
 import { requireWorkspace } from '@/lib/workspace-guard';
 import { prisma } from '@/lib/prisma';
@@ -38,14 +39,17 @@ export default async function MyListingsPage({ params }: { params: { locale: str
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold tracking-tight">{t('myListings')}</h1>
-        <Button asChild variant="accent" size="sm">
-          <Link href="/dashboard/sell">
-            <Plus className="h-4 w-4" /> {t('sell')}
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        icon={Package}
+        title={t('myListings')}
+        action={
+          <Button asChild variant="accent" size="sm">
+            <Link href="/dashboard/sell">
+              <Plus className="h-4 w-4" /> {t('sell')}
+            </Link>
+          </Button>
+        }
+      />
 
       {listings.length === 0 ? (
         <EmptyState

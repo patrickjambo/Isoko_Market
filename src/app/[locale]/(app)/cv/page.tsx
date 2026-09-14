@@ -1,9 +1,11 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { redirect } from '@/i18n/routing';
+import { FileText } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { cvDataSchema, type CvData } from '@/lib/validators/cv';
 import { CvChoice } from '@/components/cv/cv-choice';
+import { PageHeader } from '@/components/shared/page-header';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,8 +29,7 @@ export default async function CvPage({ params }: { params: { locale: string } })
 
   return (
     <div className="container max-w-5xl py-6">
-      <h1 className="text-2xl font-bold tracking-tight">{t('cvAndDocsTitle')}</h1>
-      <p className="mb-6 text-sm text-muted-foreground">{t('cvAndDocsSubtitle')}</p>
+      <PageHeader icon={FileText} title={t('cvAndDocsTitle')} subtitle={t('cvAndDocsSubtitle')} />
       <CvChoice
         initial={initial}
         fullName={user.fullName}
