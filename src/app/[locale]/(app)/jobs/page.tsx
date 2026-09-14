@@ -7,6 +7,7 @@ import { JobFilters } from '@/components/jobs/job-filters';
 import { JobFilterDialog } from '@/components/jobs/job-filter-dialog';
 import { SaveSearchButton } from '@/components/jobs/save-search-button';
 import { SeekerHome } from '@/components/jobs/seeker-home';
+import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Pagination } from '@/components/shared/pagination';
 import { jobFilterSchema } from '@/lib/validators/job';
@@ -37,17 +38,19 @@ export default async function JobsPage({
 
   return (
     <div className="container py-6">
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
-          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
-        </div>
-        <Button asChild variant="accent">
-          <Link href="/jobs/new">
-            <Plus className="h-4 w-4" /> {t('createTitle')}
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        icon={Briefcase}
+        eyebrow={t('eyebrow')}
+        title={t('title')}
+        subtitle={t('subtitle')}
+        action={
+          <Button asChild variant="accent">
+            <Link href="/jobs/new">
+              <Plus className="h-4 w-4" /> {t('createTitle')}
+            </Link>
+          </Button>
+        }
+      />
 
       {/* Personalized job-seeker home for signed-in users (§2). */}
       {user && <SeekerHome userId={user.id} location={user.location} />}

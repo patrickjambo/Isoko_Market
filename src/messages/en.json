@@ -265,7 +265,8 @@
     "sr_CONFIRMED": "Confirmed",
     "sr_DECLINED": "Declined",
     "sr_COMPLETED": "Completed",
-    "sr_CANCELLED": "Cancelled"
+    "sr_CANCELLED": "Cancelled",
+    "eyebrow": "Buy · Sell · Services"
   },
   "jobs": {
     "title": "Jobs & Gigs",
@@ -370,7 +371,8 @@
     "docMissing": "not uploaded",
     "uploadMissingDocs": "Upload missing documents",
     "editTitle": "Edit job",
-    "editSubtitle": "Update the details, requirements or documents. Changes are saved to this posting."
+    "editSubtitle": "Update the details, requirements or documents. Changes are saved to this posting.",
+    "eyebrow": "Hire · Get hired"
   },
   "cv": {
     "title": "CV builder",

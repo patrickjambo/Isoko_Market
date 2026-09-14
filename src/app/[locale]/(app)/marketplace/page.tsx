@@ -12,6 +12,7 @@ import { NearMeButton } from '@/components/marketplace/near-me-button';
 import { ViewToggle } from '@/components/marketplace/view-toggle';
 import { MapView } from '@/components/marketplace/map-view';
 import { SearchBar } from '@/components/nav/search-bar';
+import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Pagination } from '@/components/shared/pagination';
 import { listingFilterSchema } from '@/lib/validators/listing';
@@ -61,17 +62,19 @@ export default async function MarketplacePage({
 
   return (
     <div className="container py-6">
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
-          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
-        </div>
-        <Button asChild className="sm:w-auto">
-          <Link href="/dashboard/sell">
-            <Plus className="h-4 w-4" /> {t('createTitle')}
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        icon={PackageSearch}
+        eyebrow={t('eyebrow')}
+        title={t('title')}
+        subtitle={t('subtitle')}
+        action={
+          <Button asChild className="sm:w-auto">
+            <Link href="/dashboard/sell">
+              <Plus className="h-4 w-4" /> {t('createTitle')}
+            </Link>
+          </Button>
+        }
+      />
 
       {/* Search is reachable directly on the feed (Section 8.2) */}
       <div className="mb-4">

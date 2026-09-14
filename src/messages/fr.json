@@ -265,7 +265,8 @@
     "sr_CONFIRMED": "Confirmé",
     "sr_DECLINED": "Refusé",
     "sr_COMPLETED": "Terminé",
-    "sr_CANCELLED": "Annulé"
+    "sr_CANCELLED": "Annulé",
+    "eyebrow": "Acheter · Vendre · Services"
   },
   "jobs": {
     "title": "Emplois & missions",
@@ -370,7 +371,8 @@
     "docMissing": "non téléversé",
     "uploadMissingDocs": "Téléverser les documents manquants",
     "editTitle": "Modifier l’offre",
-    "editSubtitle": "Mettez à jour les détails, exigences ou documents. Les modifications sont enregistrées."
+    "editSubtitle": "Mettez à jour les détails, exigences ou documents. Les modifications sont enregistrées.",
+    "eyebrow": "Recruter · Être recruté"
   },
   "cv": {
     "title": "Créateur de CV",
