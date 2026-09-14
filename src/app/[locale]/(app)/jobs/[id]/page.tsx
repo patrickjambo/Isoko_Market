@@ -180,13 +180,13 @@ export default async function JobDetailPage({
             </div>
           )}
 
-          <div className="whitespace-pre-wrap rounded-xl border border-border bg-card p-4 text-sm leading-relaxed">
+          <div className="whitespace-pre-wrap rounded-xl border border-border bg-card p-4 shadow-sm text-sm leading-relaxed">
             {job.description}
           </div>
 
           {/* Who qualifies — the employer's stated requirements. */}
           {job.requirements && (
-            <div className="mt-3 rounded-xl border border-border bg-card p-4">
+            <div className="mt-3 rounded-xl border border-border bg-card p-4 shadow-sm">
               <h2 className="mb-2 text-sm font-semibold">{t('requirementsTitle')}</h2>
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
                 {job.requirements}
@@ -196,7 +196,7 @@ export default async function JobDetailPage({
 
           {/* Documents an applicant must provide. */}
           {job.requiredDocuments.length > 0 && (
-            <div className="mt-3 rounded-xl border border-border bg-card p-4">
+            <div className="mt-3 rounded-xl border border-border bg-card p-4 shadow-sm">
               <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold">
                 <FileText className="h-4 w-4 text-primary" /> {t('requiredDocsTitle')}
               </h2>

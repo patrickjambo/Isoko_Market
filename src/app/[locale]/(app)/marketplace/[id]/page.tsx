@@ -229,7 +229,7 @@ export default async function ListingDetailPage({
             </div>
           )}
 
-          <div className="whitespace-pre-wrap rounded-xl border border-border bg-card p-4 text-sm leading-relaxed">
+          <div className="whitespace-pre-wrap rounded-xl border border-border bg-card p-4 shadow-sm text-sm leading-relaxed">
             {listing.description}
           </div>
 
@@ -243,7 +243,7 @@ export default async function ListingDetailPage({
               : [];
             if (specs.length === 0) return null;
             return (
-              <div className="rounded-xl border border-border bg-card p-4">
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
                 <h2 className="mb-3 text-sm font-semibold">{t('specifications')}</h2>
                 <dl className="divide-y divide-border/60 text-sm">
                   {specs.map((s, i) => (
