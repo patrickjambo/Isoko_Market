@@ -97,7 +97,12 @@ export function MarketMap({ markers, locale }: { markers: MapMarker[]; locale: s
 
   return (
     <div>
-      <div ref={el} className="h-[420px] w-full overflow-hidden rounded-xl border border-border" />
+      {/* `isolate` traps Leaflet's high z-index controls (~800) inside this
+          stacking context so they can't cover modals/dialogs opened over the map. */}
+      <div
+        ref={el}
+        className="isolate h-[420px] w-full overflow-hidden rounded-xl border border-border"
+      />
       <p className="mt-2 text-center text-xs text-muted-foreground">
         {markers.length === 0 ? t('mapNoPins') : t('mapPinHint')}
       </p>

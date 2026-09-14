@@ -24,6 +24,7 @@ import {
 } from '@/lib/queries';
 import { getCurrentUser } from '@/lib/auth';
 import { categoryName } from '@/lib/i18n-helpers';
+import { districtCentroid } from '@/lib/rwanda';
 
 export const dynamic = 'force-dynamic';
 
@@ -126,14 +127,18 @@ export default async function MarketplacePage({
         <div className="mb-6">
           <MarketMap
             markers={items
-              .filter((i) => i.latitude != null && i.longitude != null)
-              .map((i) => ({
-                id: i.id,
-                title: i.title,
-                price: i.price,
-                lat: i.latitude as number,
-                lng: i.longitude as number,
-              }))}
+              .map((i) => {
+                // Precise pin if the listing has one; otherwise fall back to its
+                // district centroid so text-located listings still appear.
+                const c =
+                  i.latitude != null && i.longitude != null
+                    ? { lat: i.latitude, lng: i.longitude }
+                    : districtCentroid(i.location);
+                return c
+                  ? { id: i.id, title: i.title, price: i.price, lat: c.lat, lng: c.lng }
+                  : null;
+              })
+              .filter((m): m is NonNullable<typeof m> => m !== null)}
             locale={params.locale}
           />
         </div>
