@@ -3,6 +3,7 @@ import type { NotificationType, Prisma } from '@prisma/client';
 import { prisma } from './prisma';
 import { publish, isOnline } from './realtime';
 import { sendNotificationEmail } from './email';
+import { background } from './background';
 
 // High-signal notifications worth an email when the user is offline.
 const EMAIL_FALLBACK_TYPES: NotificationType[] = [
@@ -52,9 +53,11 @@ export async function notify(params: {
     },
   });
 
-  // Email fallback for offline users (best-effort, never blocks the caller).
+  // Email fallback for offline users — runs AFTER the response so it never blocks
+  // the caller, but via waitUntil so it actually completes on serverless (a bare
+  // un-awaited promise would be killed when the function returns).
   if (!isOnline(params.userId) && EMAIL_FALLBACK_TYPES.includes(params.type)) {
-    void sendEmailFallback(params.userId, params.title, params.body);
+    background(() => sendEmailFallback(params.userId, params.title, params.body));
   }
 
   return notification;
