@@ -40,12 +40,24 @@ const schema = z.object({
   PAYMENTS_PROVIDER: z.enum(['mock', 'mtn_momo', 'airtel_money']).default('mock'),
 
   // `local` writes to /public/uploads (dev only — a serverless host has no
-  // persistent disk). `vercel_blob` stores objects in Vercel Blob (prod). r2/s3
-  // are reserved for a future S3-compatible driver.
+  // persistent disk). `vercel_blob` stores objects in Vercel Blob (prod). `r2`
+  // (Cloudflare) and `s3` (AWS/DigitalOcean Spaces/any S3-compatible) share one
+  // SDK — see the S3_* vars below.
   STORAGE_DRIVER: z.enum(['local', 'vercel_blob', 'r2', 's3']).default('local'),
   // Auto-injected by Vercel when Blob is enabled; set locally to exercise the
   // blob driver against a real store. Empty otherwise.
   BLOB_READ_WRITE_TOKEN: z.string().optional().default(''),
+
+  // S3-compatible object storage (STORAGE_DRIVER=s3|r2). Public product images are
+  // served from S3_PUBLIC_URL (a CDN/bucket domain) as stable, cacheable URLs;
+  // private docs (IDs/CVs) are stored by key and read via short-lived signed URLs.
+  // For Cloudflare R2: S3_REGION=auto, S3_ENDPOINT=https://<account>.r2.cloudflarestorage.com.
+  S3_ENDPOINT: z.string().optional().default(''), // blank = AWS default endpoint
+  S3_REGION: z.string().optional().default('auto'),
+  S3_BUCKET: z.string().optional().default(''),
+  S3_ACCESS_KEY_ID: z.string().optional().default(''),
+  S3_SECRET_ACCESS_KEY: z.string().optional().default(''),
+  S3_PUBLIC_URL: z.string().optional().default(''), // e.g. https://cdn.isoko.market
 
   REALTIME_DRIVER: z.enum(['sse', 'pusher', 'ably']).default('sse'),
 });

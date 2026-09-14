@@ -19,6 +19,25 @@ const UPLOAD_ROOT = path.join(process.cwd(), 'public', 'uploads');
 
 export type SaveResult = { url: string; key: string };
 
+/** AWS S3 and Cloudflare R2 share the S3 API — one code path serves both. */
+const isS3 = () => env.STORAGE_DRIVER === 's3' || env.STORAGE_DRIVER === 'r2';
+
+let _s3Client: import('@aws-sdk/client-s3').S3Client | null = null;
+async function s3Client() {
+  if (_s3Client) return _s3Client;
+  const { S3Client } = await import('@aws-sdk/client-s3');
+  _s3Client = new S3Client({
+    region: env.S3_REGION || 'auto',
+    // Custom endpoint = R2 / Spaces / MinIO, which need path-style addressing.
+    ...(env.S3_ENDPOINT ? { endpoint: env.S3_ENDPOINT, forcePathStyle: true } : {}),
+    credentials: {
+      accessKeyId: env.S3_ACCESS_KEY_ID,
+      secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+    },
+  });
+  return _s3Client;
+}
+
 const ALLOWED = new Set([
   'image/jpeg',
   'image/png',
@@ -101,9 +120,26 @@ async function persistBytes(
     return { url: blob.url, key: blob.url };
   }
 
-  // TODO(prod): PutObject to S3/R2 here and return the object key. Public files
-  // get a CDN URL; private files are returned as keys and resolved with
-  // getSignedUrl() below.
+  if (isS3()) {
+    const { PutObjectCommand } = await import('@aws-sdk/client-s3');
+    const client = await s3Client();
+    await client.send(
+      new PutObjectCommand({
+        Bucket: env.S3_BUCKET,
+        Key: key,
+        Body: bytes,
+        ContentType: type,
+        // Public product images are immutable + long-cached at the CDN; private
+        // docs are never cached publicly (served via short-lived signed URLs).
+        ...(isPrivate ? {} : { CacheControl: 'public, max-age=31536000, immutable' }),
+      })
+    );
+    // Public → a stable, CDN-served URL. Private → just the key, resolved later
+    // via a signed URL / streamed by getFileBytes (never a public URL).
+    const url = isPrivate ? key : `${env.S3_PUBLIC_URL.replace(/\/$/, '')}/${key}`;
+    return { url, key };
+  }
+
   throw new Error(`Storage driver "${env.STORAGE_DRIVER}" not implemented.`);
 }
 
@@ -284,14 +320,24 @@ export async function saveFileFromUrl(rawUrl: string, opts: { private?: boolean 
 }
 
 /**
- * Resolve a private object key to a viewable URL. In production this returns a
- * short-lived signed URL; in local dev the file is already under /public.
+ * Resolve a private object key to a viewable URL. On S3/R2 this returns a
+ * short-lived (5-min) signed GET URL; in local dev the file is already under
+ * /public. (Currently private docs are streamed via getFileBytes through a gated
+ * route; this is the signed-URL alternative for direct client access.)
  */
-export function getSignedUrl(key: string): string {
+export async function getSignedUrl(key: string): Promise<string> {
   // Vercel Blob stores the full CDN URL as the key — already viewable.
   if (env.STORAGE_DRIVER === 'vercel_blob') return key;
   if (env.STORAGE_DRIVER === 'local') return `/uploads/${key}`;
-  // TODO(prod): return S3/R2 presigned GET URL with a short TTL.
+  if (isS3()) {
+    if (/^https?:\/\//.test(key)) return key; // already a full URL
+    const { GetObjectCommand } = await import('@aws-sdk/client-s3');
+    const { getSignedUrl: presign } = await import('@aws-sdk/s3-request-presigner');
+    const client = await s3Client();
+    return presign(client, new GetObjectCommand({ Bucket: env.S3_BUCKET, Key: key }), {
+      expiresIn: 300,
+    });
+  }
   return `/uploads/${key}`;
 }
 
@@ -306,6 +352,13 @@ export async function getFileBytes(key: string): Promise<Buffer> {
     const res = await fetch(key);
     if (!res.ok) throw new Error('File not found.');
     return Buffer.from(await res.arrayBuffer());
+  }
+  if (isS3()) {
+    const { GetObjectCommand } = await import('@aws-sdk/client-s3');
+    const client = await s3Client();
+    const res = await client.send(new GetObjectCommand({ Bucket: env.S3_BUCKET, Key: key }));
+    if (!res.Body) throw new Error('File not found.');
+    return Buffer.from(await res.Body.transformToByteArray());
   }
   return readFile(path.join(UPLOAD_ROOT, key));
 }
