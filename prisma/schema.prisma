@@ -278,6 +278,10 @@ model OtpCode {
   id        String   @id @default(cuid())
   email     String // OTP is now delivered by email (was phone)
   codeHash  String // OTP is hashed — never stored or logged in plaintext (Section 10)
+  // Hash of the one-tap magic-link token emailed alongside the code (high-entropy,
+  // single-use). Lets a user log in by tapping the email link instead of copying
+  // the 6-digit code. Null for older rows.
+  linkTokenHash String?
   purpose   String   @default("login") // login | verify_email
   attempts  Int      @default(0)
   expiresAt DateTime

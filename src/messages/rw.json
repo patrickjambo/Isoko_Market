@@ -164,7 +164,8 @@
     "loginNoAccount": "Nta konti ifite iyo imeri — reka tugufashe kwiyandikisha.",
     "termsNote": "Mu gukomeza wemeye Amabwiriza n'Itegeko ry'Ibanga.",
     "loggedOut": "Wasohotse neza.",
-    "invitedNote": "Watumiwe n'inshuti 🎉"
+    "invitedNote": "Watumiwe n'inshuti 🎉",
+    "otpMagicHint": "Cyangwa kanda kuri link iri muri iyo email — nta kode ikenewe."
   },
   "marketplace": {
     "title": "Isoko",

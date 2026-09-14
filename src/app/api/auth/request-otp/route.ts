@@ -8,7 +8,7 @@ import { env } from '@/lib/env';
 
 export const POST = route(async (req: NextRequest) => {
   const body = await req.json().catch(() => ({}));
-  const { email, mode } = requestOtpSchema.parse(body);
+  const { email, mode, locale } = requestOtpSchema.parse(body);
 
   // Login authenticates EXISTING accounts only — don't create one (or waste a
   // code) for an unknown email; the client redirects these to Get Started so a
@@ -28,7 +28,9 @@ export const POST = route(async (req: NextRequest) => {
     throw new ApiError('RATE_LIMITED', 'Too many attempts. Please wait a few minutes.');
   }
 
-  const code = await issueOtp(email, 'login');
+  // Only login gets the one-tap magic link (registration needs code entry so the
+  // sign-up form data is present when the code is verified).
+  const code = await issueOtp(email, 'login', { locale, magicLink: mode === 'login' });
 
   // In development we surface the fact that the code is in the console; never
   // return the code itself — EXCEPT under the E2E test flag (never production),

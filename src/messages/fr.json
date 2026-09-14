@@ -164,7 +164,8 @@
     "loginNoAccount": "Aucun compte avec cet e-mail — créons-en un.",
     "termsNote": "En continuant, vous acceptez nos Conditions et notre Politique de confidentialité.",
     "loggedOut": "Vous avez été déconnecté.",
-    "invitedNote": "Vous avez été invité par un ami 🎉"
+    "invitedNote": "Vous avez été invité par un ami 🎉",
+    "otpMagicHint": "Ou touchez simplement le lien dans cet e-mail — aucun code requis."
   },
   "marketplace": {
     "title": "Marché",

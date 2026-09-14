@@ -63,7 +63,7 @@ export function AuthForm({
       const res = await fetch('/api/auth/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, mode }),
+        body: JSON.stringify({ email, mode, locale }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -218,6 +218,9 @@ export function AuthForm({
               autoFocus
             />
           </div>
+          {mode === 'login' && (
+            <p className="text-center text-xs text-muted-foreground">{t('otpMagicHint')}</p>
+          )}
           {devHint && (
             <p className="rounded-md bg-secondary px-3 py-2 text-xs text-muted-foreground">
               {t('devCodeHint')}

@@ -80,12 +80,14 @@ export const email: EmailProvider =
       : consoleProvider;
 
 /** One-time login/registration code (5-minute TTL, single-use — see otp-service). */
-export async function sendOtpEmail(to: string, code: string): Promise<void> {
-  await email.send(
-    to,
-    'Your Isoko Market verification code',
-    `Your Isoko Market code is ${code}. It expires in 5 minutes.\n\nIf you didn't request this, you can ignore this email.`
-  );
+export async function sendOtpEmail(to: string, code: string, magicUrl?: string): Promise<void> {
+  const lines = [
+    `Your Isoko Market code is ${code}. It expires in 5 minutes.`,
+    ...(magicUrl ? ['', 'Or just tap this link to log in — no code needed:', magicUrl] : []),
+    '',
+    "If you didn't request this, you can ignore this email.",
+  ];
+  await email.send(to, 'Your Isoko Market verification code', lines.join('\n'));
 }
 
 /** Best-effort transactional notification (order updates, etc.). */

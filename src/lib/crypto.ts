@@ -1,4 +1,13 @@
-import { createHash, randomInt, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
+
+/**
+ * A high-entropy, URL-safe token for one-tap magic-link login. Unlike the 6-digit
+ * code it is unguessable, so it can safely travel in an email link. Hashed (via
+ * {@link hashOtp}) before storage, single-use, and short-lived like the code.
+ */
+export function generateLinkToken(): string {
+  return randomBytes(32).toString('base64url');
+}
 
 /**
  * OTP hashing. OTPs are never stored or logged in plaintext (Section 10).

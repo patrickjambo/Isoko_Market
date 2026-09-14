@@ -23,6 +23,8 @@ const authModeSchema = z.enum(['login', 'register']).optional().default('registe
 export const requestOtpSchema = z.object({
   email: emailSchema,
   mode: authModeSchema,
+  // Carried into the magic link so the post-login redirect uses the right locale.
+  locale: z.enum(['rw', 'en', 'fr']).optional(),
 });
 
 export const verifyOtpSchema = z.object({

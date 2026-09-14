@@ -71,6 +71,7 @@ const ERROR_TRANSLATIONS: Record<string, LocalizedError> = {
   "No recipient for this conversation.": { rw: "Nta uwakira iki kiganiro.", fr: "Aucun destinataire pour cette conversation." },
   "Payment failed. Please try again.": { rw: "Kwishyura byanze. Ongera ugerageze.", fr: "Le paiement a échoué. Réessayez." },
   "That code is incorrect or has expired.": { rw: "Iyo kode ntiyo cyangwa yararengeje igihe.", fr: "Ce code est incorrect ou a expiré." },
+  "This link is invalid or has expired.": { rw: "Iyi link ntiyo cyangwa yararengeje igihe.", fr: "Ce lien est invalide ou a expiré." },
   "Upload failed.": { rw: "Kohereza byanze.", fr: "Le téléversement a échoué." },
   "Unsupported file type.": { rw: "Ubwoko bw'idosiye ntibwemewe.", fr: "Type de fichier non pris en charge." },
   "File is too large (max 8 MB).": { rw: "Idosiye iraremereye cyane (ntarengwa 8 MB).", fr: "Fichier trop volumineux (max 8 Mo)." },
