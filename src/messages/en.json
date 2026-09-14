@@ -57,7 +57,13 @@
     "installIosBefore": "To install Isoko, tap",
     "installIosMiddle": "then",
     "installIosAdd": "Add to Home Screen",
-    "installIosAfter": "."
+    "installIosAfter": ".",
+    "installIosHow": "How to install",
+    "installIosTitle": "Add Isoko to your Home Screen",
+    "installIosStep1": "Tap the Share button in the Safari toolbar",
+    "installIosStep2": "Scroll down and tap “Add to Home Screen”",
+    "installIosStep3": "Tap “Add” — Isoko is now on your home screen",
+    "installIosSafariOnly": "Open Isoko in Safari first — iPhone only allows this from Safari, not other browsers."
   },
   "nav": {
     "home": "Home",

@@ -57,7 +57,13 @@
     "installIosBefore": "Pour installer Isoko, appuyez sur",
     "installIosMiddle": "puis",
     "installIosAdd": "Sur l’écran d’accueil",
-    "installIosAfter": "."
+    "installIosAfter": ".",
+    "installIosHow": "Voir comment",
+    "installIosTitle": "Ajouter Isoko à l’écran d’accueil",
+    "installIosStep1": "Appuyez sur le bouton Partager dans Safari",
+    "installIosStep2": "Faites défiler et touchez « Sur l’écran d’accueil »",
+    "installIosStep3": "Appuyez sur « Ajouter » — c’est fait",
+    "installIosSafariOnly": "Ouvrez d’abord Isoko dans Safari — l’iPhone ne l’autorise que depuis Safari."
   },
   "nav": {
     "home": "Accueil",

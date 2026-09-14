@@ -57,7 +57,13 @@
     "installIosBefore": "Kugira ngo winjize Isoko, kanda",
     "installIosMiddle": "hanyuma uhitemo",
     "installIosAdd": "Shyira ku Ahabanza (Add to Home Screen)",
-    "installIosAfter": "."
+    "installIosAfter": ".",
+    "installIosHow": "Reba uko byakorwa",
+    "installIosTitle": "Shyira Isoko ku Ahabanza",
+    "installIosStep1": "Kanda buto yo gusangira (Share) muri Safari",
+    "installIosStep2": "Manuka uhitemo “Add to Home Screen”",
+    "installIosStep3": "Kanda “Add” — Isoko iri ku Ahabanza",
+    "installIosSafariOnly": "Banza ufungure Isoko muri Safari — iPhone yemera ibi muri Safari gusa, ntabwo ari izindi."
   },
   "nav": {
     "home": "Ahabanza",
