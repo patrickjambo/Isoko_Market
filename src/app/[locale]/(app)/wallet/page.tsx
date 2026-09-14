@@ -4,6 +4,7 @@ import type { TransactionType, TransactionStatus } from '@prisma/client';
 import { redirect } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PageHeader } from '@/components/shared/page-header';
 import { TopUpDialog } from '@/components/wallet/topup-dialog';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -35,7 +36,7 @@ export default async function WalletPage({ params }: { params: { locale: string 
 
   return (
     <div className="container max-w-2xl py-6">
-      <h1 className="mb-4 text-2xl font-bold tracking-tight">{t('title')}</h1>
+      <PageHeader icon={Wallet} title={t('title')} subtitle={t('headerSubtitle')} />
 
       <div className="brand-gradient mb-6 flex items-center justify-between rounded-2xl p-6 text-white">
         <div>

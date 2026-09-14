@@ -554,7 +554,8 @@
     "REVIEW_RECEIVED": "Igitekerezo gishya",
     "PAYMENT": "Ihinduka ku kwishyura",
     "SYSTEM": "Itangazo",
-    "FAVORITE": "Igicuruzwa cyabitswe"
+    "FAVORITE": "Igicuruzwa cyabitswe",
+    "headerSubtitle": "Amakuru ku byo waguze, akazi, n'ubutumwa"
   },
   "profile": {
     "title": "Umwirondoro",
@@ -589,7 +590,8 @@
     "paymentSectionHint": "Abaguzi bohereza amafaranga kuri iyi nimero. Birakenewe mbere y'uko 'Gura' ikora ku bicuruzwa byawe.",
     "paymentNumberLabel": "Nimero yo kwishyurirwaho",
     "paymentProviderLabel": "Uwatanga serivisi",
-    "locationSavedHint": "Bibitswe rimwe, byuzuza aho uri iyo utangaza kandi bikoreshwa muri \"hafi yanjye\"."
+    "locationSavedHint": "Bibitswe rimwe, byuzuza aho uri iyo utangaza kandi bikoreshwa muri \"hafi yanjye\".",
+    "applicationsSubtitle": "Akazi wasabye, n'aho bigeze"
   },
   "verification": {
     "title": "Wemezwe",
@@ -636,7 +638,8 @@
       "SUCCESS": "Byagenze neza",
       "FAILED": "Byanze",
       "REFUNDED": "Byasubijwe"
-    }
+    },
+    "headerSubtitle": "Amafaranga usanganywe n'ibikorwa biheruka"
   },
   "admin": {
     "title": "Imbonerahamwe y'ubuyobozi",
@@ -1051,13 +1054,15 @@
     "sellerNoPayment": "Umucuruzi ntiyashyizeho uburyo bwo kwishyurwa",
     "awaitingPayoutBuyer": "Turategereje ko umucuruzi atanga nimero yo kwishyuraho — twamumenyesheje. Uzabasha kwishyura akimara kuyongeraho.",
     "awaitingPayoutSeller": "Umuguzi arashaka iki kintu! Ongeraho nimero yawe ya MoMo/Airtel kugira ngo ashobore kukwishyura.",
-    "addPayoutCta": "Ongeraho nimero yo kwishyuraho"
+    "addPayoutCta": "Ongeraho nimero yo kwishyuraho",
+    "headerSubtitle": "Kurikirana ibyo waguze n'ibyo wagurishije"
   },
   "saved": {
     "title": "Ibyabitswe",
     "empty": "Nta byabitswe biraba.",
     "emptyHint": "Kanda ku mutima ku gicuruzwa kugira ngo ukibike hano.",
-    "browse": "Reba ibicuruzwa"
+    "browse": "Reba ibicuruzwa",
+    "headerSubtitle": "Ibintu wabitse kugira ngo ubirebe nyuma"
   },
   "buyer": {
     "activeOrders": "Ubugure bukora",

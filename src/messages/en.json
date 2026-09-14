@@ -554,7 +554,8 @@
     "REVIEW_RECEIVED": "New review",
     "PAYMENT": "Payment update",
     "SYSTEM": "Announcement",
-    "FAVORITE": "Listing saved"
+    "FAVORITE": "Listing saved",
+    "headerSubtitle": "Updates on your orders, jobs, and messages"
   },
   "profile": {
     "title": "Profile",
@@ -589,7 +590,8 @@
     "paymentSectionHint": "Buyers send money to this number. Required before Buy Now works on your listings.",
     "paymentNumberLabel": "Payment number",
     "paymentProviderLabel": "Provider",
-    "locationSavedHint": "Saved once, this fills your location when you post and powers \"near me\"."
+    "locationSavedHint": "Saved once, this fills your location when you post and powers \"near me\".",
+    "applicationsSubtitle": "Jobs you've applied to, and where they stand"
   },
   "verification": {
     "title": "Get verified",
@@ -636,7 +638,8 @@
       "SUCCESS": "Successful",
       "FAILED": "Failed",
       "REFUNDED": "Refunded"
-    }
+    },
+    "headerSubtitle": "Your balance and recent transactions"
   },
   "admin": {
     "title": "Admin dashboard",
@@ -1051,13 +1054,15 @@
     "sellerNoPayment": "Seller hasn't set up payments",
     "awaitingPayoutBuyer": "Waiting for the seller to share their payment number — we've notified them. You'll be able to pay once they add it.",
     "awaitingPayoutSeller": "A buyer wants this item! Add your MoMo/Airtel number so they can pay you.",
-    "addPayoutCta": "Add payment number"
+    "addPayoutCta": "Add payment number",
+    "headerSubtitle": "Track what you've bought and sold"
   },
   "saved": {
     "title": "Saved",
     "empty": "No saved items yet.",
     "emptyHint": "Tap the heart on any listing to save it here.",
-    "browse": "Browse listings"
+    "browse": "Browse listings",
+    "headerSubtitle": "Items you've saved for later"
   },
   "buyer": {
     "activeOrders": "Active orders",

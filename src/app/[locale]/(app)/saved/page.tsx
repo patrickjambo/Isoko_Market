@@ -4,6 +4,7 @@ import { Link, redirect } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { ListingCard } from '@/components/marketplace/listing-card';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PageHeader } from '@/components/shared/page-header';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
@@ -39,7 +40,7 @@ export default async function SavedPage({ params }: { params: { locale: string }
 
   return (
     <div className="container max-w-4xl py-6">
-      <h1 className="mb-4 text-2xl font-bold tracking-tight">{t('title')}</h1>
+      <PageHeader icon={Heart} title={t('title')} subtitle={t('headerSubtitle')} />
 
       {favorites.length === 0 ? (
         <EmptyState

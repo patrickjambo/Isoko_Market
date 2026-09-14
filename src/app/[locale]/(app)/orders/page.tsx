@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Package, ImageOff, ShoppingBag, Store } from 'lucide-react';
 import { Link, redirect } from '@/i18n/routing';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PageHeader } from '@/components/shared/page-header';
 import { PollRefresh } from '@/components/shared/poll-refresh';
 import { OrderStatusBadge } from '@/components/orders/order-status';
 import { getCurrentUser } from '@/lib/auth';
@@ -25,7 +26,7 @@ export default async function OrdersPage({ params }: { params: { locale: string 
   return (
     <div className="container max-w-2xl py-6">
       <PollRefresh />
-      <h1 className="mb-4 text-2xl font-bold tracking-tight">{t('title')}</h1>
+      <PageHeader icon={ShoppingBag} title={t('title')} subtitle={t('headerSubtitle')} />
 
       {orders.length === 0 ? (
         <EmptyState

@@ -5,6 +5,7 @@ import type { ApplicationStatus } from '@prisma/client';
 import { Link, redirect } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PageHeader } from '@/components/shared/page-header';
 import { LiveApplications } from '@/components/jobs/live-applications';
 import { WithdrawApplicationButton } from '@/components/jobs/withdraw-application-button';
 import { getCurrentUser } from '@/lib/auth';
@@ -58,7 +59,7 @@ export default async function MyApplicationsPage({ params }: { params: { locale:
     <div className="container max-w-2xl py-6">
       {/* Live status updates land the moment an employer acts (Part 8 / DoD #5). */}
       <LiveApplications />
-      <h1 className="mb-4 text-2xl font-bold tracking-tight">{t('myApplications')}</h1>
+      <PageHeader icon={Send} title={t('myApplications')} subtitle={t('applicationsSubtitle')} />
 
       {applications.length === 0 ? (
         <EmptyState icon={FileText} title={t('myApplications')} description={t('noApplicationsHint')} />

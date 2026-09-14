@@ -554,7 +554,8 @@
     "REVIEW_RECEIVED": "Nouvel avis",
     "PAYMENT": "Mise à jour de paiement",
     "SYSTEM": "Annonce",
-    "FAVORITE": "Annonce enregistrée"
+    "FAVORITE": "Annonce enregistrée",
+    "headerSubtitle": "Nouvelles sur vos commandes, emplois et messages"
   },
   "profile": {
     "title": "Profil",
@@ -589,7 +590,8 @@
     "paymentSectionHint": "Les acheteurs envoient l'argent à ce numéro. Requis avant que « Acheter » fonctionne sur vos annonces.",
     "paymentNumberLabel": "Numéro de paiement",
     "paymentProviderLabel": "Opérateur",
-    "locationSavedHint": "Enregistrée une fois, elle remplit votre lieu lors des publications et alimente « près de moi »."
+    "locationSavedHint": "Enregistrée une fois, elle remplit votre lieu lors des publications et alimente « près de moi ».",
+    "applicationsSubtitle": "Les offres auxquelles vous avez postulé, et leur statut"
   },
   "verification": {
     "title": "Se faire vérifier",
@@ -636,7 +638,8 @@
       "SUCCESS": "Réussi",
       "FAILED": "Échoué",
       "REFUNDED": "Remboursé"
-    }
+    },
+    "headerSubtitle": "Votre solde et vos transactions récentes"
   },
   "admin": {
     "title": "Tableau de bord admin",
@@ -1051,13 +1054,15 @@
     "sellerNoPayment": "Le vendeur n'a pas configuré les paiements",
     "awaitingPayoutBuyer": "En attente que le vendeur communique son numéro de paiement — nous l'avons prévenu. Vous pourrez payer dès qu'il l'ajoute.",
     "awaitingPayoutSeller": "Un acheteur veut cet article ! Ajoutez votre numéro MoMo/Airtel pour qu'il puisse vous payer.",
-    "addPayoutCta": "Ajouter un numéro de paiement"
+    "addPayoutCta": "Ajouter un numéro de paiement",
+    "headerSubtitle": "Suivez vos achats et vos ventes"
   },
   "saved": {
     "title": "Enregistrés",
     "empty": "Aucun élément enregistré.",
     "emptyHint": "Touchez le cœur sur une annonce pour l'enregistrer ici.",
-    "browse": "Parcourir les annonces"
+    "browse": "Parcourir les annonces",
+    "headerSubtitle": "Les articles que vous avez enregistrés"
   },
   "buyer": {
     "activeOrders": "Commandes en cours",

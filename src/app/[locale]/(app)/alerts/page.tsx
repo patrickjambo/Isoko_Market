@@ -3,6 +3,7 @@ import { BellRing, Plus } from 'lucide-react';
 import { Link, redirect } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PageHeader } from '@/components/shared/page-header';
 import { PollRefresh } from '@/components/shared/poll-refresh';
 import { AlertList } from '@/components/marketplace/alert-list';
 import { getCurrentUser } from '@/lib/auth';
@@ -63,17 +64,18 @@ export default async function AlertsPage({ params }: { params: { locale: string 
     <div className="container max-w-2xl py-6">
       {/* Deletions and new alerts reflect live. */}
       <PollRefresh intervalMs={15000} />
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{t('alertsTitle')}</h1>
-          <p className="text-sm text-muted-foreground">{t('alertsSubtitle')}</p>
-        </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/marketplace">
-            <Plus className="h-4 w-4" /> {t('title')}
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        icon={BellRing}
+        title={t('alertsTitle')}
+        subtitle={t('alertsSubtitle')}
+        action={
+          <Button asChild variant="outline" size="sm">
+            <Link href="/marketplace">
+              <Plus className="h-4 w-4" /> {t('title')}
+            </Link>
+          </Button>
+        }
+      />
 
       {rows.length === 0 ? (
         <EmptyState icon={BellRing} title={t('alertsEmpty')} />
