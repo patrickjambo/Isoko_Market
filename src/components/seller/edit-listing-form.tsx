@@ -156,11 +156,15 @@ export function EditListingForm({
 
       <div className="space-y-1.5">
         <Label>{t('locationLabel')}</Label>
+        {/* Backfill precise coordinates for older, coordless listings — the
+            hasPin guard means this only fires when none are set (never overwrites
+            an existing pin), and it stays editable via search/pin. */}
         <LocationField
           location={d.location}
           latitude={d.latitude}
           longitude={d.longitude}
           onChange={(g) => set({ location: g.location, latitude: g.latitude, longitude: g.longitude })}
+          autoLocate
         />
       </div>
 
