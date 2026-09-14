@@ -179,19 +179,18 @@
   .animate-kenburns {
     animation: kenburns 7s ease-in-out infinite alternate;
   }
-  /* Hero legibility scrim over the full-bleed photo: solid deep-teal on the left
-     (where the copy sits) easing to clear on the right (so the photo shows), plus
-     a soft bottom darken for the corner overlays and mobile. */
+  /* Hero legibility scrim over the full-bleed photo: deep-teal only on the LEFT
+     where the copy sits, then fully CLEAR by ~65% so the photo shows in true,
+     bright colour on the right (no green/muddy wash over the whole image). */
   .hero-scrim {
-    background-image:
-      linear-gradient(
-        90deg,
-        hsl(178 84% 14% / 0.97) 0%,
-        hsl(177 82% 19% / 0.9) 32%,
-        hsl(176 80% 24% / 0.55) 60%,
-        hsl(176 78% 28% / 0.15) 100%
-      ),
-      linear-gradient(0deg, hsl(185 50% 7% / 0.5), transparent 42%);
+    background-image: linear-gradient(
+      90deg,
+      hsl(178 82% 13% / 0.92) 0%,
+      hsl(177 78% 18% / 0.72) 26%,
+      hsl(176 74% 24% / 0.34) 46%,
+      hsl(176 70% 28% / 0.08) 60%,
+      transparent 72%
+    );
   }
 }
 

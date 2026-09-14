@@ -91,8 +91,11 @@ export default async function HomePage({ params }: { params: { locale: string } 
         ) : (
           <div className="brand-gradient absolute inset-0 z-0" />
         )}
-        {/* Legibility scrim (solid brand on the left → clear on the right) */}
-        <div className="hero-scrim pointer-events-none absolute inset-0 z-10" />
+        {/* Legibility scrim. Desktop: solid brand on the left → fully clear on the
+            right so the photo stays bright and visible. Mobile: a gentle overall
+            darken since the copy spans the full width over the photo. */}
+        <div className="hero-scrim pointer-events-none absolute inset-0 z-10 hidden md:block" />
+        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/45 to-black/30 md:hidden" />
 
         <div className="container relative z-20 flex items-center py-16 md:min-h-[34rem] md:py-24">
           <div className="max-w-xl space-y-6">
