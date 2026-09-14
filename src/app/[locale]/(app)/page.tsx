@@ -81,16 +81,21 @@ export default async function HomePage({ params }: { params: { locale: string } 
       {/* Personalized buyer home for signed-in users (Section 2) */}
       {user && <BuyerStrips userId={user.id} location={user.location} locale={params.locale} />}
 
-      {/* Hero */}
-      <section className="relative overflow-hidden brand-gradient text-white">
-        {/* Layered depth: mesh spotlights + a faint engineered grid + soft glows */}
-        <div className="brand-mesh pointer-events-none absolute inset-0" />
-        <div className="hero-grid pointer-events-none absolute inset-0 opacity-70" />
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+      {/* Hero — full-bleed looping marketplace photo behind the headline, with a
+          brand scrim fading left→right so the copy stays readable over it. */}
+      <section className="relative isolate overflow-hidden text-white">
+        {/* Full-bleed backdrop: real photos when we have them, else the brand
+            gradient so a brand-new install still looks intentional. */}
+        {heroSlides.length > 0 ? (
+          <HeroShowcase slides={heroSlides} />
+        ) : (
+          <div className="brand-gradient absolute inset-0 z-0" />
+        )}
+        {/* Legibility scrim (solid brand on the left → clear on the right) */}
+        <div className="hero-scrim pointer-events-none absolute inset-0 z-10" />
 
-        <div className="container relative grid gap-10 py-14 md:grid-cols-2 md:items-center md:py-20">
-          <div className="space-y-6">
+        <div className="container relative z-20 flex items-center py-16 md:min-h-[34rem] md:py-24">
+          <div className="max-w-xl space-y-6">
             {stats.newToday > 0 && (
               <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium backdrop-blur">
                 <Sparkles className="h-4 w-4 text-accent" />
@@ -103,7 +108,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
               </div>
             )}
 
-            <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl">
+            <h1 className="text-3xl font-extrabold leading-tight tracking-tight drop-shadow-sm sm:text-4xl md:text-5xl">
               {t('heroTitle')}
             </h1>
             <p className="max-w-xl text-base text-white/90 sm:text-lg">{t('heroSubtitle')}</p>
@@ -137,37 +142,6 @@ export default async function HomePage({ params }: { params: { locale: string } 
                 </Link>
               </Button>
             </div>
-          </div>
-          <div className="relative hidden md:block">
-            {/* A looping showcase of real marketplace photos when we have them;
-                otherwise a composed trust cluster so a brand-new install still
-                reads designed and full rather than empty. */}
-            {heroSlides.length > 0 ? (
-              <HeroShowcase slides={heroSlides} />
-            ) : (
-              <>
-                <div className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-white/5 blur-2xl" />
-                <div className="relative space-y-4">
-                  <TrustPanel title={t('trustTitle')} body={t('trustBody')} />
-                  <div className="grid grid-cols-2 gap-3">
-                    {pillars.map((p) => {
-                      const Icon = p.icon;
-                      return (
-                        <div
-                          key={p.title}
-                          className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-3 py-3 backdrop-blur transition-colors hover:bg-white/15"
-                        >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-accent">
-                        <Icon className="h-4 w-4" />
-                      </span>
-                          <span className="text-sm font-medium leading-tight">{p.title}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         </div>
       </section>
@@ -351,17 +325,6 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
-function TrustPanel({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="rounded-2xl border border-white/15 bg-white/10 p-6 shadow-lg backdrop-blur-md">
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/90 text-accent-foreground shadow-sm">
-        <ShieldCheck className="h-7 w-7" />
-      </div>
-      <h3 className="mb-2 text-lg font-bold">{title}</h3>
-      <p className="text-sm text-white/85">{body}</p>
-    </div>
-  );
-}
 
 function SectionHeader({ title, href, live }: { title: string; href: string; live?: string }) {
   return (
