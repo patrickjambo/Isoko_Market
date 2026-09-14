@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { consumeOtpByToken } from '@/lib/otp-service';
 import { prisma } from '@/lib/prisma';
-import { createSession } from '@/lib/session';
+import { writeSessionCookie } from '@/lib/session';
 import { landingFor } from '@/lib/onboarding';
 import { routing } from '@/i18n/routing';
 import { env } from '@/lib/env';
@@ -34,6 +34,9 @@ export async function GET(req: NextRequest) {
   // No account for this email — magic login can't create one; go register.
   if (!user) return to('/get-started');
 
-  await createSession({ userId: user.id, role: user.role, v: user.sessionVersion });
-  return to(landingFor(user));
+  // Attach the session cookie to THIS redirect response — a cookie set via
+  // next/headers would be dropped on a response we build ourselves.
+  const res = to(landingFor(user));
+  await writeSessionCookie(res, { userId: user.id, role: user.role, v: user.sessionVersion });
+  return res;
 }
