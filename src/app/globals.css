@@ -202,3 +202,14 @@
     transform: scale(1.08);
   }
 }
+
+/* Brand-tint the leaflet.markercluster bubbles (default is blue/green/yellow) so
+   the marketplace map matches Isoko's teal. */
+.marker-cluster {
+  background: hsl(176 84% 22% / 0.25) !important;
+}
+.marker-cluster div {
+  background: hsl(176 84% 22%) !important;
+  color: #fff !important;
+  font-weight: 700;
+}

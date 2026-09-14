@@ -3,6 +3,8 @@
 import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import type { Map as LeafletMap, LayerGroup } from 'leaflet';
 import { formatRWF } from '@/lib/utils';
 
@@ -61,6 +63,7 @@ export function MarketMap({ markers, locale }: { markers: MapMarker[]; locale: s
 
   async function drawMarkers(m: LeafletMap) {
     const L = (await import('leaflet')).default;
+    await import('leaflet.markercluster'); // augments L with markerClusterGroup
     layer.current?.remove();
     if (markers.length === 0) return;
 
@@ -75,18 +78,19 @@ export function MarketMap({ markers, locale }: { markers: MapMarker[]; locale: s
       iconAnchor: [13, 26],
     });
 
-    const group = L.layerGroup().addTo(m);
+    // Cluster nearby pins into a count bubble that splits apart as you zoom in.
+    const group = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
     const points: [number, number][] = [];
     for (const mk of markers) {
       const href = `/${locale}/marketplace/${mk.id}`;
-      L.marker([mk.lat, mk.lng], { icon: pin })
-        .bindPopup(
-          `<a href="${href}" style="font-weight:600;color:#0b6b62;text-decoration:none">${escapeHtml(mk.title)}</a>` +
-            `<br/><span style="font-size:12px;color:#555">${formatRWF(mk.price, locale)}</span>`
-        )
-        .addTo(group);
+      const marker = L.marker([mk.lat, mk.lng], { icon: pin }).bindPopup(
+        `<a href="${href}" style="font-weight:600;color:#0b6b62;text-decoration:none">${escapeHtml(mk.title)}</a>` +
+          `<br/><span style="font-size:12px;color:#555">${formatRWF(mk.price, locale)}</span>`
+      );
+      group.addLayer(marker);
       points.push([mk.lat, mk.lng]);
     }
+    m.addLayer(group);
     layer.current = group;
     m.fitBounds(points, { padding: [40, 40], maxZoom: 15 });
   }
