@@ -290,7 +290,11 @@
     "mapPinHint": "Tap a pin to open the listing.",
     "storesMatching": "Shops matching your search",
     "rateService": "Rate service",
-    "reviewsTitle": "Reviews"
+    "reviewsTitle": "Reviews",
+    "locationTitle": "Location",
+    "routeFromMe": "Route from my location",
+    "yourLocation": "Your location",
+    "routeError": "Couldn’t load the route — use Get directions."
   },
   "jobs": {
     "title": "Jobs & Gigs",

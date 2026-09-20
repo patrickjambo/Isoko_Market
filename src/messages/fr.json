@@ -290,7 +290,11 @@
     "mapPinHint": "Touchez un repère pour ouvrir l’annonce.",
     "storesMatching": "Boutiques correspondant à votre recherche",
     "rateService": "Noter le service",
-    "reviewsTitle": "Avis"
+    "reviewsTitle": "Avis",
+    "locationTitle": "Emplacement",
+    "routeFromMe": "Itinéraire depuis ma position",
+    "yourLocation": "Votre position",
+    "routeError": "Itinéraire indisponible — utilisez « Get directions »."
   },
   "jobs": {
     "title": "Emplois & missions",

@@ -290,7 +290,11 @@
     "mapPinHint": "Kanda ku kadomo urebe igicuruzwa.",
     "storesMatching": "Amaduka ahuye n'ishakisha ryawe",
     "rateService": "Tanga amanota",
-    "reviewsTitle": "Ibitekerezo"
+    "reviewsTitle": "Ibitekerezo",
+    "locationTitle": "Aho biherereye",
+    "routeFromMe": "Inzira uhereye aho uri",
+    "yourLocation": "Aho uri",
+    "routeError": "Ntibishoboye kubona inzira — koresha Get directions."
   },
   "jobs": {
     "title": "Akazi & Imirimo",
