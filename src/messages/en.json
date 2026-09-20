@@ -287,7 +287,8 @@
     "sr_CANCELLED": "Cancelled",
     "eyebrow": "Buy · Sell · Services",
     "mapNoPins": "No listings with a location to show here yet — try the grid view or widen your search.",
-    "mapPinHint": "Tap a pin to open the listing."
+    "mapPinHint": "Tap a pin to open the listing.",
+    "storesMatching": "Shops matching your search"
   },
   "jobs": {
     "title": "Jobs & Gigs",

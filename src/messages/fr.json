@@ -287,7 +287,8 @@
     "sr_CANCELLED": "Annulé",
     "eyebrow": "Acheter · Vendre · Services",
     "mapNoPins": "Aucune annonce géolocalisée à afficher — essayez la grille ou élargissez la recherche.",
-    "mapPinHint": "Touchez un repère pour ouvrir l’annonce."
+    "mapPinHint": "Touchez un repère pour ouvrir l’annonce.",
+    "storesMatching": "Boutiques correspondant à votre recherche"
   },
   "jobs": {
     "title": "Emplois & missions",

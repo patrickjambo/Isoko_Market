@@ -11,6 +11,7 @@ import { SpecFilters } from '@/components/marketplace/spec-filters';
 import { NearMeButton } from '@/components/marketplace/near-me-button';
 import { ViewToggle } from '@/components/marketplace/view-toggle';
 import { MarketMap } from '@/components/marketplace/market-map';
+import { StoreResults } from '@/components/marketplace/store-results';
 import { SearchBar } from '@/components/nav/search-bar';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -25,6 +26,8 @@ import {
 import { getCurrentUser } from '@/lib/auth';
 import { categoryName } from '@/lib/i18n-helpers';
 import { districtCentroid } from '@/lib/rwanda';
+import { storeName } from '@/lib/store';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,6 +56,30 @@ export default async function MarketplacePage({
   const favSet = user ? await favoritedSet(user.id, rawItems.map((i) => i.id)) : new Set<string>();
   const items = rawItems.map((i) => ({ ...i, favorited: favSet.has(i.id) }));
   const showFavorite = Boolean(user);
+
+  // When the query looks like a shop/company name, surface those storefronts above
+  // the products (only for a real text search, and only shops that have stock).
+  const storeRows =
+    filter.q && filter.q.trim().length >= 2
+      ? await prisma.user.findMany({
+          where: {
+            listings: { some: { status: 'ACTIVE' } },
+            OR: [
+              { businessName: { contains: filter.q, mode: 'insensitive' } },
+              { fullName: { contains: filter.q, mode: 'insensitive' } },
+            ],
+          },
+          take: 4,
+          select: { id: true, fullName: true, businessName: true, avatarUrl: true, isVerified: true },
+        })
+      : [];
+  const stores = storeRows.map((s) => ({
+    id: s.id,
+    name: storeName(s),
+    avatarUrl: s.avatarUrl,
+    isVerified: s.isVerified,
+  }));
+
   // Show categories that match the active Products/Services tab (all when on "All").
   const kindFilter = searchParams.kind;
   const localizedCategories = categories
@@ -143,6 +170,9 @@ export default async function MarketplacePage({
           />
         </div>
       )}
+
+      {/* Matching storefronts (when searching a shop/company name). */}
+      <StoreResults stores={stores} />
 
       {items.length === 0 ? (
         // No dead-end (Section 3): point back to categories/all instead of blank.
