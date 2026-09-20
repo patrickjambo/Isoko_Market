@@ -356,6 +356,10 @@ model Listing {
   showPhone   Boolean          @default(false) // seller's contact preference (Section 8)
   contactInfo Json? // structured, clickable contact: { phone?, whatsapp?, email?, instagram? }
   staleNudgedAt DateTime? // when the "still available?" nudge was sent (Section 5)
+  // Denormalised product/service rating (recomputed on each review) so the stars
+  // render on marketplace/home cards without an aggregate per card.
+  ratingAvg   Float            @default(0)
+  ratingCount Int              @default(0)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
@@ -365,12 +369,14 @@ model Listing {
   orders        Order[]
   serviceRequests ServiceRequest[]
   views         ListingView[]
+  reviews       Review[]
 
   @@index([status, createdAt])
   @@index([categoryId])
   @@index([location])
   @@index([sellerId])
   @@index([isFeatured, status])
+  @@index([ratingAvg])
 }
 
 model ListingImage {
@@ -739,10 +745,17 @@ model Review {
   rating        Int // 1..5
   comment       String?
   transactionId String?
+  // The reviewed product/service (a review rates BOTH the seller and their
+  // listing). `serviceRequestId` is the equivalent of `transactionId` for a
+  // completed service — it gates one review per completed request.
+  listingId        String?
+  listing          Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  serviceRequestId String?
   createdAt     DateTime @default(now())
 
   @@unique([reviewerId, revieweeId, transactionId])
   @@index([revieweeId])
+  @@index([listingId])
 }
 
 model Report {

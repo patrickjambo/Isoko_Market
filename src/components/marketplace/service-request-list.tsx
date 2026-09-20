@@ -7,6 +7,7 @@ import { Link, useRouter } from '@/i18n/routing';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { StarReviewDialog } from '@/components/reviews/star-review-dialog';
 import { useToast } from '@/components/ui/toast';
 import { initials, timeAgo } from '@/lib/utils';
 
@@ -100,6 +101,14 @@ export function ServiceRequestList({
             <Button size="sm" variant="outline" className="text-destructive" onClick={() => setStatus(r.id, 'CANCELLED')} disabled={busy === r.id}>
               <Ban className="h-4 w-4" /> {t('cancelRequest')}
             </Button>
+          )}
+          {/* Seeker rates the service once the provider marks it completed. */}
+          {!provider && r.status === 'COMPLETED' && (
+            <StarReviewDialog
+              endpoint={`/api/service-requests/${r.id}/review`}
+              triggerLabel={t('rateService')}
+              title={t('rateService')}
+            />
           )}
         </div>
       </div>

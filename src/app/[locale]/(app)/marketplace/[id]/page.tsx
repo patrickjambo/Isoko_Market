@@ -20,7 +20,10 @@ import { getListing, getSimilarListings } from '@/lib/queries';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { suggestPrice } from '@/lib/suggestions';
-import { formatRWF, timeAgo, cn } from '@/lib/utils';
+import { formatRWF, timeAgo, initials, cn } from '@/lib/utils';
+import { Star } from 'lucide-react';
+import { StarRating } from '@/components/trust/star-rating';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatPhoneDisplay } from '@/lib/phone';
 import { categoryName } from '@/lib/i18n-helpers';
 import { categoryFallbackImage } from '@/lib/listing-image';
@@ -61,7 +64,7 @@ export default async function ListingDetailPage({
     }
   }
 
-  const [ratingAgg, favCount, myFavorite, similar, priceCtx, openRequest] = await Promise.all([
+  const [ratingAgg, favCount, myFavorite, similar, priceCtx, openRequest, reviews] = await Promise.all([
     prisma.review.aggregate({ where: { revieweeId: listing.seller.id }, _avg: { rating: true } }),
     prisma.favorite.count({ where: { listingId: listing.id } }),
     user
@@ -85,6 +88,13 @@ export default async function ListingDetailPage({
           select: { id: true },
         })
       : Promise.resolve(null),
+    // Reviews OF this product/service (rating stars + comments).
+    prisma.review.findMany({
+      where: { listingId: listing.id },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      include: { reviewer: { select: { fullName: true, avatarUrl: true } } },
+    }),
   ]);
   const hasOpenRequest = Boolean(openRequest);
 
@@ -142,6 +152,9 @@ export default async function ListingDetailPage({
               </p>
             )}
             <h1 className="text-2xl font-bold tracking-tight">{listing.title}</h1>
+            {listing.ratingCount > 0 && (
+              <StarRating value={listing.ratingAvg} count={listing.ratingCount} />
+            )}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-4 w-4" /> {listing.location}
@@ -268,6 +281,40 @@ export default async function ListingDetailPage({
           />
         </div>
       </div>
+
+      {/* Product / service reviews — stars + comments from real buyers/clients */}
+      {reviews.length > 0 && (
+        <section className="mt-10">
+          <div className="mb-3 flex items-center gap-2">
+            <h2 className="text-lg font-bold tracking-tight">{t('reviewsTitle')}</h2>
+            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+              <Star className="h-4 w-4 fill-accent text-accent" />
+              <span className="font-semibold text-foreground">{listing.ratingAvg.toFixed(1)}</span>
+              <span>({listing.ratingCount})</span>
+            </span>
+          </div>
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {reviews.map((r) => (
+              <li key={r.id} className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                <div className="mb-1 flex items-center gap-2">
+                  <Avatar className="h-8 w-8">
+                    {r.reviewer.avatarUrl && (
+                      <AvatarImage src={r.reviewer.avatarUrl} alt={r.reviewer.fullName} />
+                    )}
+                    <AvatarFallback>{initials(r.reviewer.fullName)}</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-semibold">{r.reviewer.fullName}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {timeAgo(r.createdAt, params.locale)}
+                  </span>
+                </div>
+                <StarRating value={r.rating} />
+                {r.comment && <p className="mt-1 text-sm text-muted-foreground">{r.comment}</p>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Similar listings carousel (Section 4) — no re-search needed */}
       {similar.length > 0 && (

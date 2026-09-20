@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { MapPin } from 'lucide-react';
+import { MapPin, Star } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,8 @@ export type ListingCardData = {
   isFeatured: boolean;
   kind?: string;
   distanceKm?: number;
+  ratingAvg?: number;
+  ratingCount?: number;
   images: { url: string }[];
   category?: { slug: string } | null;
   seller: { fullName: string; isVerified: boolean; verificationStatus: string };
@@ -64,6 +66,13 @@ export function ListingCard({
             {listing.status === 'SOLD' && <Badge variant="secondary">{t('sold')}</Badge>}
           </div>
           <h3 className="line-clamp-1 font-medium text-foreground">{listing.title}</h3>
+          {listing.ratingCount ? (
+            <div className="flex items-center gap-1 text-xs">
+              <Star className="h-3.5 w-3.5 fill-accent text-accent" />
+              <span className="font-semibold text-foreground">{listing.ratingAvg?.toFixed(1)}</span>
+              <span className="text-muted-foreground">({listing.ratingCount})</span>
+            </div>
+          ) : null}
           <div className="mt-auto flex items-center gap-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <MapPin className="h-3 w-3 shrink-0" /> {listing.location}
