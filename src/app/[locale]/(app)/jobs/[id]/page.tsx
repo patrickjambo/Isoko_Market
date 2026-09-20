@@ -231,6 +231,7 @@ export default async function JobDetailPage({
             itemCountLabel={t('applicants', { count: job._count.applications })}
             locale={params.locale}
             linkLabel={t('viewCompanyJobs')}
+            linkAnchor="jobs"
           />
         </div>
       </div>

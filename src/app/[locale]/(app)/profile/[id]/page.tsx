@@ -77,7 +77,7 @@ export default async function PublicProfilePage({
         </dl>
       </section>
 
-      <section>
+      <section id="store" className="scroll-mt-20">
         <h2 className="mb-3 text-lg font-semibold">{t('store')}</h2>
         {listings.length === 0 ? (
           <EmptyState icon={Package} title={t('listings')} />
@@ -91,7 +91,7 @@ export default async function PublicProfilePage({
       </section>
 
       {jobs.length > 0 && (
-        <section>
+        <section id="jobs" className="scroll-mt-20">
           <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
             <Briefcase className="h-5 w-5 text-primary" /> {t('openPositions')}
           </h2>

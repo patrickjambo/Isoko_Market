@@ -264,6 +264,7 @@ export default async function ListingDetailPage({
             itemCount={listing.seller._count.listings}
             itemCountLabel={t('title').toLowerCase()}
             locale={params.locale}
+            linkAnchor="store"
           />
         </div>
       </div>
