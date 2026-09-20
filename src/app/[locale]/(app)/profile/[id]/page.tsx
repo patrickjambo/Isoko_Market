@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Package, Star } from 'lucide-react';
+import { Package, Star, Briefcase } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProfileHeader } from '@/components/profile/profile-header';
 import { ListingCard } from '@/components/marketplace/listing-card';
+import { JobCard } from '@/components/jobs/job-card';
+import { getEmployerOpenJobs } from '@/lib/queries';
 import { StarRating } from '@/components/trust/star-rating';
 import { EmptyState } from '@/components/shared/empty-state';
 import { getCurrentUser } from '@/lib/auth';
@@ -26,7 +28,7 @@ export default async function PublicProfilePage({
   ]);
   if (!person) notFound();
 
-  const [listings, ratingAgg, reviews, completedTx, itemsSold] = await Promise.all([
+  const [listings, jobs, ratingAgg, reviews, completedTx, itemsSold] = await Promise.all([
     prisma.listing.findMany({
       where: { sellerId: person.id, status: 'ACTIVE' },
       orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
@@ -42,6 +44,7 @@ export default async function PublicProfilePage({
         seller: { select: { fullName: true, isVerified: true, verificationStatus: true } },
       },
     }),
+    getEmployerOpenJobs(person.id),
     prisma.review.aggregate({ where: { revieweeId: person.id }, _avg: { rating: true } }),
     prisma.review.findMany({
       where: { revieweeId: person.id },
@@ -86,6 +89,19 @@ export default async function PublicProfilePage({
           </div>
         )}
       </section>
+
+      {jobs.length > 0 && (
+        <section>
+          <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+            <Briefcase className="h-5 w-5 text-primary" /> {t('openPositions')}
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {jobs.map((job) => (
+              <JobCard key={job.id} job={job} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section>
         <h2 className="mb-3 text-lg font-semibold">{t('reviews')}</h2>

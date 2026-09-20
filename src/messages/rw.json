@@ -394,7 +394,9 @@
     "uploadMissingDocs": "Ohereza inyandiko zibura",
     "editTitle": "Hindura akazi",
     "editSubtitle": "Vugurura amakuru, ibisabwa cyangwa inyandiko. Impinduka zibikwa kuri iri tangazo.",
-    "eyebrow": "Gushaka · Guhabwa akazi"
+    "eyebrow": "Gushaka · Guhabwa akazi",
+    "companiesHiring": "Amasosiyete ari gushaka abakozi ahuye n'ishakisha",
+    "viewCompanyJobs": "Reba akazi kose"
   },
   "cv": {
     "title": "Kubaka CV",
@@ -597,7 +599,8 @@
     "locationSavedHint": "Bibitswe rimwe, byuzuza aho uri iyo utangaza kandi bikoreshwa muri \"hafi yanjye\".",
     "applicationsSubtitle": "Akazi wasabye, n'aho bigeze",
     "businessNameLabel": "Izina ry'ubucuruzi / iduka (si ngombwa)",
-    "businessNameHint": "Curisha nk'iduka — abaguzi bashakisha iri zina babona ibicuruzwa byawe byose hamwe."
+    "businessNameHint": "Curisha nk'iduka — abaguzi bashakisha iri zina babona ibicuruzwa byawe byose hamwe.",
+    "openPositions": "Imyanya y'akazi ifunguye"
   },
   "verification": {
     "title": "Wemezwe",

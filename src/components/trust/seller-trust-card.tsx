@@ -32,6 +32,7 @@ export async function SellerTrustCard({
   itemCount,
   itemCountLabel,
   locale,
+  linkLabel,
 }: {
   person: Person;
   rating: number;
@@ -39,6 +40,8 @@ export async function SellerTrustCard({
   itemCount: number;
   itemCountLabel: string;
   locale: string;
+  /** Footer CTA label — defaults to "Visit store"; jobs pass "View all jobs". */
+  linkLabel?: string;
 }) {
   const t = await getTranslations('profile');
   const tt = await getTranslations('trust');
@@ -100,7 +103,7 @@ export async function SellerTrustCard({
         href={`/profile/${person.id}`}
         className="mt-3 flex items-center justify-center gap-1.5 rounded-lg border border-border bg-secondary/40 py-2 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
       >
-        <Store className="h-4 w-4" /> {t('visitStore')}
+        <Store className="h-4 w-4" /> {linkLabel ?? t('visitStore')}
       </Link>
     </div>
   );

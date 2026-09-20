@@ -303,6 +303,16 @@ const jobCardSelect = {
   employer: { select: { fullName: true, isVerified: true } },
 } satisfies Prisma.JobSelect;
 
+/** An employer's currently-open jobs, for their public company page. */
+export async function getEmployerOpenJobs(employerId: string, take = 30) {
+  return prisma.job.findMany({
+    where: { employerId, status: 'OPEN' },
+    orderBy: { createdAt: 'desc' },
+    take,
+    select: jobCardSelect,
+  });
+}
+
 export const getLatestJobs = unstable_cache(
   async (take = 6) =>
     prisma.job.findMany({
@@ -321,6 +331,9 @@ export async function searchJobs(filter: JobFilter) {
     where.OR = [
       { title: { contains: filter.q, mode: 'insensitive' } },
       { description: { contains: filter.q, mode: 'insensitive' } },
+      // Searching a company name returns every job that employer has posted.
+      { employer: { businessName: { contains: filter.q, mode: 'insensitive' } } },
+      { employer: { fullName: { contains: filter.q, mode: 'insensitive' } } },
     ];
   }
   if (filter.type) where.type = filter.type;

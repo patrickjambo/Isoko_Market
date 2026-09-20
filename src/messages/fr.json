@@ -394,7 +394,9 @@
     "uploadMissingDocs": "Téléverser les documents manquants",
     "editTitle": "Modifier l’offre",
     "editSubtitle": "Mettez à jour les détails, exigences ou documents. Les modifications sont enregistrées.",
-    "eyebrow": "Recruter · Être recruté"
+    "eyebrow": "Recruter · Être recruté",
+    "companiesHiring": "Entreprises qui recrutent correspondant à votre recherche",
+    "viewCompanyJobs": "Voir toutes les offres"
   },
   "cv": {
     "title": "Créateur de CV",
@@ -597,7 +599,8 @@
     "locationSavedHint": "Enregistrée une fois, elle remplit votre lieu lors des publications et alimente « près de moi ».",
     "applicationsSubtitle": "Les offres auxquelles vous avez postulé, et leur statut",
     "businessNameLabel": "Nom de l'entreprise / boutique (facultatif)",
-    "businessNameHint": "Vendez comme une boutique — en cherchant ce nom, les acheteurs trouvent tous vos produits."
+    "businessNameHint": "Vendez comme une boutique — en cherchant ce nom, les acheteurs trouvent tous vos produits.",
+    "openPositions": "Postes ouverts"
   },
   "verification": {
     "title": "Se faire vérifier",

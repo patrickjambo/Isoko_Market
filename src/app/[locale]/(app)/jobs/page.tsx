@@ -10,9 +10,12 @@ import { SeekerHome } from '@/components/jobs/seeker-home';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Pagination } from '@/components/shared/pagination';
+import { StoreResults } from '@/components/marketplace/store-results';
 import { jobFilterSchema } from '@/lib/validators/job';
 import { searchJobs, getCvSkills } from '@/lib/queries';
 import { getCurrentUser } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { storeName } from '@/lib/store';
 import { matchScore } from '@/lib/skills';
 
 export const dynamic = 'force-dynamic';
@@ -35,6 +38,28 @@ export default async function JobsPage({
 
   // Signed-in seekers get real match badges on every card (§4/§5).
   const cvSkills = user ? await getCvSkills(user.id) : [];
+
+  // Searching a company name surfaces those employers (with open roles) as chips.
+  const companyRows =
+    filter.q && filter.q.trim().length >= 2
+      ? await prisma.user.findMany({
+          where: {
+            jobs: { some: { status: 'OPEN' } },
+            OR: [
+              { businessName: { contains: filter.q, mode: 'insensitive' } },
+              { fullName: { contains: filter.q, mode: 'insensitive' } },
+            ],
+          },
+          take: 4,
+          select: { id: true, fullName: true, businessName: true, avatarUrl: true, isVerified: true },
+        })
+      : [];
+  const companies = companyRows.map((c) => ({
+    id: c.id,
+    name: storeName(c),
+    avatarUrl: c.avatarUrl,
+    isVerified: c.isVerified,
+  }));
 
   return (
     <div className="container py-6">
@@ -64,6 +89,9 @@ export default async function JobsPage({
           current={{ q: searchParams.q, type: searchParams.type, location: searchParams.location }}
         />
       </div>
+
+      {/* Matching companies (when searching an employer/company name). */}
+      <StoreResults stores={companies} label={t('companiesHiring')} icon={Briefcase} />
 
       {items.length === 0 ? (
         <EmptyState

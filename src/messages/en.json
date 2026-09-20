@@ -394,7 +394,9 @@
     "uploadMissingDocs": "Upload missing documents",
     "editTitle": "Edit job",
     "editSubtitle": "Update the details, requirements or documents. Changes are saved to this posting.",
-    "eyebrow": "Hire · Get hired"
+    "eyebrow": "Hire · Get hired",
+    "companiesHiring": "Companies hiring matching your search",
+    "viewCompanyJobs": "View all jobs"
   },
   "cv": {
     "title": "CV builder",
@@ -597,7 +599,8 @@
     "locationSavedHint": "Saved once, this fills your location when you post and powers \"near me\".",
     "applicationsSubtitle": "Jobs you've applied to, and where they stand",
     "businessNameLabel": "Business / store name (optional)",
-    "businessNameHint": "Sell as a shop — buyers who search this name find all your products together."
+    "businessNameHint": "Sell as a shop — buyers who search this name find all your products together.",
+    "openPositions": "Open positions"
   },
   "verification": {
     "title": "Get verified",
