@@ -19,6 +19,7 @@ export default async function SettingsPage({ params }: { params: { locale: strin
       <SettingsForm
         initial={{
           fullName: user.fullName,
+          businessName: user.businessName ?? '',
           bio: user.bio ?? '',
           location: user.location ?? '',
           latitude: user.latitude,

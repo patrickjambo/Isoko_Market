@@ -594,7 +594,9 @@
     "paymentNumberLabel": "Numéro de paiement",
     "paymentProviderLabel": "Opérateur",
     "locationSavedHint": "Enregistrée une fois, elle remplit votre lieu lors des publications et alimente « près de moi ».",
-    "applicationsSubtitle": "Les offres auxquelles vous avez postulé, et leur statut"
+    "applicationsSubtitle": "Les offres auxquelles vous avez postulé, et leur statut",
+    "businessNameLabel": "Nom de l'entreprise / boutique (facultatif)",
+    "businessNameHint": "Vendez comme une boutique — en cherchant ce nom, les acheteurs trouvent tous vos produits."
   },
   "verification": {
     "title": "Se faire vérifier",

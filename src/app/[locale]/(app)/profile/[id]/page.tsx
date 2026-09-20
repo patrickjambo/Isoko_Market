@@ -29,8 +29,8 @@ export default async function PublicProfilePage({
   const [listings, ratingAgg, reviews, completedTx, itemsSold] = await Promise.all([
     prisma.listing.findMany({
       where: { sellerId: person.id, status: 'ACTIVE' },
-      orderBy: { createdAt: 'desc' },
-      take: 8,
+      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+      take: 60,
       select: {
         id: true,
         title: true,

@@ -137,6 +137,9 @@ export async function searchListings(filter: ListingFilter) {
     where.OR = [
       { title: { contains: filter.q, mode: 'insensitive' } },
       { description: { contains: filter.q, mode: 'insensitive' } },
+      // Searching a shop/company name returns everything that seller is selling.
+      { seller: { businessName: { contains: filter.q, mode: 'insensitive' } } },
+      { seller: { fullName: { contains: filter.q, mode: 'insensitive' } } },
     ];
   }
   if (filter.categoryId) where.categoryId = filter.categoryId;
@@ -238,6 +241,7 @@ export async function getListing(id: string) {
         select: {
           id: true,
           fullName: true,
+          businessName: true,
           phone: true,
           paymentNumber: true, // gates "Buy Now" (seller must have a payout number)
           avatarUrl: true,
@@ -345,6 +349,7 @@ export async function getJob(id: string) {
         select: {
           id: true,
           fullName: true,
+          businessName: true,
           avatarUrl: true,
           location: true,
           isVerified: true,

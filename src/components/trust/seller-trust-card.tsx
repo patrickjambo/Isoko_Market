@@ -1,15 +1,17 @@
 import { getTranslations } from 'next-intl/server';
-import { CalendarDays, MapPin, Package } from 'lucide-react';
+import { CalendarDays, MapPin, Package, Store } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { StarRating } from '@/components/trust/star-rating';
 import { ActiveIndicator } from '@/components/trust/active-indicator';
 import { initials, isActiveToday, timeAgo } from '@/lib/utils';
+import { storeName } from '@/lib/store';
 
 type Person = {
   id: string;
   fullName: string;
+  businessName: string | null;
   avatarUrl: string | null;
   location: string | null;
   isVerified: boolean;
@@ -46,12 +48,12 @@ export async function SellerTrustCard({
     <div className="rounded-xl border border-border bg-card p-4">
       <Link href={`/profile/${person.id}`} className="flex items-center gap-3">
         <Avatar className="h-12 w-12">
-          {person.avatarUrl && <AvatarImage src={person.avatarUrl} alt={person.fullName} />}
-          <AvatarFallback>{initials(person.fullName)}</AvatarFallback>
+          {person.avatarUrl && <AvatarImage src={person.avatarUrl} alt={storeName(person)} />}
+          <AvatarFallback>{initials(storeName(person))}</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="truncate font-semibold">{person.fullName}</p>
+            <p className="truncate font-semibold">{storeName(person)}</p>
             {person.isVerified && (
               <VerifiedBadge status="VERIFIED" label={tt('verifiedBadge')} />
             )}
@@ -92,6 +94,14 @@ export async function SellerTrustCard({
           label={active ? t('activeToday') : t('lastActive', { time: person.lastActiveAt ? timeAgo(person.lastActiveAt, locale) : '—' })}
         />
       </dl>
+
+      {/* Explicit way to see everything this seller/shop is selling. */}
+      <Link
+        href={`/profile/${person.id}`}
+        className="mt-3 flex items-center justify-center gap-1.5 rounded-lg border border-border bg-secondary/40 py-2 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
+      >
+        <Store className="h-4 w-4" /> {t('visitStore')}
+      </Link>
     </div>
   );
 }

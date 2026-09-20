@@ -7,10 +7,12 @@ import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { StarRating } from '@/components/trust/star-rating';
 import { ActiveIndicator } from '@/components/trust/active-indicator';
 import { initials, isActiveToday, timeAgo } from '@/lib/utils';
+import { storeName } from '@/lib/store';
 
 type Person = {
   id: string;
   fullName: string;
+  businessName: string | null;
   bio: string | null;
   avatarUrl: string | null;
   location: string | null;
@@ -42,13 +44,13 @@ export async function ProfileHeader({
     <div className="rounded-2xl border border-border bg-card p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <Avatar className="h-20 w-20 text-2xl">
-          {person.avatarUrl && <AvatarImage src={person.avatarUrl} alt={person.fullName} />}
-          <AvatarFallback>{initials(person.fullName)}</AvatarFallback>
+          {person.avatarUrl && <AvatarImage src={person.avatarUrl} alt={storeName(person)} />}
+          <AvatarFallback>{initials(storeName(person))}</AvatarFallback>
         </Avatar>
 
         <div className="flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">{person.fullName}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{storeName(person)}</h1>
             <VerifiedBadge
               status={person.verificationStatus as 'VERIFIED' | 'PENDING' | 'UNVERIFIED'}
               label={person.isVerified ? tt('verifiedBadge') : undefined}

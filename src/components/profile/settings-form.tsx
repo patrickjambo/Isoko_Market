@@ -19,6 +19,7 @@ export function SettingsForm({
 }: {
   initial: {
     fullName: string;
+    businessName: string;
     bio: string;
     location: string;
     latitude: number | null;
@@ -71,6 +72,7 @@ export function SettingsForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName: form.get('fullName'),
+          businessName: form.get('businessName'),
           bio: form.get('bio'),
           location,
           latitude: coords?.latitude ?? null,
@@ -122,6 +124,11 @@ export function SettingsForm({
       <div className="space-y-1.5">
         <Label htmlFor="fullName">{tc('required')}</Label>
         <Input name="fullName" defaultValue={initial.fullName} required />
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="businessName">{t('businessNameLabel')}</Label>
+        <Input name="businessName" defaultValue={initial.businessName} maxLength={80} />
+        <p className="text-xs text-muted-foreground">{t('businessNameHint')}</p>
       </div>
       <div className="space-y-1.5">
         <Label>{t('title')}</Label>

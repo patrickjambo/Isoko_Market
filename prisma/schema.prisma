@@ -212,6 +212,10 @@ model User {
   paymentProvider    String? // mtn_momo | airtel_money — which app the buyer pays with
   passwordHash       String?
   fullName           String
+  // Optional storefront name for businesses/companies — their listings group
+  // under this on their public store page and it's matched in search. Falls back
+  // to fullName for individual sellers.
+  businessName       String?
   bio                String?
   avatarUrl          String?
   location           String?

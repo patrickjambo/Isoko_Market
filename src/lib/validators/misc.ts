@@ -56,6 +56,8 @@ export const partnerSchema = z.object({
 
 export const updateProfileSchema = z.object({
   fullName: z.string().trim().min(2).max(80).optional(),
+  // Optional storefront name; empty string clears it back to the personal name.
+  businessName: z.string().trim().max(80).optional(),
   bio: z.string().trim().max(500).optional(),
   location: z.string().trim().max(80).optional(),
   latitude: z.coerce.number().min(-90).max(90).optional().nullable(),

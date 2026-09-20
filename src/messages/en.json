@@ -594,7 +594,9 @@
     "paymentNumberLabel": "Payment number",
     "paymentProviderLabel": "Provider",
     "locationSavedHint": "Saved once, this fills your location when you post and powers \"near me\".",
-    "applicationsSubtitle": "Jobs you've applied to, and where they stand"
+    "applicationsSubtitle": "Jobs you've applied to, and where they stand",
+    "businessNameLabel": "Business / store name (optional)",
+    "businessNameHint": "Sell as a shop — buyers who search this name find all your products together."
   },
   "verification": {
     "title": "Get verified",

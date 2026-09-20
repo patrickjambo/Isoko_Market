@@ -594,7 +594,9 @@
     "paymentNumberLabel": "Nimero yo kwishyurirwaho",
     "paymentProviderLabel": "Uwatanga serivisi",
     "locationSavedHint": "Bibitswe rimwe, byuzuza aho uri iyo utangaza kandi bikoreshwa muri \"hafi yanjye\".",
-    "applicationsSubtitle": "Akazi wasabye, n'aho bigeze"
+    "applicationsSubtitle": "Akazi wasabye, n'aho bigeze",
+    "businessNameLabel": "Izina ry'ubucuruzi / iduka (si ngombwa)",
+    "businessNameHint": "Curisha nk'iduka — abaguzi bashakisha iri zina babona ibicuruzwa byawe byose hamwe."
   },
   "verification": {
     "title": "Wemezwe",
