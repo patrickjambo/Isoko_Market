@@ -45,7 +45,7 @@ export function ListingCard({
     return (
       <Link
         href={`/marketplace/${listing.id}`}
-        className="group flex gap-3 overflow-hidden rounded-xl border border-border bg-card p-2 transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
+        className="group flex gap-3 overflow-hidden rounded-xl border border-border bg-card p-2 shadow-sm transition-all duration-200 hover:border-primary/30 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
       >
         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-muted">
           <Image
@@ -53,7 +53,10 @@ export function ListingCard({
             alt={listing.title}
             fill
             sizes="96px"
-            className={cn('object-cover', listing.status === 'SOLD' && 'opacity-60 grayscale')}
+            className={cn(
+              'object-cover transition-transform duration-500 ease-out group-hover:scale-110',
+              listing.status === 'SOLD' && 'opacity-60 grayscale'
+            )}
           />
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1 py-1">
@@ -92,7 +95,7 @@ export function ListingCard({
   return (
     <Link
       href={`/marketplace/${listing.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
+      className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="relative aspect-square overflow-hidden bg-muted">
         {showFavorite && (
@@ -104,7 +107,7 @@ export function ListingCard({
           fill
           sizes="(max-width: 768px) 50vw, 25vw"
           className={cn(
-            'object-cover transition-transform group-hover:scale-105',
+            'object-cover transition-transform duration-500 ease-out group-hover:scale-110',
             listing.status === 'SOLD' && 'opacity-60 grayscale'
           )}
         />

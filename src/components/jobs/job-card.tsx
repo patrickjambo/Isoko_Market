@@ -43,7 +43,7 @@ export function JobCard({ job, match }: { job: JobCardData; match?: MatchTier })
   return (
     <Link
       href={`/jobs/${job.id}`}
-      className="group flex flex-col gap-3 rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
+      className="group flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="flex items-start justify-between gap-2">
         <h3 className="line-clamp-2 font-semibold leading-snug text-foreground group-hover:text-primary">

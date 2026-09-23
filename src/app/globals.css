@@ -31,10 +31,10 @@
     --secondary: 175 30% 94%;
     --secondary-foreground: 176 60% 18%;
 
-    /* Warm orange — darkened to 40% L so it meets WCAG AA (4.5:1) both as
-       `.text-accent` on light surfaces and as white text on `bg-accent`
-       (was 52% L / #f56e14 → only 2.83:1). */
-    --accent: 24 90% 38%;
+    /* Warm orange — 38% L for WCAG AA (4.5:1) both as `.text-accent` on light
+       surfaces and white text on `bg-accent`. Saturation eased 90→78 for a more
+       refined, less "loud" orange (lightness unchanged, so contrast is intact). */
+    --accent: 24 78% 38%;
     --accent-foreground: 0 0% 100%;
 
     --muted: 180 12% 95%;
@@ -66,7 +66,7 @@
     --primary-foreground: 185 40% 7%;
     --secondary: 185 24% 16%;
     --secondary-foreground: 40 20% 96%;
-    --accent: 24 92% 55%;
+    --accent: 24 80% 55%;
     --accent-foreground: 185 40% 7%;
     --muted: 185 20% 16%;
     --muted-foreground: 180 10% 65%;
