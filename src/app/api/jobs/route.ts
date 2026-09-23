@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { route, jsonOk } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { rwandaCoords } from '@/lib/rwanda';
 import { createJobSchema, jobFilterSchema } from '@/lib/validators/job';
 import { cleanContact } from '@/lib/contact';
 import { francsToMinor } from '@/lib/utils';
@@ -47,8 +48,7 @@ export const POST = route(async (req: NextRequest) => {
       payMax: input.payMax != null ? francsToMinor(input.payMax) : null,
       payPeriod: input.payPeriod,
       location: input.location,
-      latitude: input.latitude ?? null,
-      longitude: input.longitude ?? null,
+      ...rwandaCoords(input.latitude, input.longitude),
       ...(cleanContact(input.contactInfo) ? { contactInfo: cleanContact(input.contactInfo)! } : {}),
       skills,
       partnerId,

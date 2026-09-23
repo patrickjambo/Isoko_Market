@@ -4,6 +4,7 @@ import { route, jsonOk, ApiError } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
 import { authorize } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
+import { rwandaCoords } from '@/lib/rwanda';
 import { publishTopic } from '@/lib/realtime';
 import { cascadeJobFilled } from '@/lib/job-cascade';
 import { createJobSchema } from '@/lib/validators/job';
@@ -42,8 +43,7 @@ export const PUT = route(async (req: NextRequest, ctx: { params: { id: string } 
       payMax: input.payMax != null ? francsToMinor(input.payMax) : null,
       payPeriod: input.payPeriod,
       location: input.location,
-      latitude: input.latitude ?? null,
-      longitude: input.longitude ?? null,
+      ...rwandaCoords(input.latitude, input.longitude),
       contactInfo: contact ?? Prisma.DbNull,
       skills,
     },

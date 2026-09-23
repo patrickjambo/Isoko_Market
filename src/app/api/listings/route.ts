@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { route, jsonOk } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
+import { rwandaCoords } from '@/lib/rwanda';
 import { prisma } from '@/lib/prisma';
 import { createListingSchema, listingFilterSchema } from '@/lib/validators/listing';
 import { cleanContact } from '@/lib/contact';
@@ -32,8 +33,7 @@ export const POST = route(async (req: NextRequest) => {
       kind: input.kind ?? 'PRODUCT',
       condition: input.condition,
       location: input.location,
-      latitude: input.latitude ?? null,
-      longitude: input.longitude ?? null,
+      ...rwandaCoords(input.latitude, input.longitude),
       ...(cleanContact(input.contactInfo) ? { contactInfo: cleanContact(input.contactInfo)! } : {}),
       ...(input.specs?.length ? { specs: input.specs } : {}),
       images: {

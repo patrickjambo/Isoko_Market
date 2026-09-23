@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { LocationButton, type GeoResult } from '@/components/shared/location-button';
 import { searchPlaces, getAccuratePosition, reverseGeocode, type PlaceResult } from '@/lib/geolocation';
+import { isInRwanda } from '@/lib/rwanda';
 
 // Map is client-only + lazy (Leaflet touches window, ~heavy) — loads only when a
 // location has been chosen.
@@ -64,6 +65,9 @@ export function LocationField({
     (async () => {
       try {
         const fix = await getAccuratePosition();
+        // A laptop with no GPS can report a Wi-Fi/IP point in the wrong country —
+        // don't auto-fill a coordinate outside Rwanda; let them set it manually.
+        if (!isInRwanda(fix.latitude, fix.longitude)) return;
         const label = await reverseGeocode(fix.latitude, fix.longitude);
         onChangeRef.current({
           location: label ?? location,

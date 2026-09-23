@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { route, jsonOk, ApiError } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
+import { rwandaCoords } from '@/lib/rwanda';
 import { authorize } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
 import { publish, publishTopic } from '@/lib/realtime';
@@ -42,9 +43,11 @@ export const PUT = route(async (req: NextRequest, ctx: { params: { id: string } 
         kind: input.kind, // undefined leaves the stored kind unchanged
         condition: input.condition,
         location: input.location,
-        // undefined => keep the stored coords (edit form may not re-capture them).
-        latitude: input.latitude,
-        longitude: input.longitude,
+        // Only touch coords when the edit sends them (undefined => keep stored);
+        // when sent, drop anything outside Rwanda so a bad pin can't be saved.
+        ...(input.latitude !== undefined || input.longitude !== undefined
+          ? rwandaCoords(input.latitude, input.longitude)
+          : {}),
         tags: input.tags,
         // Only touch specs when the edit actually sends the field: undefined =>
         // leave as-is; [] => clear; non-empty => replace.

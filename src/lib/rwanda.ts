@@ -128,6 +128,31 @@ const REGION_CENTROIDS: Record<string, { lat: number; lng: number }> = {
  * "Gasabo, Kigali City, Rwanda"…). Returns null if nothing matches. Used as a map
  * fallback when a listing has no precise lat/lng.
  */
+/**
+ * Is a coordinate plausibly inside Rwanda? Guards against garbage GPS — a laptop
+ * with no real GPS geolocates from Wi-Fi/IP and can report a point in another
+ * city or country, which would send "get directions" to the wrong place. Padded
+ * bounding box around Rwanda (real in-country readings never fall outside).
+ */
+export function isInRwanda(lat?: number | null, lng?: number | null): boolean {
+  if (lat == null || lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) return false;
+  return lat >= -3.0 && lat <= -1.0 && lng >= 28.8 && lng <= 31.0;
+}
+
+/**
+ * Persist coordinates only if they're plausibly in Rwanda; otherwise drop both to
+ * null (keeping the text location) so a wrong-country/garbage pin can never send a
+ * buyer to the wrong place. Applied on every listing/job save.
+ */
+export function rwandaCoords(
+  lat?: number | null,
+  lng?: number | null
+): { latitude: number | null; longitude: number | null } {
+  return isInRwanda(lat, lng)
+    ? { latitude: lat as number, longitude: lng as number }
+    : { latitude: null, longitude: null };
+}
+
 export function districtCentroid(
   location: string | null | undefined
 ): { lat: number; lng: number } | null {
