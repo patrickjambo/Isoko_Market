@@ -294,10 +294,7 @@
     "storesMatching": "Boutiques correspondant à votre recherche",
     "rateService": "Noter le service",
     "reviewsTitle": "Avis",
-    "locationTitle": "Emplacement",
-    "routeFromMe": "Itinéraire depuis ma position",
-    "yourLocation": "Votre position",
-    "routeError": "Itinéraire indisponible — utilisez « Get directions »."
+    "locationTitle": "Emplacement"
   },
   "jobs": {
     "title": "Emplois & missions",

@@ -5,7 +5,7 @@ import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { ImageGallery } from '@/components/marketplace/image-gallery';
 import { ListingCard } from '@/components/marketplace/listing-card';
-import { RouteMap } from '@/components/marketplace/route-map';
+import { LocationMap } from '@/components/marketplace/location-map';
 import { SellerTrustCard } from '@/components/trust/seller-trust-card';
 import { MessageSellerButton } from '@/components/messaging/message-seller-button';
 import { ContactLinks } from '@/components/shared/contact-links';
@@ -287,7 +287,7 @@ export default async function ListingDetailPage({
       {listing.latitude != null && listing.longitude != null && (
         <section className="mt-10">
           <h2 className="mb-3 text-lg font-bold tracking-tight">{t('locationTitle')}</h2>
-          <RouteMap lat={listing.latitude} lng={listing.longitude} title={listing.title} />
+          <LocationMap lat={listing.latitude} lng={listing.longitude} title={listing.title} />
         </section>
       )}
 

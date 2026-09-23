@@ -294,10 +294,7 @@
     "storesMatching": "Shops matching your search",
     "rateService": "Rate service",
     "reviewsTitle": "Reviews",
-    "locationTitle": "Location",
-    "routeFromMe": "Route from my location",
-    "yourLocation": "Your location",
-    "routeError": "Couldn’t load the route — use Get directions."
+    "locationTitle": "Location"
   },
   "jobs": {
     "title": "Jobs & Gigs",

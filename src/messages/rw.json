@@ -294,10 +294,7 @@
     "storesMatching": "Amaduka ahuye n'ishakisha ryawe",
     "rateService": "Tanga amanota",
     "reviewsTitle": "Ibitekerezo",
-    "locationTitle": "Aho biherereye",
-    "routeFromMe": "Inzira uhereye aho uri",
-    "yourLocation": "Aho uri",
-    "routeError": "Ntibishoboye kubona inzira — koresha Get directions."
+    "locationTitle": "Aho biherereye"
   },
   "jobs": {
     "title": "Akazi & Imirimo",
