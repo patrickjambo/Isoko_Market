@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/ui/toast';
 import { getAccuratePosition, geoErrorKey, reverseGeocode } from '@/lib/geolocation';
 
-export type GeoResult = { latitude: number; longitude: number; label?: string };
+export type GeoResult = { latitude: number; longitude: number; label?: string; accuracy?: number };
 
 /**
  * "Use my location" — captures precise GPS from the browser (permission-gated,
@@ -32,7 +32,7 @@ export function LocationButton({
       // Watches the GPS and returns the most accurate fix (see getAccuratePosition).
       const { latitude, longitude, accuracy } = await getAccuratePosition();
       const label = await reverseGeocode(latitude, longitude);
-      onLocated({ latitude, longitude, label });
+      onLocated({ latitude, longitude, label, accuracy });
       // A very coarse fix (hundreds of metres+) is usually "wrong": tell the user.
       toast(accuracy > 500 ? t('locationApprox') : t('locationCaptured'), accuracy > 500 ? 'info' : 'success');
     } catch (err) {

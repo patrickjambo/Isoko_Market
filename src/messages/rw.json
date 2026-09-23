@@ -64,7 +64,10 @@
     "installIosStep2": "Manuka uhitemo “Add to Home Screen”",
     "installIosStep3": "Kanda “Add” — Isoko iri ku Ahabanza",
     "installIosSafariOnly": "Banza ufungure Isoko muri Safari — iPhone yemera ibi muri Safari gusa, ntabwo ari izindi.",
-    "detectingLocation": "Turimo kumenya aho uri…"
+    "detectingLocation": "Turimo kumenya aho uri…",
+    "locPrecise": "Ahantu nyako hashyizweho (±{m} m)",
+    "locApprox": "Ahantu hagereranyije (±{m} m). Kuri mudasobwa ni ibisanzwe — kurura akadomo hepfo ujye ahantu nyako, cyangwa ukoreshe telefone kugira ngo GPS ikore yisumbuye.",
+    "locSet": "Ahantu hashyizweho — kurura akadomo hepfo niba hatari ho nyako."
   },
   "nav": {
     "home": "Ahabanza",

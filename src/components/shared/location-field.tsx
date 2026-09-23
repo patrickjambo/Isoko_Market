@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
-import { Search, Loader2, MapPin } from 'lucide-react';
+import { Search, Loader2, MapPin, Check, AlertTriangle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { LocationButton, type GeoResult } from '@/components/shared/location-button';
@@ -49,6 +49,10 @@ export function LocationField({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [autoLocating, setAutoLocating] = useState(false);
+  // GPS accuracy of the last capture (metres). null = set manually (pin/search),
+  // which is exact by intent. Drives the confidence line so a non-technical seller
+  // knows whether their location is precise or needs a nudge on the map.
+  const [accuracy, setAccuracy] = useState<number | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -68,6 +72,7 @@ export function LocationField({
         // A laptop with no GPS can report a Wi-Fi/IP point in the wrong country —
         // don't auto-fill a coordinate outside Rwanda; let them set it manually.
         if (!isInRwanda(fix.latitude, fix.longitude)) return;
+        setAccuracy(fix.accuracy);
         const label = await reverseGeocode(fix.latitude, fix.longitude);
         onChangeRef.current({
           location: label ?? location,
@@ -105,14 +110,30 @@ export function LocationField({
     <div className="space-y-2">
       <LocationButton
         done={hasPin}
-        onLocated={(g: GeoResult) =>
-          onChange({ location: g.label ?? location, latitude: g.latitude, longitude: g.longitude })
-        }
+        onLocated={(g: GeoResult) => {
+          setAccuracy(g.accuracy ?? null);
+          onChange({ location: g.label ?? location, latitude: g.latitude, longitude: g.longitude });
+        }}
       />
 
       {autoLocating && (
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Loader2 className="h-3 w-3 animate-spin" /> {t('detectingLocation')}
+        </p>
+      )}
+
+      {/* Confidence line: tells a non-technical seller if the auto GPS is exact,
+          or approximate (laptop) and needs a nudge on the map below. */}
+      {!autoLocating && hasPin && accuracy != null && accuracy > 150 && (
+        <p className="flex items-start gap-1.5 rounded-lg border border-accent/30 bg-accent/10 px-2.5 py-2 text-xs text-accent-foreground">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+          <span>{t('locApprox', { m: Math.round(accuracy) })}</span>
+        </p>
+      )}
+      {!autoLocating && hasPin && (accuracy == null || accuracy <= 150) && (
+        <p className="flex items-center gap-1.5 text-xs font-medium text-success">
+          <Check className="h-3.5 w-3.5 shrink-0" />
+          {accuracy != null ? t('locPrecise', { m: Math.round(accuracy) }) : t('locSet')}
         </p>
       )}
 
@@ -138,6 +159,7 @@ export function LocationField({
                   type="button"
                   onMouseDown={(e) => {
                     e.preventDefault();
+                    setAccuracy(null); // picked a place = exact by intent
                     onChange({ location: r.label, latitude: r.latitude, longitude: r.longitude });
                     setOpen(false);
                   }}
@@ -157,9 +179,10 @@ export function LocationField({
           <p className="text-xs font-medium text-muted-foreground">{t('confirmOnMap')}</p>
           <MapPicker
             value={{ lat: latitude, lng: longitude }}
-            onChange={(lat, lng, label) =>
-              onChange({ location: label ?? location, latitude: lat, longitude: lng })
-            }
+            onChange={(lat, lng, label) => {
+              setAccuracy(null); // dragging the pin = the exact spot
+              onChange({ location: label ?? location, latitude: lat, longitude: lng });
+            }}
           />
         </div>
       )}

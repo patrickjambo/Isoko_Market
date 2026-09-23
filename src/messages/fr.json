@@ -64,7 +64,10 @@
     "installIosStep2": "Faites défiler et touchez « Sur l’écran d’accueil »",
     "installIosStep3": "Appuyez sur « Ajouter » — c’est fait",
     "installIosSafariOnly": "Ouvrez d’abord Isoko dans Safari — l’iPhone ne l’autorise que depuis Safari.",
-    "detectingLocation": "Détection de votre position…"
+    "detectingLocation": "Détection de votre position…",
+    "locPrecise": "Position exacte enregistrée (±{m} m)",
+    "locApprox": "Position approximative (±{m} m). Sur un ordinateur c’est normal — déplacez le repère ci-dessous vers l’endroit exact, ou publiez depuis votre téléphone pour un GPS automatique.",
+    "locSet": "Position enregistrée — déplacez le repère ci-dessous si ce n’est pas exact."
   },
   "nav": {
     "home": "Accueil",

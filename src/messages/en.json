@@ -64,7 +64,10 @@
     "installIosStep2": "Scroll down and tap “Add to Home Screen”",
     "installIosStep3": "Tap “Add” — Isoko is now on your home screen",
     "installIosSafariOnly": "Open Isoko in Safari first — iPhone only allows this from Safari, not other browsers.",
-    "detectingLocation": "Detecting your location…"
+    "detectingLocation": "Detecting your location…",
+    "locPrecise": "Exact location set (±{m} m)",
+    "locApprox": "Approximate location (±{m} m). On a laptop this is normal — drag the pin below to your exact spot, or post from your phone for automatic GPS.",
+    "locSet": "Location set — drag the pin below if it isn’t exact."
   },
   "nav": {
     "home": "Home",
