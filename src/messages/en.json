@@ -85,7 +85,8 @@
     "login": "Log in",
     "register": "Sign up",
     "logout": "Log out",
-    "language": "Language"
+    "language": "Language",
+    "cart": "Cart"
   },
   "home": {
     "heroTitle": "Buy, sell, and find work — with people you can trust",

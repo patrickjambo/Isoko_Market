@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { Search, ShoppingBag } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { getCurrentUser } from '@/lib/auth';
@@ -17,9 +17,12 @@ export async function Header() {
   const tc = await getTranslations('common');
   const user = await getCurrentUser();
 
-  const unread = user
-    ? await prisma.notification.count({ where: { userId: user.id, readAt: null } })
-    : 0;
+  const [unread, saved] = user
+    ? await Promise.all([
+        prisma.notification.count({ where: { userId: user.id, readAt: null } }),
+        prisma.favorite.count({ where: { userId: user.id } }),
+      ])
+    : [0, 0];
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -47,6 +50,17 @@ export async function Header() {
               <div className="hidden sm:block">
                 <PostMenu />
               </div>
+              {/* Cart — products the buyer saved to buy later (the /saved list). */}
+              <Button variant="ghost" size="icon" asChild aria-label={t('cart')} className="relative">
+                <Link href="/saved">
+                  <ShoppingBag className="h-5 w-5" />
+                  {saved > 0 && (
+                    <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">
+                      {saved > 99 ? '99+' : saved}
+                    </span>
+                  )}
+                </Link>
+              </Button>
               <NotificationBell initialUnread={unread} />
               <UserMenu />
             </>

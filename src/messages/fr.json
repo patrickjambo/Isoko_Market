@@ -85,7 +85,8 @@
     "login": "Se connecter",
     "register": "S'inscrire",
     "logout": "Se déconnecter",
-    "language": "Langue"
+    "language": "Langue",
+    "cart": "Panier"
   },
   "home": {
     "heroTitle": "Achetez, vendez et trouvez du travail — avec des personnes de confiance",
