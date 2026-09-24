@@ -1,20 +1,21 @@
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import logo from '@/images/logo.png';
+import mark from '@/images/logo-mark.png';
 
 /**
- * Zenova brand — the provided logo mark. Kept square so it drops into headers,
- * the footer and icons at any size.
+ * Zenova brand — the emblem, cropped from the supplied lockup and given a
+ * transparent background so it sits cleanly on any surface (no boxed field).
+ * Kept roughly square so it drops into headers, the footer and small icons.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
     <Image
-      src={logo}
+      src={mark}
       alt="Zenova"
-      width={96}
-      height={96}
+      width={102}
+      height={108}
       priority
-      className={cn('h-12 w-12 rounded-md object-contain', className)}
+      className={cn('h-12 w-auto object-contain', className)}
     />
   );
 }
