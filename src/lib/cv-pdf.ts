@@ -189,7 +189,7 @@ export async function generateCvPdf(input: {
 }
 
 function drawFooter(page: PDFPage, font: PDFFont) {
-  page.drawText('Generated with Isoko Market', { x: 48, y: 28, size: 8, font, color: GREY });
+  page.drawText('Generated with Zenova', { x: 48, y: 28, size: 8, font, color: GREY });
 }
 
 /**

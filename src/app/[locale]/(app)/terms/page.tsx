@@ -8,7 +8,7 @@ export default function TermsPage({ params }: { params: { locale: string } }) {
   return (
     <Prose title="Terms of Service">
       <p>
-        By using Isoko Market you agree to trade honestly, post accurate listings and jobs, and
+        By using Zenova you agree to trade honestly, post accurate listings and jobs, and
         treat other members with respect.
       </p>
       <h2>Free core actions</h2>
@@ -25,7 +25,7 @@ export default function TermsPage({ params }: { params: { locale: string } }) {
       </p>
       <h2>Liability</h2>
       <p>
-        Isoko Market connects buyers, sellers, employers and job-seekers but is not a party to the
+        Zenova connects buyers, sellers, employers and job-seekers but is not a party to the
         transactions between them. Always meet safely and confirm goods before paying.
       </p>
     </Prose>

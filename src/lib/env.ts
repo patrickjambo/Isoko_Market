@@ -22,7 +22,7 @@ const schema = z.object({
   EMAIL_PROVIDER: z.enum(['console', 'resend', 'brevo']).default('console'),
   RESEND_API_KEY: z.string().optional().default(''),
   BREVO_API_KEY: z.string().optional().default(''),
-  EMAIL_FROM: z.string().default('Isoko Market <onboarding@resend.dev>'),
+  EMAIL_FROM: z.string().default('Zenova <onboarding@resend.dev>'),
 
   // AI assist (Claude) — writes listing descriptions, CV summaries, etc. from a
   // few words. Optional: with no ANTHROPIC_API_KEY the app falls back to the
@@ -35,7 +35,7 @@ const schema = z.object({
   // adapter can be reactivated if transactional SMS is ever added.
   SMS_PROVIDER: z.enum(['console', 'pindo', 'africastalking']).default('console'),
   SMS_API_KEY: z.string().optional().default(''),
-  SMS_SENDER_ID: z.string().default('ISOKO'),
+  SMS_SENDER_ID: z.string().default('ZENOVA'),
 
   PAYMENTS_PROVIDER: z.enum(['mock', 'mtn_momo', 'airtel_money']).default('mock'),
 

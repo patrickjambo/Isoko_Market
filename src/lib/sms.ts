@@ -36,5 +36,5 @@ export const sms: SmsProvider =
   env.SMS_PROVIDER === 'pindo' ? pindoProvider : consoleProvider;
 
 export async function sendOtpSms(to: string, code: string): Promise<void> {
-  await sms.send(to, `Isoko Market: your verification code is ${code}. It expires in 5 minutes.`);
+  await sms.send(to, `Zenova: your verification code is ${code}. It expires in 5 minutes.`);
 }

@@ -12,27 +12,27 @@ import '../globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Isoko Market — Connecting Communities • Empowering Trade',
-    template: '%s · Isoko Market',
+    default: 'Zenova — Connecting Communities • Empowering Trade',
+    template: '%s · Zenova',
   },
   description:
     'A trust-first, multilingual marketplace and job board for Rwandan youth. Buy, sell, and find work with verified people. Kinyarwanda, English & French.',
-  applicationName: 'Isoko Market',
+  applicationName: 'Zenova',
   // Use the validated env (empty/whitespace already normalized to the default)
   // so an unset/blank NEXT_PUBLIC_APP_URL can't crash the build via new URL('').
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   manifest: '/manifest.webmanifest',
-  // Installable-app polish: home-screen icon + full-screen iOS launch. The Apple
-  // touch icon points at the generated PNG route (src/app/apple-icon.tsx) — iOS
-  // ignores SVG apple-touch-icons, so a raster is required for a clean install.
+  // Installable-app polish: home-screen icon + full-screen iOS launch. Both the
+  // favicon and the Apple touch icon use the Zenova logo (a raster PNG — iOS
+  // ignores SVG apple-touch-icons, so a raster is required for a clean install).
   icons: {
-    icon: '/icon.svg',
-    apple: '/apple-icon',
+    icon: '/icon.png',
+    apple: '/icon.png',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Isoko',
+    title: 'Zenova',
   },
 };
 

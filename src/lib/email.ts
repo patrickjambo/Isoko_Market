@@ -18,8 +18,8 @@ export interface EmailProvider {
 function parseFrom(from: string): { name: string; email: string } {
   const m = from.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
   const addr = m?.[2]?.trim();
-  if (addr) return { name: m?.[1]?.trim() || 'Isoko Market', email: addr };
-  return { name: 'Isoko Market', email: from.trim() };
+  if (addr) return { name: m?.[1]?.trim() || 'Zenova', email: addr };
+  return { name: 'Zenova', email: from.trim() };
 }
 
 const consoleProvider: EmailProvider = {
@@ -83,7 +83,7 @@ export const email: EmailProvider =
 /** One-time login/registration code (5-minute TTL, single-use — see otp-service). */
 export async function sendOtpEmail(to: string, code: string, magicUrl?: string): Promise<void> {
   const text = [
-    `Your Isoko Market code is ${code}. It expires in 5 minutes.`,
+    `Your Zenova code is ${code}. It expires in 5 minutes.`,
     ...(magicUrl ? ['', 'Or just tap this link to log in — no code needed:', magicUrl] : []),
     '',
     "If you didn't request this, you can ignore this email.",
@@ -93,23 +93,23 @@ export async function sendOtpEmail(to: string, code: string, magicUrl?: string):
   // clients). The button opens the confirm page, which logs the user in on load.
   const html = `
 <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:480px;margin:0 auto;padding:8px 4px;color:#1c1c1c">
-  <p style="font-size:15px;line-height:1.5;margin:0 0 8px">Your Isoko Market code is
+  <p style="font-size:15px;line-height:1.5;margin:0 0 8px">Your Zenova code is
     <strong style="font-size:18px;letter-spacing:2px">${code}</strong>. It expires in 5 minutes.</p>
   ${
     magicUrl
       ? `<p style="font-size:15px;line-height:1.5;margin:20px 0 12px">Or just tap the button to log in — no code needed:</p>
   <p style="text-align:center;margin:0 0 8px">
-    <a href="${magicUrl}" style="display:inline-block;background:#0b6b62;color:#ffffff;text-decoration:none;font-weight:600;font-size:16px;padding:13px 32px;border-radius:10px">Log in to Isoko</a>
+    <a href="${magicUrl}" style="display:inline-block;background:#0b6b62;color:#ffffff;text-decoration:none;font-weight:600;font-size:16px;padding:13px 32px;border-radius:10px">Log in to Zenova</a>
   </p>`
       : ''
   }
   <p style="font-size:12px;line-height:1.5;color:#777;margin:24px 0 0">If you didn't request this, you can ignore this email.</p>
 </div>`.trim();
 
-  await email.send(to, 'Your Isoko Market verification code', text, html);
+  await email.send(to, 'Your Zenova verification code', text, html);
 }
 
 /** Best-effort transactional notification (order updates, etc.). */
 export async function sendNotificationEmail(to: string, title: string, body?: string): Promise<void> {
-  await email.send(to, `Isoko Market: ${title}`, body ? `${title}\n\n${body}` : title);
+  await email.send(to, `Zenova: ${title}`, body ? `${title}\n\n${body}` : title);
 }

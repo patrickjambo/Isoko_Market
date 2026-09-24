@@ -32,7 +32,7 @@ export function ShareButton({ title, label }: { title: string; label: string }) 
   const [copied, setCopied] = useState(false);
 
   const url = () => (typeof window !== 'undefined' ? window.location.href : '');
-  const message = `${title} — ${t('shareVia')} Isoko`;
+  const message = `${title} — ${t('shareVia')} Zenova`;
 
   async function copy() {
     try {

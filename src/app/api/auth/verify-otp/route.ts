@@ -36,7 +36,7 @@ export const POST = route(async (req: NextRequest) => {
     (await prisma.user.create({
       data: {
         email,
-        fullName: input.fullName?.trim() || 'Isoko user',
+        fullName: input.fullName?.trim() || 'Zenova user',
         role,
         preferredRole: input.intent ?? null,
         locale: input.locale ?? 'rw',

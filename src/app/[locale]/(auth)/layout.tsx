@@ -18,7 +18,7 @@ export default function AuthLayout({
       <header className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-1.5">
           <AuthBack />
-          <Link href="/" aria-label="Isoko Market home">
+          <Link href="/" aria-label="Zenova home">
             <Logo />
           </Link>
         </div>

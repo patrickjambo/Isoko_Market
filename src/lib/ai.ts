@@ -116,13 +116,13 @@ export async function aiListingDescription(input: {
     .join('\n');
 
   const system = isService
-    ? `You write concise, trustworthy descriptions of SERVICES offered on Isoko Market, ` +
+    ? `You write concise, trustworthy descriptions of SERVICES offered on Zenova, ` +
       `a marketplace for young people in Rwanda. Write 2–4 short sentences in ${lang} describing ` +
       `the service the person provides and what a client can expect. Be warm and clear. Use ONLY ` +
       `the facts provided — never invent qualifications, experience, guarantees, or claims that ` +
       `aren't given. Do not describe it as a physical item and do not mention condition. No emojis, ` +
       `no hype, no price. Output ONLY the description text, nothing else.`
-    : `You write concise, trustworthy marketplace listing descriptions for Isoko Market, ` +
+    : `You write concise, trustworthy marketplace listing descriptions for Zenova, ` +
       `a marketplace for young people in Rwanda. Write 2–4 short sentences in ${lang}. ` +
       `Be warm and clear. Use ONLY the facts provided — never invent specifications, ` +
       `brands, measurements, defects, or claims that aren't given. No emojis, no hype, ` +

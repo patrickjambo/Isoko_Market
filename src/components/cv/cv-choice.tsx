@@ -11,7 +11,7 @@ import type { CvData } from '@/lib/validators/cv';
 type Mode = 'build' | 'upload';
 
 /**
- * Two complementary ways to be ready to apply — a structured Isoko CV AND/OR
+ * Two complementary ways to be ready to apply — a structured Zenova CV AND/OR
  * uploaded documents. NOT mutually exclusive (like LinkedIn/Indeed: a profile
  * plus a reusable document library). Both persist on the seeker's profile and
  * are shown to every employer they apply to, so nothing is uploaded twice.

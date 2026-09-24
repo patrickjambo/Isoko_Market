@@ -44,7 +44,7 @@ export async function generateMetadata({
 
 /**
  * Partner / cooperative white-label job board (Phase 5). A branded, shareable
- * page listing a partner's open roles, powered by the Isoko backend.
+ * page listing a partner's open roles, powered by the Zenova backend.
  */
 export default async function BoardPage({
   params,

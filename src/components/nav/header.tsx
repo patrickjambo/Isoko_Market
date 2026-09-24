@@ -27,7 +27,7 @@ export async function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container flex h-16 items-center gap-3">
-        <Link href="/" aria-label="Isoko Market home" className="shrink-0">
+        <Link href="/" aria-label="Zenova home" className="shrink-0">
           <Logo />
         </Link>
 

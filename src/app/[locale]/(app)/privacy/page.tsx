@@ -8,7 +8,7 @@ export default function PrivacyPage({ params }: { params: { locale: string } }) 
   return (
     <Prose title="Privacy Policy">
       <p>
-        Isoko Market is committed to protecting your personal data in line with Rwanda&apos;s
+        Zenova is committed to protecting your personal data in line with Rwanda&apos;s
         Law No. 058/2021 on the Protection of Personal Data and Privacy.
       </p>
       <h2>What we collect</h2>

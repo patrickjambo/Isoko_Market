@@ -6,9 +6,9 @@ export const metadata = { title: 'About' };
 export default function AboutPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
   return (
-    <Prose title="About Isoko Market">
+    <Prose title="About Zenova">
       <p>
-        Isoko Market exists to reduce youth unemployment and digital exclusion in Rwanda through a
+        Zenova exists to reduce youth unemployment and digital exclusion in Rwanda through a
         trusted, accessible and affordable platform to buy, sell, and find work.
       </p>
       <p>

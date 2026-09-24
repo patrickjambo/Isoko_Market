@@ -27,7 +27,7 @@ export function ReferralShare({ code, link }: { code: string; link: string }) {
   async function share() {
     if (typeof navigator !== 'undefined' && 'share' in navigator) {
       try {
-        await navigator.share({ title: 'Isoko Market', text: t('subtitle'), url: link });
+        await navigator.share({ title: 'Zenova', text: t('subtitle'), url: link });
       } catch {
         /* cancelled */
       }

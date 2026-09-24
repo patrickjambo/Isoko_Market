@@ -1,5 +1,5 @@
 /**
- * Rwandan phone-number handling. Phone is the primary identity on Isoko
+ * Rwandan phone-number handling. Phone is the primary identity on Zenova
  * (mirrors mobile-money habits — Section 4.1), so normalization must be strict
  * and consistent everywhere a phone is stored or looked up.
  */

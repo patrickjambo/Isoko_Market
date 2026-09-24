@@ -46,7 +46,7 @@ function isIosSafari() {
 }
 
 /**
- * "Add Isoko to your home screen." Android/Chrome fires `beforeinstallprompt`, so
+ * "Add Zenova to your home screen." Android/Chrome fires `beforeinstallprompt`, so
  * there we install in one tap. iOS never fires it (Apple only allows a manual
  * Add-to-Home-Screen from Safari), so on iPhone the button opens a short how-to
  * dialog instead — otherwise there is nothing to tap and install looks broken.

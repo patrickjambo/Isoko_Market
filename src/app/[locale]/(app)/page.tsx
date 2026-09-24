@@ -22,6 +22,7 @@ import { PollRefresh } from '@/components/shared/poll-refresh';
 import { CountUp } from '@/components/home/count-up';
 import { HeroSearch } from '@/components/home/hero-search';
 import { RotatingText } from '@/components/home/rotating-text';
+import { ConnectTradeGrow } from '@/components/home/connect-trade-grow';
 import { HeroShowcase, type HeroSlide } from '@/components/home/hero-showcase';
 import { LiveBadge } from '@/components/home/live-badge';
 import {
@@ -179,6 +180,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
           </div>
         </section>
       )}
+
+      {/* Connect · Trade · Hire · Grow — the four things you can do here. */}
+      <ConnectTradeGrow />
 
       {/* Stats band — social proof for new visitors (guests only). Omits any
           hollow zero and the whole band if the platform is brand new. */}

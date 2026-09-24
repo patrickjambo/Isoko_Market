@@ -6,9 +6,7 @@ import { routing } from './i18n/routing';
 export default createMiddleware(routing);
 
 export const config = {
-  // Skip API routes, Next internals, generated metadata icons (served at a bare
-  // path, e.g. /apple-icon — no dot, so it must be excluded explicitly or the
-  // locale prefix would 307-redirect iOS away from its home-screen icon), and any
-  // file with an extension.
-  matcher: ['/((?!api|_next|_vercel|apple-icon|icon|.*\\..*).*)'],
+  // Skip API routes, Next internals, and any file with an extension (the brand
+  // icon is a static /icon.png, caught by the dotted-file rule).
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
