@@ -86,7 +86,9 @@
     "register": "Sign up",
     "logout": "Log out",
     "language": "Language",
-    "cart": "Cart"
+    "cart": "Cart",
+    "categories": "Categories",
+    "allCategories": "All categories"
   },
   "home": {
     "ctaBrowse": "Browse the marketplace",
@@ -118,7 +120,6 @@
     "ctaGetStarted": "Get Started",
     "ctaSeeWhat": "See what's on Zenova",
     "searchPlaceholder": "Search phones, cars, furniture, jobs…",
-    "browseCategories": "Browse by category",
     "live": "Live",
     "liveUpdating": "Updates automatically",
     "newTodaySuffix": "new in the last 24h",
@@ -138,7 +139,6 @@
     "heroRot2": "Sell it in minutes.",
     "heroRot3": "Find work that fits.",
     "heroRot4": "People you can trust.",
-    "heroTagline": "Rwanda’s marketplace — trade, services & jobs.",
     "ctgConnect": "Connect",
     "ctgTrade": "Trade",
     "ctgHire": "Hire",

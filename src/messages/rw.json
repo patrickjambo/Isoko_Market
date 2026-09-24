@@ -86,7 +86,9 @@
     "register": "Iyandikishe",
     "logout": "Sohoka",
     "language": "Ururimi",
-    "cart": "Agatebo"
+    "cart": "Agatebo",
+    "categories": "Ibyiciro",
+    "allCategories": "Ibyiciro byose"
   },
   "home": {
     "ctaBrowse": "Reba isoko",
@@ -118,7 +120,6 @@
     "ctaGetStarted": "Tangira",
     "ctaSeeWhat": "Reba ibiri kuri Zenova",
     "searchPlaceholder": "Shakisha telefone, imodoka, ibikoresho, akazi…",
-    "browseCategories": "Reba ibyiciro",
     "live": "Bizima",
     "liveUpdating": "Bivugururwa byikora",
     "newTodaySuffix": "bishya mu masaha 24",
@@ -138,7 +139,6 @@
     "heroRot2": "Gurisha mu minota mike.",
     "heroRot3": "Shaka akazi kakubereye.",
     "heroRot4": "Abantu wizeye.",
-    "heroTagline": "Zenova ry’u Rwanda — kugura, serivisi n’akazi.",
     "ctgConnect": "Huza",
     "ctgTrade": "Gucuruza",
     "ctgHire": "Gukoresha",

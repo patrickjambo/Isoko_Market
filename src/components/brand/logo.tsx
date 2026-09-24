@@ -11,10 +11,10 @@ export function LogoMark({ className }: { className?: string }) {
     <Image
       src={logo}
       alt="Zenova"
-      width={44}
-      height={44}
+      width={96}
+      height={96}
       priority
-      className={cn('h-10 w-10 rounded-md object-cover', className)}
+      className={cn('h-12 w-12 rounded-md object-contain', className)}
     />
   );
 }
@@ -30,7 +30,7 @@ export function Logo({
     <span className={cn('inline-flex items-center gap-2', className)}>
       <LogoMark />
       {showText && (
-        <span className="text-xl font-extrabold tracking-tight text-foreground sm:text-2xl">
+        <span className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
           Zenova
         </span>
       )}

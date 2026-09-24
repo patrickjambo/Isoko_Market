@@ -86,7 +86,9 @@
     "register": "S'inscrire",
     "logout": "Se déconnecter",
     "language": "Langue",
-    "cart": "Panier"
+    "cart": "Panier",
+    "categories": "Catégories",
+    "allCategories": "Toutes les catégories"
   },
   "home": {
     "ctaBrowse": "Parcourir le marché",
@@ -118,7 +120,6 @@
     "ctaGetStarted": "Commencer",
     "ctaSeeWhat": "Voir ce qui est sur Zenova",
     "searchPlaceholder": "Rechercher téléphones, voitures, meubles, emplois…",
-    "browseCategories": "Parcourir par catégorie",
     "live": "En direct",
     "liveUpdating": "Mise à jour automatique",
     "newTodaySuffix": "nouveautés en 24h",
@@ -138,7 +139,6 @@
     "heroRot2": "Vendez en quelques minutes.",
     "heroRot3": "Trouvez un travail adapté.",
     "heroRot4": "Des gens de confiance.",
-    "heroTagline": "Le marché du Rwanda — commerce, services & emplois.",
     "ctgConnect": "Connecter",
     "ctgTrade": "Échanger",
     "ctgHire": "Recruter",

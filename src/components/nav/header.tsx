@@ -1,12 +1,15 @@
 import { Search, ShoppingBag } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getCategories } from '@/lib/queries';
+import { categoryName } from '@/lib/i18n-helpers';
 import { Logo } from '@/components/brand/logo';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from './search-bar';
 import { DesktopNavLinks } from './nav-links';
+import { CategoriesMenu } from './categories-menu';
 import { LocaleSwitcher } from './locale-switcher';
 import { PostMenu } from './post-menu';
 import { NotificationBell } from './notification-bell';
@@ -15,14 +18,20 @@ import { UserMenu } from './user-menu';
 export async function Header() {
   const t = await getTranslations('nav');
   const tc = await getTranslations('common');
+  const locale = await getLocale();
   const user = await getCurrentUser();
 
-  const [unread, saved] = user
-    ? await Promise.all([
-        prisma.notification.count({ where: { userId: user.id, readAt: null } }),
-        prisma.favorite.count({ where: { userId: user.id } }),
-      ])
-    : [0, 0];
+  const [unread, saved, categories] = await Promise.all([
+    user
+      ? prisma.notification.count({ where: { userId: user.id, readAt: null } })
+      : Promise.resolve(0),
+    user ? prisma.favorite.count({ where: { userId: user.id } }) : Promise.resolve(0),
+    getCategories(),
+  ]);
+
+  const menuCategories = categories
+    .filter((c) => c.kind === 'PRODUCT')
+    .map((c) => ({ id: c.id, name: categoryName(c, locale) }));
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -31,7 +40,10 @@ export async function Header() {
           <Logo />
         </Link>
 
-        <DesktopNavLinks />
+        <div className="hidden items-center gap-1 md:flex">
+          <DesktopNavLinks />
+          <CategoriesMenu categories={menuCategories} />
+        </div>
 
         <div className="ml-auto hidden max-w-md flex-1 lg:block">
           <SearchBar />

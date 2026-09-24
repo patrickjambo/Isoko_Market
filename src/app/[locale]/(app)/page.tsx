@@ -30,21 +30,18 @@ import {
   getLatestJobs,
   getLatestServices,
   getPlatformStats,
-  getCategories,
 } from '@/lib/queries';
-import { categoryName } from '@/lib/i18n-helpers';
 import { getCurrentUser } from '@/lib/auth';
 
 export default async function HomePage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
   const t = await getTranslations('home');
 
-  const [listings, services, jobs, stats, categories, user] = await Promise.all([
+  const [listings, services, jobs, stats, user] = await Promise.all([
     getFeaturedListings(8),
     getLatestServices(4),
     getLatestJobs(6),
     getPlatformStats(),
-    getCategories(),
     getCurrentUser(),
   ]);
 
@@ -54,8 +51,6 @@ export default async function HomePage({ params }: { params: { locale: string } 
     { icon: Smartphone, title: t('pillarPayTitle'), body: t('pillarPayBody') },
     { icon: Languages, title: t('pillarLangTitle'), body: t('pillarLangBody') },
   ];
-
-  const topCategories = categories.filter((c) => c.kind === 'PRODUCT').slice(0, 8);
 
   // Hero showcase — a looping frame of REAL marketplace photos (our own live
   // content), mixing products and services so it shows the platform in action.
@@ -125,7 +120,6 @@ export default async function HomePage({ params }: { params: { locale: string } 
                 phrases={[t('heroRot1'), t('heroRot2'), t('heroRot3'), t('heroRot4')]}
               />
             </h1>
-            <p className="max-w-md text-base text-white/90 sm:text-lg">{t('heroTagline')}</p>
 
             {/* Prominent, working search into the marketplace */}
             <HeroSearch />
@@ -159,26 +153,6 @@ export default async function HomePage({ params }: { params: { locale: string } 
           </div>
         </div>
       </section>
-      )}
-
-      {/* Category quick-links */}
-      {topCategories.length > 0 && (
-        <section className="border-b border-border bg-card/50">
-          <div className="container flex flex-wrap items-center gap-2 py-4">
-            <span className="mr-1 text-sm font-semibold text-muted-foreground">
-              {t('browseCategories')}
-            </span>
-            {topCategories.map((c) => (
-              <Link
-                key={c.id}
-                href={`/marketplace?categoryId=${c.id}`}
-                className="rounded-full border border-border bg-background px-3.5 py-1.5 text-sm font-medium transition-colors hover:border-primary hover:bg-secondary hover:text-primary"
-              >
-                {categoryName(c, params.locale)}
-              </Link>
-            ))}
-          </div>
-        </section>
       )}
 
       {/* Connect · Trade · Hire · Grow — the four things you can do here. */}
