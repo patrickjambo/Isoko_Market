@@ -29,8 +29,11 @@ export async function Header() {
     getCategories(),
   ]);
 
-  const menuCategories = categories
+  const productCategories = categories
     .filter((c) => c.kind === 'PRODUCT')
+    .map((c) => ({ id: c.id, name: categoryName(c, locale) }));
+  const serviceCategories = categories
+    .filter((c) => c.kind === 'SERVICE')
     .map((c) => ({ id: c.id, name: categoryName(c, locale) }));
 
   return (
@@ -42,7 +45,7 @@ export async function Header() {
 
         <div className="hidden items-center gap-1 md:flex">
           <DesktopNavLinks />
-          <CategoriesMenu categories={menuCategories} />
+          <CategoriesMenu products={productCategories} services={serviceCategories} variant="nav" />
         </div>
 
         <div className="ml-auto hidden max-w-md flex-1 lg:block">
@@ -50,6 +53,14 @@ export async function Header() {
         </div>
 
         <div className="ml-auto flex items-center gap-1 lg:ml-3">
+          {/* Categories reachable on mobile too — the desktop nav (with its text
+              dropdown) is hidden below md, so surface a compact icon trigger. */}
+          <CategoriesMenu
+            products={productCategories}
+            services={serviceCategories}
+            variant="icon"
+            className="md:hidden"
+          />
           {/* Search reachable in one tap on mobile (Section 8.2) */}
           <Button variant="ghost" size="icon" asChild aria-label={tc('search')} className="lg:hidden">
             <Link href="/marketplace">

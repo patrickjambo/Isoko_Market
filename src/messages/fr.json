@@ -88,7 +88,9 @@
     "language": "Langue",
     "cart": "Panier",
     "categories": "Catégories",
-    "allCategories": "Toutes les catégories"
+    "allCategories": "Toutes les catégories",
+    "products": "Produits",
+    "servicesGroup": "Services"
   },
   "home": {
     "ctaBrowse": "Parcourir le marché",

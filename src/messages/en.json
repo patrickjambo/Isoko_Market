@@ -88,7 +88,9 @@
     "language": "Language",
     "cart": "Cart",
     "categories": "Categories",
-    "allCategories": "All categories"
+    "allCategories": "All categories",
+    "products": "Products",
+    "servicesGroup": "Services"
   },
   "home": {
     "ctaBrowse": "Browse the marketplace",
