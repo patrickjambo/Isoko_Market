@@ -89,8 +89,6 @@
     "cart": "Cart"
   },
   "home": {
-    "heroTitle": "Buy, sell, and find work — with people you can trust",
-    "heroSubtitle": "Isoko Market connects Rwandan youth to trade, services, and jobs. Verified profiles, mobile-money payments, and full support in Kinyarwanda, English and French.",
     "ctaBrowse": "Browse the marketplace",
     "ctaJobs": "Find a job",
     "ctaRegister": "Join Isoko free",
@@ -135,7 +133,12 @@
     "ctaBandBody": "Join thousands of Rwandans trading and working on Isoko every day.",
     "showcaseTag": "Live on Isoko",
     "showcaseSale": "For sale",
-    "showcaseService": "Service"
+    "showcaseService": "Service",
+    "heroRot1": "Buy anything, near you.",
+    "heroRot2": "Sell it in minutes.",
+    "heroRot3": "Find work that fits.",
+    "heroRot4": "People you can trust.",
+    "heroTagline": "Rwanda’s marketplace — trade, services & jobs."
   },
   "auth": {
     "loginTitle": "Welcome back",

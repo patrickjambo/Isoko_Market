@@ -21,6 +21,7 @@ import { ResumeDraft } from '@/components/seller/resume-draft';
 import { PollRefresh } from '@/components/shared/poll-refresh';
 import { CountUp } from '@/components/home/count-up';
 import { HeroSearch } from '@/components/home/hero-search';
+import { RotatingText } from '@/components/home/rotating-text';
 import { HeroShowcase, type HeroSlide } from '@/components/home/hero-showcase';
 import { LiveBadge } from '@/components/home/live-badge';
 import {
@@ -118,10 +119,12 @@ export default async function HomePage({ params }: { params: { locale: string } 
               </div>
             )}
 
-            <h1 className="text-3xl font-extrabold leading-tight tracking-tight drop-shadow-sm sm:text-4xl md:text-5xl">
-              {t('heroTitle')}
+            <h1 className="min-h-[2.2em] text-3xl font-extrabold leading-tight tracking-tight drop-shadow-sm sm:text-4xl md:text-5xl">
+              <RotatingText
+                phrases={[t('heroRot1'), t('heroRot2'), t('heroRot3'), t('heroRot4')]}
+              />
             </h1>
-            <p className="max-w-xl text-base text-white/90 sm:text-lg">{t('heroSubtitle')}</p>
+            <p className="max-w-md text-base text-white/90 sm:text-lg">{t('heroTagline')}</p>
 
             {/* Prominent, working search into the marketplace */}
             <HeroSearch />

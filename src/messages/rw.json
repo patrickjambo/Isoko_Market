@@ -89,8 +89,6 @@
     "cart": "Agatebo"
   },
   "home": {
-    "heroTitle": "Gura, gurisha, ushake akazi — ku bantu wizeye",
-    "heroSubtitle": "Isoko Market ihuza urubyiruko rw'u Rwanda n'ubucuruzi, serivisi, n'akazi. Imyirondoro yemejwe, kwishyura hakoreshejwe amafaranga ya telefoni, no gukoresha ikinyarwanda, icyongereza n'igifaransa.",
     "ctaBrowse": "Reba isoko",
     "ctaJobs": "Shaka akazi",
     "ctaRegister": "Injira kuri Isoko ku buntu",
@@ -135,7 +133,12 @@
     "ctaBandBody": "Ifatanye n'ibihumbi by'Abanyarwanda bacuruza kandi bakora kuri Isoko buri munsi.",
     "showcaseTag": "Kuri Isoko",
     "showcaseSale": "Kigurishwa",
-    "showcaseService": "Serivisi"
+    "showcaseService": "Serivisi",
+    "heroRot1": "Gura icyo ushaka, hafi yawe.",
+    "heroRot2": "Gurisha mu minota mike.",
+    "heroRot3": "Shaka akazi kakubereye.",
+    "heroRot4": "Abantu wizeye.",
+    "heroTagline": "Isoko ry’u Rwanda — kugura, serivisi n’akazi."
   },
   "auth": {
     "loginTitle": "Murakaza neza",
