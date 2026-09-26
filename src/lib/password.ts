@@ -1,5 +1,6 @@
 import 'server-only';
 import bcrypt from 'bcryptjs';
+import { randomBytes } from 'node:crypto';
 
 /**
  * Password hashing for platform staff (admins/moderators) who log in with
@@ -14,6 +15,19 @@ export async function hashPassword(plain: string): Promise<string> {
 
 export async function verifyPassword(plain: string, hash: string): Promise<boolean> {
   return bcrypt.compare(plain, hash);
+}
+
+/**
+ * A readable, strong temporary password (letters + digits, passes the policy) —
+ * used when a super admin resets another staff member's password. Ambiguous
+ * characters (0/O, 1/l/I) are omitted so it's easy to relay verbally.
+ */
+export function generatePassword(): string {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+  const bytes = randomBytes(15);
+  let out = '';
+  for (const b of bytes) out += alphabet[b % alphabet.length];
+  return `${out.slice(0, 5)}-${out.slice(5, 10)}-${out.slice(10)}9a`;
 }
 
 /** Minimum policy for a staff password. Returns an error message, or null if OK. */

@@ -853,7 +853,16 @@
     "categorySellerAdded": "Cyongewemo n'umucuruzi",
     "categoryListingCount": "ibicuruzwa {count}",
     "categoryDeleteConfirm": "Gusiba iki cyiciro? Ibicuruzwa {count} bizasigara nta cyiciro. Ntibisubirwaho.",
-    "account": "Konti"
+    "account": "Konti",
+    "statusActiveLabel": "Irakora",
+    "statusInactiveLabel": "Yahagaritswe",
+    "resetPassword": "Subiramo ijambobanga",
+    "activate": "Ongera uyikoreshe",
+    "deactivate": "Hagarika",
+    "resetPasswordDone": "Ijambobanga ry’agateganyo rishya",
+    "resetPasswordHint": "Riha uwo mukozi. Risimbura irya kera kandi rimusohora mu zindi seheji. Agomba kurihindura muri Admin → Konti.",
+    "copy": "Koporora",
+    "copied": "Byakoporowe"
   },
   "trust": {
     "verifiedSeller": "Umucuruzi wemejwe",

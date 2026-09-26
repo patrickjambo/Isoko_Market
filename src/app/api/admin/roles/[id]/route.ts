@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { audit } from '@/lib/audit';
 import { emitAdmin } from '@/lib/admin-realtime';
 import { permissionMatrix, PERMISSION_MODULES, ALL_PERMISSIONS } from '@/lib/permissions';
+import { generatePassword, hashPassword } from '@/lib/password';
 
 const ADMIN_ROLES = ['SUPER_ADMIN', 'MODERATOR', 'SUPPORT', 'FINANCE_ADMIN', 'READONLY_ANALYST'] as const;
 
@@ -32,6 +33,8 @@ export const GET = adminRoute('roles.view', async (_req, ctx: { params: { id: st
 
 const patchSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('setRole'), adminRole: z.enum(ADMIN_ROLES) }),
+  z.object({ op: z.literal('resetPassword') }),
+  z.object({ op: z.literal('setStatus'), status: z.enum(['ACTIVE', 'SUSPENDED']), reason: z.string().trim().max(300).optional() }),
   z.object({
     op: z.literal('setPermission'),
     permissionKey: z.string().refine((k) => ALL_PERMISSIONS.includes(k), 'Unknown permission'),
@@ -53,9 +56,62 @@ export const PATCH = adminRoute(
 
     const target = await prisma.user.findFirst({
       where: { id: ctx.params.id, role: 'ADMIN' },
-      select: { id: true, adminRole: true },
+      select: { id: true, adminRole: true, accountStatus: true, sessionVersion: true },
     });
     if (!target) throw new ApiError('NOT_FOUND', 'Admin not found.');
+
+    if (body.op === 'resetPassword') {
+      // Generate a fresh temporary password, revoke the admin's existing sessions
+      // (sessionVersion bump) and hand the plaintext back ONCE for the super admin
+      // to relay. They should change it under Admin → Account after logging in.
+      const password = generatePassword();
+      await prisma.user.update({
+        where: { id: target.id },
+        data: { passwordHash: await hashPassword(password), sessionVersion: target.sessionVersion + 1 },
+      });
+      const log = await audit({
+        actorId: admin.id,
+        action: 'roles.resetPassword',
+        targetType: 'USER',
+        targetId: target.id,
+      });
+      await emitAdmin('permission.changed', 'Staff password reset');
+      return { data: { password }, meta: { audit: log } };
+    }
+
+    if (body.op === 'setStatus') {
+      const deactivating = body.status !== 'ACTIVE';
+      if (target.id === admin.id) {
+        throw new ApiError('BAD_REQUEST', 'You cannot change your own account status.');
+      }
+      // Never deactivate the last active Super Admin.
+      if (deactivating && target.adminRole === 'SUPER_ADMIN') {
+        const activeSupers = await prisma.user.count({
+          where: { role: 'ADMIN', adminRole: 'SUPER_ADMIN', accountStatus: 'ACTIVE' },
+        });
+        if (activeSupers <= 1) throw new ApiError('BAD_REQUEST', 'At least one active Super Admin is required.');
+      }
+      await prisma.user.update({
+        where: { id: target.id },
+        data: {
+          accountStatus: body.status,
+          statusReason: deactivating ? (body.reason ?? null) : null,
+          // Deactivating revokes any live sessions immediately.
+          ...(deactivating ? { sessionVersion: target.sessionVersion + 1 } : {}),
+        },
+      });
+      const log = await audit({
+        actorId: admin.id,
+        action: deactivating ? 'roles.deactivate' : 'roles.activate',
+        targetType: 'USER',
+        targetId: target.id,
+        reason: body.reason,
+        before: { accountStatus: target.accountStatus },
+        after: { accountStatus: body.status },
+      });
+      await emitAdmin('permission.changed', `Staff ${deactivating ? 'deactivated' : 'activated'}`);
+      return { data: { accountStatus: body.status }, meta: { audit: log } };
+    }
 
     if (body.op === 'setRole') {
       // Never leave the platform without a SUPER_ADMIN.

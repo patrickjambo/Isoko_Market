@@ -853,7 +853,16 @@
     "categorySellerAdded": "Seller-added",
     "categoryListingCount": "{count} listings",
     "categoryDeleteConfirm": "Delete this category? {count} listing(s) will become uncategorised. This cannot be undone.",
-    "account": "Account"
+    "account": "Account",
+    "statusActiveLabel": "Active",
+    "statusInactiveLabel": "Deactivated",
+    "resetPassword": "Reset password",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "resetPasswordDone": "New temporary password",
+    "resetPasswordHint": "Share this with the staff member. It replaces their old password and signs them out of other sessions. They should change it under Admin → Account.",
+    "copy": "Copy",
+    "copied": "Copied"
   },
   "trust": {
     "verifiedSeller": "Verified seller",

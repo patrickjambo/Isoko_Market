@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Loader2, KeyRound, Check, X, CircleDot } from 'lucide-react';
+import { Loader2, KeyRound, Check, X, CircleDot, RotateCcw, Ban, CircleCheck, Copy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
 import { useCan } from '@/components/admin/admin-context';
@@ -51,6 +52,8 @@ export function AdminRoles() {
   const [loading, setLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [savingKey, setSavingKey] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [resetPw, setResetPw] = useState<string | null>(null);
 
   const loadAdmins = useCallback(async () => {
     try {
@@ -84,7 +87,44 @@ export function AdminRoles() {
   }, [loadAdmins]);
   useEffect(() => {
     if (selectedId) loadDetail(selectedId);
+    setResetPw(null); // don't leak one admin's temp password onto another
   }, [selectedId, loadDetail]);
+
+  async function resetPassword() {
+    if (!selectedId) return;
+    setBusy(true);
+    setResetPw(null);
+    try {
+      const { data } = await adminApi<{ password: string }>(`/api/admin/roles/${selectedId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ op: 'resetPassword' }),
+      });
+      setResetPw(data.password);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'error', 'error');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function setStatus(status: 'ACTIVE' | 'SUSPENDED') {
+    if (!selectedId) return;
+    setBusy(true);
+    try {
+      await adminApi(`/api/admin/roles/${selectedId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ op: 'setStatus', status }),
+      });
+      toast(t('actionLogged'), 'success');
+      await Promise.all([loadAdmins(), loadDetail(selectedId)]);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'error', 'error');
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function setRole(adminRole: string) {
     if (!selectedId) return;
@@ -190,6 +230,54 @@ export function AdminRoles() {
                 </Select>
               </div>
             </div>
+
+            {canManage && (
+              <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-border pb-4">
+                <Badge variant={detail.admin.accountStatus === 'ACTIVE' ? 'success' : 'destructive'}>
+                  {detail.admin.accountStatus === 'ACTIVE' ? t('statusActiveLabel') : t('statusInactiveLabel')}
+                </Badge>
+                <div className="ml-auto flex flex-wrap items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={resetPassword} disabled={busy}>
+                    <RotateCcw className="h-4 w-4" /> {t('resetPassword')}
+                  </Button>
+                  {detail.admin.accountStatus === 'ACTIVE' ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setStatus('SUSPENDED')}
+                      disabled={busy}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Ban className="h-4 w-4" /> {t('deactivate')}
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm" onClick={() => setStatus('ACTIVE')} disabled={busy}>
+                      <CircleCheck className="h-4 w-4" /> {t('activate')}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {resetPw && (
+              <div className="mb-4 rounded-lg border border-primary/30 bg-primary/5 px-3 py-3">
+                <p className="text-sm font-semibold text-foreground">{t('resetPasswordDone')}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <code className="rounded bg-background px-2 py-1 font-mono text-sm">{resetPw}</code>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(resetPw);
+                      toast(t('copied'), 'success');
+                    }}
+                  >
+                    <Copy className="h-4 w-4" /> {t('copy')}
+                  </Button>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">{t('resetPasswordHint')}</p>
+              </div>
+            )}
 
             {detail.admin.adminRole === 'SUPER_ADMIN' && (
               <p className="mb-4 rounded-lg bg-secondary/50 px-3 py-2 text-sm text-muted-foreground">

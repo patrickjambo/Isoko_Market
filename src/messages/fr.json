@@ -853,7 +853,16 @@
     "categorySellerAdded": "Ajoutée par un vendeur",
     "categoryListingCount": "{count} annonces",
     "categoryDeleteConfirm": "Supprimer cette catégorie ? {count} annonce(s) seront sans catégorie. Action irréversible.",
-    "account": "Compte"
+    "account": "Compte",
+    "statusActiveLabel": "Actif",
+    "statusInactiveLabel": "Désactivé",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "activate": "Activer",
+    "deactivate": "Désactiver",
+    "resetPasswordDone": "Nouveau mot de passe temporaire",
+    "resetPasswordHint": "Communiquez-le au membre du personnel. Il remplace l’ancien et le déconnecte des autres sessions. Il devra le changer dans Admin → Compte.",
+    "copy": "Copier",
+    "copied": "Copié"
   },
   "trust": {
     "verifiedSeller": "Vendeur vérifié",
