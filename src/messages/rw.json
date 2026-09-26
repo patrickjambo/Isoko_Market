@@ -200,7 +200,8 @@
     "login": "Injira",
     "passwordLabel": "Ijambobanga",
     "passwordPlaceholder": "Ijambobanga ryawe",
-    "staffPasswordSubtitle": "Andika ijambobanga rya {email}"
+    "staffPasswordSubtitle": "Andika ijambobanga rya {email}",
+    "useCodeInstead": "Injira ukoresheje kode"
   },
   "marketplace": {
     "title": "Zenova",

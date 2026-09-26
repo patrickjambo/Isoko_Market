@@ -8,7 +8,7 @@ import { env } from '@/lib/env';
 
 export const POST = route(async (req: NextRequest) => {
   const body = await req.json().catch(() => ({}));
-  const { email, mode, locale } = requestOtpSchema.parse(body);
+  const { email, mode, locale, forceOtp } = requestOtpSchema.parse(body);
 
   // Login authenticates EXISTING accounts only — don't create one (or waste a
   // code) for an unknown email; the client redirects these to Get Started so a
@@ -22,8 +22,9 @@ export const POST = route(async (req: NextRequest) => {
       throw new ApiError('NOT_FOUND', 'No account found for this email. Please register first.');
     }
     // Staff (ADMIN accounts with a password) log in with email + password — no
-    // OTP. Tell the client to show the password field instead of sending a code.
-    if (existing.passwordHash && existing.role === 'ADMIN') {
+    // OTP. Tell the client to show the password field instead of sending a code,
+    // UNLESS they explicitly asked for a code (forgot-password escape hatch).
+    if (existing.passwordHash && existing.role === 'ADMIN' && !forceOtp) {
       return jsonOk({ ok: true, method: 'password' });
     }
   }

@@ -200,7 +200,8 @@
     "login": "Log in",
     "passwordLabel": "Password",
     "passwordPlaceholder": "Your password",
-    "staffPasswordSubtitle": "Enter the password for {email}"
+    "staffPasswordSubtitle": "Enter the password for {email}",
+    "useCodeInstead": "Log in with a code instead"
   },
   "marketplace": {
     "title": "Marketplace",

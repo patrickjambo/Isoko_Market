@@ -37,6 +37,7 @@ export function AuthForm({
   const [role, setRole] = useState<'BUYER' | 'SELLER' | 'EMPLOYER'>('BUYER');
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
+  const [forcedOtp, setForcedOtp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendIn, setResendIn] = useState(0);
@@ -48,7 +49,7 @@ export function AuthForm({
     return () => clearTimeout(id);
   }, [resendIn]);
 
-  async function requestOtp(e?: React.FormEvent) {
+  async function requestOtp(e?: React.FormEvent, opts?: { forceOtp?: boolean }) {
     e?.preventDefault();
     setError(null);
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
@@ -59,12 +60,13 @@ export function AuthForm({
       setError(t('fullNameLabel'));
       return;
     }
+    if (opts?.forceOtp) setForcedOtp(true);
     setLoading(true);
     try {
       const res = await fetch('/api/auth/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, mode, locale }),
+        body: JSON.stringify({ email, mode, locale, ...(opts?.forceOtp ? { forceOtp: true } : {}) }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -251,17 +253,28 @@ export function AuthForm({
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {loading ? t('verifying') : t('login')}
           </Button>
-          <button
-            type="button"
-            onClick={() => {
-              setStep('email');
-              setPassword('');
-              setError(null);
-            }}
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" /> {t('changeEmail')}
-          </button>
+          <div className="flex items-center justify-between text-sm">
+            <button
+              type="button"
+              onClick={() => {
+                setStep('email');
+                setPassword('');
+                setError(null);
+              }}
+              className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" /> {t('changeEmail')}
+            </button>
+            {/* Forgot password → fall back to a one-time email code. */}
+            <button
+              type="button"
+              onClick={() => requestOtp(undefined, { forceOtp: true })}
+              disabled={loading}
+              className="font-semibold text-primary hover:underline disabled:text-muted-foreground"
+            >
+              {t('useCodeInstead')}
+            </button>
+          </div>
         </form>
       ) : (
         <form onSubmit={verify} className="space-y-4" noValidate>
@@ -306,7 +319,7 @@ export function AuthForm({
             </button>
             <button
               type="button"
-              onClick={() => requestOtp()}
+              onClick={() => requestOtp(undefined, { forceOtp: forcedOtp })}
               disabled={resendIn > 0 || loading}
               className="font-semibold text-primary disabled:text-muted-foreground"
             >

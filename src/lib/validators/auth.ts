@@ -25,6 +25,9 @@ export const requestOtpSchema = z.object({
   mode: authModeSchema,
   // Carried into the magic link so the post-login redirect uses the right locale.
   locale: z.enum(['rw', 'en', 'fr']).optional(),
+  // Staff normally get a password prompt (no OTP). This forces a one-time code to
+  // be sent instead — the "forgot my password / log in with a code" escape hatch.
+  forceOtp: z.boolean().optional(),
 });
 
 export const verifyOtpSchema = z.object({

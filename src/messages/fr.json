@@ -200,7 +200,8 @@
     "login": "Se connecter",
     "passwordLabel": "Mot de passe",
     "passwordPlaceholder": "Votre mot de passe",
-    "staffPasswordSubtitle": "Saisissez le mot de passe pour {email}"
+    "staffPasswordSubtitle": "Saisissez le mot de passe pour {email}",
+    "useCodeInstead": "Se connecter avec un code"
   },
   "marketplace": {
     "title": "Marché",
