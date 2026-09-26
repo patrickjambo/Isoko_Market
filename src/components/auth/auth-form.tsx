@@ -12,7 +12,7 @@ import { useToast } from '@/components/ui/toast';
 import { intentHome, type Intent } from '@/lib/onboarding';
 
 type Mode = 'login' | 'register';
-type Step = 'email' | 'otp';
+type Step = 'email' | 'otp' | 'password';
 
 export function AuthForm({
   mode,
@@ -36,6 +36,7 @@ export function AuthForm({
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState<'BUYER' | 'SELLER' | 'EMPLOYER'>('BUYER');
   const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendIn, setResendIn] = useState(0);
@@ -76,9 +77,37 @@ export function AuthForm({
         }
         throw new Error(data.error?.message ?? 'error');
       }
+      // Staff accounts log in with a password (no OTP) — the server tells us
+      // which step to show next.
+      if (data.method === 'password') {
+        setStep('password');
+        return;
+      }
       setDevHint(Boolean(data.devHint));
       setStep('otp');
       setResendIn(50);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loginWithPassword(e?: React.FormEvent) {
+    e?.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/staff-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message ?? 'error');
+      toast(t('loginTitle'), 'success');
+      router.push(returnTo || data.redirectTo || '/');
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'error');
     } finally {
@@ -136,7 +165,9 @@ export function AuthForm({
             ? mode === 'login'
               ? t('loginSubtitle')
               : t('registerSubtitle')
-            : t('otpSubtitle', { email })}
+            : step === 'password'
+              ? t('staffPasswordSubtitle', { email })
+              : t('otpSubtitle', { email })}
         </p>
       </div>
 
@@ -200,6 +231,37 @@ export function AuthForm({
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {loading ? t('sendingCode') : t('sendCode')}
           </Button>
+        </form>
+      ) : step === 'password' ? (
+        <form onSubmit={loginWithPassword} className="space-y-4" noValidate>
+          <div className="space-y-1.5">
+            <Label htmlFor="password">{t('passwordLabel')}</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={t('passwordPlaceholder')}
+              autoComplete="current-password"
+              required
+              autoFocus
+            />
+          </div>
+          <Button type="submit" size="lg" className="w-full" disabled={loading || !password}>
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {loading ? t('verifying') : t('login')}
+          </Button>
+          <button
+            type="button"
+            onClick={() => {
+              setStep('email');
+              setPassword('');
+              setError(null);
+            }}
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" /> {t('changeEmail')}
+          </button>
         </form>
       ) : (
         <form onSubmit={verify} className="space-y-4" noValidate>

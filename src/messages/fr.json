@@ -196,7 +196,11 @@
     "magicInvalidBody": "Ce lien de connexion est incomplet. Demandez un nouveau code pour vous connecter.",
     "backToLogin": "Retour à la connexion",
     "linkExpired": "Ce lien de connexion a expiré ou a déjà été utilisé. Demandez un nouveau code ci-dessous.",
-    "tooManyAttempts": "Trop de tentatives. Patientez quelques minutes, puis demandez un nouveau code."
+    "tooManyAttempts": "Trop de tentatives. Patientez quelques minutes, puis demandez un nouveau code.",
+    "login": "Se connecter",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Votre mot de passe",
+    "staffPasswordSubtitle": "Saisissez le mot de passe pour {email}"
   },
   "marketplace": {
     "title": "Marché",
@@ -631,7 +635,7 @@
     "title": "Se faire vérifier",
     "subtitle": "Obtenez un badge vérifié et gagnez la confiance des acheteurs et employeurs",
     "why": "Pourquoi nous le demandons",
-    "whyBody": "Votre carte d'identité nationale confirme que vous êtes une personne réelle. Elle est chiffrée, jamais affichée publiquement, et examinée uniquement par notre équipe de confiance.",
+    "whyBody": "Une photo nette de votre carte d'identité nationale permet à notre équipe de vérifier que vous êtes une personne réelle. Elle est chiffrée, jamais affichée publiquement, et examinée uniquement par notre équipe de confiance.",
     "uploadLabel": "Téléversez votre carte d'identité nationale",
     "uploadHint": "Une photo nette du recto de votre carte.",
     "submit": "Soumettre pour vérification",
@@ -847,7 +851,8 @@
     "categoryService": "Service",
     "categorySellerAdded": "Ajoutée par un vendeur",
     "categoryListingCount": "{count} annonces",
-    "categoryDeleteConfirm": "Supprimer cette catégorie ? {count} annonce(s) seront sans catégorie. Action irréversible."
+    "categoryDeleteConfirm": "Supprimer cette catégorie ? {count} annonce(s) seront sans catégorie. Action irréversible.",
+    "account": "Compte"
   },
   "trust": {
     "verifiedSeller": "Vendeur vérifié",
@@ -1243,5 +1248,21 @@
     "seeker": "Chercheur d'emploi",
     "employer": "Employeur",
     "admin": "Admin"
+  },
+  "adminAccount": {
+    "title": "Compte et sécurité",
+    "subtitle": "Modifiez l’e-mail et le mot de passe de connexion.",
+    "emailLabel": "E-mail de connexion",
+    "newPasswordLabel": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Laisser vide pour conserver",
+    "passwordHint": "Au moins 8 caractères, avec une lettre et un chiffre.",
+    "confirmLabel": "Confirmer le nouveau mot de passe",
+    "currentPasswordLabel": "Mot de passe actuel",
+    "currentPasswordPlaceholder": "Saisissez votre mot de passe actuel",
+    "reauthHint": "Requis pour confirmer toute modification.",
+    "save": "Enregistrer",
+    "saved": "Vos identifiants ont été mis à jour.",
+    "mismatch": "Les nouveaux mots de passe ne correspondent pas.",
+    "nothingToChange": "Modifiez d’abord votre e-mail ou mot de passe."
   }
 }

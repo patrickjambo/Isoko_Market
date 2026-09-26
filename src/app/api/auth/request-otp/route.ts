@@ -14,9 +14,17 @@ export const POST = route(async (req: NextRequest) => {
   // code) for an unknown email; the client redirects these to Get Started so a
   // new user registers with a goal + name.
   if (mode === 'login') {
-    const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+    const existing = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, passwordHash: true, role: true },
+    });
     if (!existing) {
       throw new ApiError('NOT_FOUND', 'No account found for this email. Please register first.');
+    }
+    // Staff (ADMIN accounts with a password) log in with email + password — no
+    // OTP. Tell the client to show the password field instead of sending a code.
+    if (existing.passwordHash && existing.role === 'ADMIN') {
+      return jsonOk({ ok: true, method: 'password' });
     }
   }
 
@@ -36,7 +44,12 @@ export const POST = route(async (req: NextRequest) => {
   // return the code itself — EXCEPT under the E2E test flag (never production),
   // so Playwright can complete the OTP flow deterministically.
   const e2e = env.NODE_ENV !== 'production' && process.env.E2E_TESTING === '1';
-  return jsonOk({ ok: true, devHint: env.NODE_ENV === 'development', ...(e2e ? { code } : {}) });
+  return jsonOk({
+    ok: true,
+    method: 'otp',
+    devHint: env.NODE_ENV === 'development',
+    ...(e2e ? { code } : {}),
+  });
 });
 
 // Guard against accidental GET.

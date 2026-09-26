@@ -196,7 +196,11 @@
     "magicInvalidBody": "Iyi link yo kwinjira ibuze amakuru. Saba kode nshya kugira ngo winjire.",
     "backToLogin": "Subira ku kwinjira",
     "linkExpired": "Iyo link yo kwinjira yararengeje igihe cyangwa yamaze gukoreshwa. Saba kode nshya hepfo.",
-    "tooManyAttempts": "Wagerageje kenshi cyane. Tegereza iminota mike, hanyuma usabe kode nshya."
+    "tooManyAttempts": "Wagerageje kenshi cyane. Tegereza iminota mike, hanyuma usabe kode nshya.",
+    "login": "Injira",
+    "passwordLabel": "Ijambobanga",
+    "passwordPlaceholder": "Ijambobanga ryawe",
+    "staffPasswordSubtitle": "Andika ijambobanga rya {email}"
   },
   "marketplace": {
     "title": "Zenova",
@@ -631,7 +635,7 @@
     "title": "Wemezwe",
     "subtitle": "Bona ikimenyetso cy'uwemejwe kandi wubake icyizere n'abaguzi n'abakoresha",
     "why": "Impamvu dusaba ibi",
-    "whyBody": "Indangamuntu yawe yemeza ko uri umuntu nyawe. Irabikwa mu ibanga, ntiyerekanwa ku mugaragaro, kandi isuzumwa gusa n'itsinda ryacu ry'icyizere.",
+    "whyBody": "Ifoto isobanutse y'indangamuntu yawe ituma itsinda ryacu risuzuma ko uri umuntu nyawe. Irabikwa mu ibanga, ntiyerekanwa ku mugaragaro, kandi isuzumwa gusa n'itsinda ryacu ry'icyizere.",
     "uploadLabel": "Shyiraho indangamuntu yawe",
     "uploadHint": "Ifoto isobanutse y'uruhande rw'imbere rw'indangamuntu.",
     "submit": "Ohereza kugira ngo wemezwe",
@@ -847,7 +851,8 @@
     "categoryService": "Serivisi",
     "categorySellerAdded": "Cyongewemo n'umucuruzi",
     "categoryListingCount": "ibicuruzwa {count}",
-    "categoryDeleteConfirm": "Gusiba iki cyiciro? Ibicuruzwa {count} bizasigara nta cyiciro. Ntibisubirwaho."
+    "categoryDeleteConfirm": "Gusiba iki cyiciro? Ibicuruzwa {count} bizasigara nta cyiciro. Ntibisubirwaho.",
+    "account": "Konti"
   },
   "trust": {
     "verifiedSeller": "Umucuruzi wemejwe",
@@ -1243,5 +1248,21 @@
     "seeker": "Ushaka akazi",
     "employer": "Utanga akazi",
     "admin": "Umuyobozi"
+  },
+  "adminAccount": {
+    "title": "Konti n’umutekano",
+    "subtitle": "Hindura imeyili n’ijambobanga winjiza.",
+    "emailLabel": "Imeyili yo kwinjira",
+    "newPasswordLabel": "Ijambobanga rishya",
+    "newPasswordPlaceholder": "Siga ubusa kugira ngo urigumane",
+    "passwordHint": "Byibura inyuguti 8, hakaba inyuguti n’umubare.",
+    "confirmLabel": "Emeza ijambobanga rishya",
+    "currentPasswordLabel": "Ijambobanga rigezweho",
+    "currentPasswordPlaceholder": "Andika ijambobanga rigezweho",
+    "reauthHint": "Rirakenewe kugira ngo wemeze impinduka.",
+    "save": "Bika impinduka",
+    "saved": "Ibyo winjiza byahinduwe.",
+    "mismatch": "Amagambobanga mashya ntabwo ahura.",
+    "nothingToChange": "Banza uhindure imeyili cyangwa ijambobanga."
   }
 }

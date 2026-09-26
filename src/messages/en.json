@@ -196,7 +196,11 @@
     "magicInvalidBody": "This login link is missing information. Request a new code to sign in.",
     "backToLogin": "Back to login",
     "linkExpired": "That login link has expired or was already used. Request a new code below.",
-    "tooManyAttempts": "Too many attempts. Please wait a few minutes, then request a new code."
+    "tooManyAttempts": "Too many attempts. Please wait a few minutes, then request a new code.",
+    "login": "Log in",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Your password",
+    "staffPasswordSubtitle": "Enter the password for {email}"
   },
   "marketplace": {
     "title": "Marketplace",
@@ -631,7 +635,7 @@
     "title": "Get verified",
     "subtitle": "Earn a verified badge and build trust with buyers and employers",
     "why": "Why we ask this",
-    "whyBody": "Your National ID confirms you are a real person. It is encrypted, never shown publicly, and only reviewed by our trust team.",
+    "whyBody": "A clear photo of your National ID lets our team check you're a real person. It is encrypted, never shown publicly, and only reviewed by our trust team.",
     "uploadLabel": "Upload your National ID",
     "uploadHint": "A clear photo of the front of your ID card.",
     "submit": "Submit for verification",
@@ -847,7 +851,8 @@
     "categoryService": "Service",
     "categorySellerAdded": "Seller-added",
     "categoryListingCount": "{count} listings",
-    "categoryDeleteConfirm": "Delete this category? {count} listing(s) will become uncategorised. This cannot be undone."
+    "categoryDeleteConfirm": "Delete this category? {count} listing(s) will become uncategorised. This cannot be undone.",
+    "account": "Account"
   },
   "trust": {
     "verifiedSeller": "Verified seller",
@@ -1243,5 +1248,21 @@
     "seeker": "Job seeker",
     "employer": "Employer",
     "admin": "Admin"
+  },
+  "adminAccount": {
+    "title": "Account & security",
+    "subtitle": "Change the email and password you use to sign in.",
+    "emailLabel": "Login email",
+    "newPasswordLabel": "New password",
+    "newPasswordPlaceholder": "Leave blank to keep current",
+    "passwordHint": "At least 8 characters, with a letter and a number.",
+    "confirmLabel": "Confirm new password",
+    "currentPasswordLabel": "Current password",
+    "currentPasswordPlaceholder": "Enter your current password",
+    "reauthHint": "Required to confirm any change.",
+    "save": "Save changes",
+    "saved": "Your credentials were updated.",
+    "mismatch": "The new passwords do not match.",
+    "nothingToChange": "Change your email or password first."
   }
 }

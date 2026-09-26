@@ -15,6 +15,7 @@ import {
   KeyRound,
   ScrollText,
   Tags,
+  UserCog,
   PanelLeftClose,
   PanelLeftOpen,
   Menu,
@@ -98,6 +99,8 @@ export function AdminShell({
       { href: '/admin/content', label: t('content'), icon: Languages, perm: 'content.view' },
       { href: '/admin/roles', label: t('rolesPanel'), icon: KeyRound, perm: 'roles.view' },
       { href: '/admin/audit', label: t('auditLog'), icon: ScrollText, perm: 'audit.view' },
+      // Self-service credentials — every admin can manage their own login (no perm).
+      { href: '/admin/account', label: t('account'), icon: UserCog },
     ] as NavItem[]
   ).filter((item) => can(item.perm));
 

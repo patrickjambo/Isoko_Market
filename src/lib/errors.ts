@@ -111,6 +111,15 @@ const ERROR_TRANSLATIONS: Record<string, LocalizedError> = {
   "Use a hex colour like #0F766E.": { rw: "Koresha ibara rya hex nka #0F766E.", fr: "Utilisez une couleur hexadécimale comme #0F766E." },
   "Write a message.": { rw: "Andika ubutumwa.", fr: "Écrivez un message." },
 
+  // ── staff password login + account settings ──
+  "Invalid email or password.": { rw: "Imeyili cyangwa ijambobanga si byo.", fr: "E-mail ou mot de passe incorrect." },
+  "This account is not active. Contact an administrator.": { rw: "Iyi konti ntikora. Vugana n’umuyobozi.", fr: "Ce compte n’est pas actif. Contactez un administrateur." },
+  "Current password is incorrect.": { rw: "Ijambobanga rigezweho si ryo.", fr: "Le mot de passe actuel est incorrect." },
+  "That email is already in use.": { rw: "Iyo imeyili isanzwe ikoreshwa.", fr: "Cet e-mail est déjà utilisé." },
+  "Admins only.": { rw: "Abayobozi gusa.", fr: "Administrateurs uniquement." },
+  "Password must be at least 8 characters.": { rw: "Ijambobanga rigomba kuba nibura inyuguti 8.", fr: "Le mot de passe doit comporter au moins 8 caractères." },
+  "Password must include at least one letter and one number.": { rw: "Ijambobanga rigomba kugira nibura inyuguti n’umubare.", fr: "Le mot de passe doit contenir au moins une lettre et un chiffre." },
+
   // ── generic wrapper messages (VALIDATION / INTERNAL) ──
   "Please check the highlighted fields.": { rw: "Reba ibisabwa byagaragajwe.", fr: "Veuillez vérifier les champs indiqués." },
   "Something went wrong. Please try again.": { rw: "Habaye ikibazo. Ongera ugerageze.", fr: "Une erreur s’est produite. Réessayez." },
