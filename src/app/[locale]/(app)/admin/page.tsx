@@ -105,9 +105,10 @@ export default async function AdminOverviewPage({ params }: { params: { locale: 
       </header>
 
       {/* Advanced cards */}
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <Card
           href="/admin/users"
+          tone="emerald"
           icon={Users}
           label={t('cardActiveUsers')}
           value={users.toLocaleString()}
@@ -123,6 +124,7 @@ export default async function AdminOverviewPage({ params }: { params: { locale: 
         />
         <Card
           href="/admin/verifications"
+          tone="sky"
           icon={ShieldCheck}
           label={t('cardVerificationQueue')}
           value={pendingVerif.toLocaleString()}
@@ -131,6 +133,7 @@ export default async function AdminOverviewPage({ params }: { params: { locale: 
         />
         <Card
           href="/admin/moderation"
+          tone="violet"
           icon={Flag}
           label={t('cardModeration')}
           value={openReports.toLocaleString()}
@@ -139,6 +142,7 @@ export default async function AdminOverviewPage({ params }: { params: { locale: 
         />
         <Card
           href="/admin/listings"
+          tone="teal"
           icon={ShoppingBag}
           label={t('cardListings')}
           value={listings.toLocaleString()}
@@ -150,6 +154,7 @@ export default async function AdminOverviewPage({ params }: { params: { locale: 
         />
         <Card
           href="/admin/transactions"
+          tone="amber"
           icon={CreditCard}
           label={t('cardTransactions')}
           value={formatRWF(revenueToday._sum.amount ?? 0, params.locale)}
@@ -161,6 +166,7 @@ export default async function AdminOverviewPage({ params }: { params: { locale: 
         />
         <Card
           href="/admin/analytics"
+          tone="rose"
           icon={Briefcase}
           label={t('cardJobs')}
           value={jobs.toLocaleString()}
@@ -168,24 +174,36 @@ export default async function AdminOverviewPage({ params }: { params: { locale: 
         />
 
         {/* System Health — live in-process metrics (Sentry corroborates in prod) */}
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Radio className="h-4 w-4" /> {t('cardHealth')}
+        <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <div className="flex items-start justify-between">
+            <span
+              className={cn(
+                'flex h-10 w-10 items-center justify-center rounded-xl',
+                healthStatus === 'green'
+                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                  : healthStatus === 'yellow'
+                    ? 'bg-amber-500/10 text-amber-600'
+                    : 'bg-rose-500/10 text-rose-600'
+              )}
+            >
+              <Radio className="h-5 w-5" />
             </span>
             <span
               className={cn(
-                'h-3 w-3 rounded-full',
+                'mt-1 h-2.5 w-2.5 rounded-full',
                 healthStatus === 'green'
-                  ? 'bg-success'
+                  ? 'bg-success ring-4 ring-success/15'
                   : healthStatus === 'yellow'
-                    ? 'bg-accent'
-                    : 'bg-destructive'
+                    ? 'bg-accent ring-4 ring-accent/15'
+                    : 'bg-destructive ring-4 ring-destructive/15'
               )}
               title={healthStatus}
             />
           </div>
-          <p className="text-2xl font-extrabold">{t(`health_${healthStatus}`)}</p>
+          <div className="space-y-0.5">
+            <p className="text-sm font-medium text-muted-foreground">{t('cardHealth')}</p>
+            <p className="text-2xl font-extrabold tracking-tight">{t(`health_${healthStatus}`)}</p>
+          </div>
           <div className="grid grid-cols-3 gap-1 text-xs text-muted-foreground">
             <span>
               {t('latency')}: <span className="font-semibold text-foreground">{health.p50}ms</span>
@@ -204,7 +222,7 @@ export default async function AdminOverviewPage({ params }: { params: { locale: 
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
         <section>
           <h2 className="mb-3 font-semibold">{t('kpiGoals')}</h2>
-          <div className="space-y-4 rounded-xl border border-border bg-card p-4">
+          <div className="space-y-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
             <KpiBar label={t('metricUsers')} value={users} goal={GOAL_USERS} />
             <KpiBar label={t('metricTransactions')} value={txSuccess} goal={GOAL_TRANSACTIONS} />
           </div>
@@ -217,6 +235,17 @@ export default async function AdminOverviewPage({ params }: { params: { locale: 
   );
 }
 
+type Tone = 'emerald' | 'sky' | 'violet' | 'amber' | 'teal' | 'rose';
+
+const TONE_TILE: Record<Tone, string> = {
+  emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  sky: 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
+  violet: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+  amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-500',
+  teal: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
+  rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
+};
+
 function Card({
   href,
   icon: Icon,
@@ -225,6 +254,7 @@ function Card({
   extra,
   chart,
   alert,
+  tone = 'emerald',
 }: {
   href: string;
   icon: LucideIcon;
@@ -233,19 +263,30 @@ function Card({
   extra?: React.ReactNode;
   chart?: React.ReactNode;
   alert?: boolean;
+  tone?: Tone;
 }) {
   return (
     <Link
       href={href}
-      className="group flex flex-col gap-2 rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-md"
+      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg"
     >
-      <div className="flex items-center justify-between">
-        <span className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Icon className="h-4 w-4" /> {label}
+      <div className="flex items-start justify-between">
+        <span
+          className={cn(
+            'flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105',
+            TONE_TILE[tone]
+          )}
+        >
+          <Icon className="h-5 w-5" />
         </span>
-        {alert && <span className="h-2.5 w-2.5 rounded-full bg-destructive" />}
+        {alert && (
+          <span className="flex h-2.5 w-2.5 shrink-0 rounded-full bg-destructive ring-4 ring-destructive/15" />
+        )}
       </div>
-      <p className="text-2xl font-extrabold">{value}</p>
+      <div className="space-y-0.5">
+        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        <p className="text-2xl font-extrabold tracking-tight">{value}</p>
+      </div>
       {chart}
       {extra}
     </Link>
@@ -263,7 +304,10 @@ function KpiBar({ label, value, goal }: { label: string; value: number; goal: nu
         </span>
       </div>
       <div className="h-2.5 overflow-hidden rounded-full bg-secondary">
-        <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );
