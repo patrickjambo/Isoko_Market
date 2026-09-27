@@ -29,10 +29,13 @@ import { formatRWF } from '@/lib/utils';
 export function BuyNowButton({
   listingId,
   price,
+  fee = 0,
   locale,
 }: {
   listingId: string;
   price: number;
+  /** Platform commission (RWF minor units) deducted from the seller's payout. */
+  fee?: number;
   locale: string;
 }) {
   const t = useTranslations('orders');
@@ -84,9 +87,23 @@ export function BuyNowButton({
           <DialogTitle>{t('orderSummary')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
-            <span className="text-sm text-muted-foreground">{t('youPay')}</span>
-            <span className="text-xl font-extrabold text-primary">{formatRWF(price, locale)}</span>
+          <div className="rounded-lg bg-secondary/50 p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">{t('youPay')}</span>
+              <span className="text-xl font-extrabold text-primary">{formatRWF(price, locale)}</span>
+            </div>
+            {fee > 0 && (
+              <div className="mt-2 space-y-1 border-t border-border pt-2 text-xs text-muted-foreground">
+                <div className="flex items-center justify-between">
+                  <span>{t('platformFee')}</span>
+                  <span>{formatRWF(fee, locale)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>{t('sellerReceives')}</span>
+                  <span className="font-semibold text-foreground">{formatRWF(price - fee, locale)}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">

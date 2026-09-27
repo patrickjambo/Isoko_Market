@@ -18,6 +18,7 @@ import { ShareButton } from '@/components/shared/share-button';
 import { ListingOwnerActions } from '@/components/marketplace/listing-owner-actions';
 import { LiveItemStatus } from '@/components/shared/live-item-status';
 import { getListing, getSimilarListings } from '@/lib/queries';
+import { quoteCommission } from '@/lib/commission';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { suggestPrice } from '@/lib/suggestions';
@@ -203,6 +204,7 @@ export default async function ListingDetailPage({
                     <BuyNowButton
                       listingId={listing.id}
                       price={listing.price}
+                      fee={(await quoteCommission(listing.price, listing.seller.createdAt)).fee}
                       locale={params.locale}
                     />
                   )

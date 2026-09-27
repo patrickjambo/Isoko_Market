@@ -1153,7 +1153,9 @@
     "awaitingPayoutBuyer": "En attente que le vendeur communique son numéro de paiement — nous l'avons prévenu. Vous pourrez payer dès qu'il l'ajoute.",
     "awaitingPayoutSeller": "Un acheteur veut cet article ! Ajoutez votre numéro MoMo/Airtel pour qu'il puisse vous payer.",
     "addPayoutCta": "Ajouter un numéro de paiement",
-    "headerSubtitle": "Suivez vos achats et vos ventes"
+    "headerSubtitle": "Suivez vos achats et vos ventes",
+    "platformFee": "Frais de plateforme",
+    "sellerReceives": "Le vendeur reçoit"
   },
   "saved": {
     "title": "Enregistrés",

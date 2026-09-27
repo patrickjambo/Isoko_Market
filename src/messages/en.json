@@ -1153,7 +1153,9 @@
     "awaitingPayoutBuyer": "Waiting for the seller to share their payment number — we've notified them. You'll be able to pay once they add it.",
     "awaitingPayoutSeller": "A buyer wants this item! Add your MoMo/Airtel number so they can pay you.",
     "addPayoutCta": "Add payment number",
-    "headerSubtitle": "Track what you've bought and sold"
+    "headerSubtitle": "Track what you've bought and sold",
+    "platformFee": "Platform fee",
+    "sellerReceives": "Seller receives"
   },
   "saved": {
     "title": "Saved",

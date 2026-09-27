@@ -1153,7 +1153,9 @@
     "awaitingPayoutBuyer": "Turategereje ko umucuruzi atanga nimero yo kwishyuraho — twamumenyesheje. Uzabasha kwishyura akimara kuyongeraho.",
     "awaitingPayoutSeller": "Umuguzi arashaka iki kintu! Ongeraho nimero yawe ya MoMo/Airtel kugira ngo ashobore kukwishyura.",
     "addPayoutCta": "Ongeraho nimero yo kwishyuraho",
-    "headerSubtitle": "Kurikirana ibyo waguze n'ibyo wagurishije"
+    "headerSubtitle": "Kurikirana ibyo waguze n'ibyo wagurishije",
+    "platformFee": "Amafaranga y’urubuga",
+    "sellerReceives": "Umugurisha yakira"
   },
   "saved": {
     "title": "Ibyabitswe",
