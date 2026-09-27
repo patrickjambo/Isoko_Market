@@ -904,7 +904,8 @@
     "decisionNotePlaceholder": "Add a note explaining the decision (optional)…",
     "favourBuyer": "Resolve for buyer",
     "favourSeller": "Resolve for seller",
-    "disputeResolved": "Dispute resolved"
+    "disputeResolved": "Dispute resolved",
+    "settingsTitle": "Settings"
   },
   "trust": {
     "verifiedSeller": "Verified seller",
@@ -1362,5 +1363,35 @@
     "adminSubtitle": "Help-desk requests from users.",
     "queueEmpty": "No tickets in this view",
     "highPriority": "High priority"
+  },
+  "commission": {
+    "title": "Commission & fees",
+    "subtitle": "Control the platform commission taken on each sale — no code needed.",
+    "enableTitle": "Charge commission",
+    "enableHint": "When on, the platform keeps a commission from each completed sale.",
+    "typeLabel": "Commission type",
+    "typePercent": "Percentage of sale",
+    "typeFixed": "Fixed amount per sale",
+    "percentLabel": "Percentage",
+    "fixedLabel": "Fixed amount (RWF)",
+    "minLabel": "Minimum fee (RWF)",
+    "maxLabel": "Maximum fee (RWF)",
+    "destKindLabel": "Send commission to",
+    "destPhone": "Phone number",
+    "destCode": "MoMo code",
+    "destValueLabel": "Number / code",
+    "startsAtLabel": "Start charging on",
+    "startsAtHint": "Leave empty to charge immediately. Before this date it stays free for everyone.",
+    "freeDaysLabel": "Free period for new sellers (days)",
+    "freeNone": "None",
+    "freeMonth": "1 month",
+    "freeYear": "1 year",
+    "previewTitle": "Preview",
+    "previewSale": "On a sale of (RWF)",
+    "previewFee": "Commission",
+    "previewSeller": "Seller receives",
+    "save": "Save settings",
+    "saved": "Commission settings saved",
+    "errDestination": "Set a destination (phone or MoMo code) before enabling."
   }
 }

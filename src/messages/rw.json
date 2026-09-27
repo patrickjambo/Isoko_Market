@@ -904,7 +904,8 @@
     "decisionNotePlaceholder": "Ongeraho impamvu y’icyemezo (si ngombwa)…",
     "favourBuyer": "Kemurira umuguzi",
     "favourSeller": "Kemurira umugurisha",
-    "disputeResolved": "Impaka yakemuwe"
+    "disputeResolved": "Impaka yakemuwe",
+    "settingsTitle": "Igenamiterere"
   },
   "trust": {
     "verifiedSeller": "Umucuruzi wemejwe",
@@ -1362,5 +1363,35 @@
     "adminSubtitle": "Ibibazo by’abakoresha.",
     "queueEmpty": "Nta tike iri muri iyi ngingo",
     "highPriority": "Byihutirwa"
+  },
+  "commission": {
+    "title": "Komisiyo n’amafaranga",
+    "subtitle": "Genzura komisiyo urubuga rufata kuri buri gurisha — nta code ikenewe.",
+    "enableTitle": "Gufata komisiyo",
+    "enableHint": "Iyo bikora, urubuga rufata komisiyo kuri buri gurisha ryarangiye.",
+    "typeLabel": "Ubwoko bwa komisiyo",
+    "typePercent": "Ijanisha ry’igurisha",
+    "typeFixed": "Amafaranga ahoraho kuri buri gurisha",
+    "percentLabel": "Ijanisha",
+    "fixedLabel": "Amafaranga ahoraho (RWF)",
+    "minLabel": "Komisiyo ntoya (RWF)",
+    "maxLabel": "Komisiyo nini (RWF)",
+    "destKindLabel": "Ohereza komisiyo kuri",
+    "destPhone": "Numero ya telefone",
+    "destCode": "Kode ya MoMo",
+    "destValueLabel": "Numero / kode",
+    "startsAtLabel": "Tangira gufata ku itariki",
+    "startsAtHint": "Reka ubusa kugira ngo utangire ako kanya. Mbere y’iyi tariki biguma ku buntu.",
+    "freeDaysLabel": "Igihe cy’ubuntu ku bagurisha bashya (iminsi)",
+    "freeNone": "Nta na kimwe",
+    "freeMonth": "Ukwezi 1",
+    "freeYear": "Umwaka 1",
+    "previewTitle": "Igaragaza",
+    "previewSale": "Ku igurisha rya (RWF)",
+    "previewFee": "Komisiyo",
+    "previewSeller": "Umugurisha yakira",
+    "save": "Bika igenamiterere",
+    "saved": "Igenamiterere rya komisiyo ryabitswe",
+    "errDestination": "Shyiraho aho komisiyo ijya (numero cyangwa kode) mbere yo gukoresha."
   }
 }

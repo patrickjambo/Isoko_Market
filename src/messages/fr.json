@@ -904,7 +904,8 @@
     "decisionNotePlaceholder": "Ajoutez une note expliquant la décision (facultatif)…",
     "favourBuyer": "Trancher pour l’acheteur",
     "favourSeller": "Trancher pour le vendeur",
-    "disputeResolved": "Litige résolu"
+    "disputeResolved": "Litige résolu",
+    "settingsTitle": "Paramètres"
   },
   "trust": {
     "verifiedSeller": "Vendeur vérifié",
@@ -1362,5 +1363,35 @@
     "adminSubtitle": "Demandes d’assistance des utilisateurs.",
     "queueEmpty": "Aucun ticket dans cette vue",
     "highPriority": "Priorité haute"
+  },
+  "commission": {
+    "title": "Commission & frais",
+    "subtitle": "Contrôlez la commission prélevée sur chaque vente — sans code.",
+    "enableTitle": "Prélever une commission",
+    "enableHint": "Activée, la plateforme retient une commission sur chaque vente finalisée.",
+    "typeLabel": "Type de commission",
+    "typePercent": "Pourcentage de la vente",
+    "typeFixed": "Montant fixe par vente",
+    "percentLabel": "Pourcentage",
+    "fixedLabel": "Montant fixe (RWF)",
+    "minLabel": "Frais minimum (RWF)",
+    "maxLabel": "Frais maximum (RWF)",
+    "destKindLabel": "Envoyer la commission à",
+    "destPhone": "Numéro de téléphone",
+    "destCode": "Code MoMo",
+    "destValueLabel": "Numéro / code",
+    "startsAtLabel": "Commencer à prélever le",
+    "startsAtHint": "Laissez vide pour prélever immédiatement. Avant cette date, c’est gratuit pour tous.",
+    "freeDaysLabel": "Période gratuite pour les nouveaux vendeurs (jours)",
+    "freeNone": "Aucune",
+    "freeMonth": "1 mois",
+    "freeYear": "1 an",
+    "previewTitle": "Aperçu",
+    "previewSale": "Pour une vente de (RWF)",
+    "previewFee": "Commission",
+    "previewSeller": "Le vendeur reçoit",
+    "save": "Enregistrer",
+    "saved": "Paramètres de commission enregistrés",
+    "errDestination": "Définissez une destination (numéro ou code MoMo) avant d’activer."
   }
 }

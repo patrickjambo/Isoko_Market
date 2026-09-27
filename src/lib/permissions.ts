@@ -23,6 +23,7 @@ export const PERMISSION_MODULES: { module: string; keys: string[] }[] = [
   { module: 'analytics', keys: ['analytics.view', 'analytics.export'] },
   { module: 'content', keys: ['content.view', 'content.edit'] },
   { module: 'roles', keys: ['roles.view', 'roles.manage'] },
+  { module: 'settings', keys: ['settings.view', 'settings.manage'] },
   { module: 'audit', keys: ['audit.view'] },
 ];
 
@@ -71,6 +72,8 @@ export const ROLE_DEFAULTS: Record<AdminRoleName, string[] | '*'> = {
     'transactions.refund',
     'analytics.view',
     'analytics.export',
+    'settings.view',
+    'settings.manage',
     'audit.view',
   ],
   READONLY_ANALYST: [...VIEW_ONLY, 'analytics.export'],

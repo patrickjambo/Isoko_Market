@@ -103,6 +103,40 @@ enum PaymentProviderName {
   MOCK
 }
 
+enum CommissionType {
+  PERCENT // commissionPercent % of the order amount
+  FIXED // a flat commissionFixed per order
+}
+
+enum PayoutTargetKind {
+  PHONE
+  MOMO_CODE
+}
+
+/// Platform-wide settings (single row, id="singleton"). Commission is configured
+/// entirely from the admin dashboard — no code changes to change the rate,
+/// destination, launch date or free period.
+model PlatformSettings {
+  id                String         @id @default("singleton")
+  // Master switch — when off, the platform takes NO commission (free for all).
+  commissionEnabled Boolean        @default(false)
+  commissionType    CommissionType @default(PERCENT)
+  commissionPercent Float          @default(0) // e.g. 5 = 5%
+  commissionFixed   Int            @default(0) // RWF minor units, when FIXED
+  commissionMin     Int            @default(0) // floor in minor units (0 = none)
+  commissionMax     Int            @default(0) // cap in minor units (0 = none)
+  // Where the platform's commission is paid out to.
+  payoutKind        PayoutTargetKind @default(PHONE)
+  payoutValue       String         @default("")
+  // Platform-wide go-live for charging: before this instant nobody is charged.
+  chargingStartsAt  DateTime?
+  // New sellers pay no commission for this many days after they sign up.
+  freePeriodDays    Int            @default(0)
+  updatedById       String?
+  updatedAt         DateTime       @updatedAt
+  createdAt         DateTime       @default(now())
+}
+
 enum NotificationType {
   MESSAGE
   APPLICATION_UPDATE
@@ -440,6 +474,9 @@ model Order {
   sellerConfirmedAt    DateTime? // when the seller confirmed the money arrived
   deliveryMethod  String? // pickup | delivery
   disputeReportId String?
+  // Commission the platform took on this order (RWF minor units), snapshotted at
+  // settlement time so a later rate change never rewrites history. 0 = none.
+  commissionAmount Int        @default(0)
   reviewed        Boolean     @default(false)
   // DORMANT (legacy escrow / MoMo path — unused by the manual flow, kept for the
   // dormant PaymentProvider): escrow + a Transaction ledger link.
