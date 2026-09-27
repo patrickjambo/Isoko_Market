@@ -862,7 +862,11 @@
     "resetPasswordDone": "Ijambobanga ry’agateganyo rishya",
     "resetPasswordHint": "Riha uwo mukozi. Risimbura irya kera kandi rimusohora mu zindi seheji. Agomba kurihindura muri Admin → Konti.",
     "copy": "Koporora",
-    "copied": "Byakoporowe"
+    "copied": "Byakoporowe",
+    "viewId": "Reba indangamuntu",
+    "idDocument": "Indangamuntu",
+    "idUnavailable": "Indangamuntu ntibonetse",
+    "openFull": "Fungura ingana neza"
   },
   "trust": {
     "verifiedSeller": "Umucuruzi wemejwe",

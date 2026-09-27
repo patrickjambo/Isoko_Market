@@ -4,6 +4,8 @@ import { Link } from '@/i18n/routing';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EmptyState } from '@/components/shared/empty-state';
 import { VerificationActions } from '@/components/admin/verification-actions';
+import { IdPhoto } from '@/components/admin/id-photo';
+import { AdminLiveRefresh } from '@/components/admin/admin-live-refresh';
 import { prisma } from '@/lib/prisma';
 import { initials, timeAgo } from '@/lib/utils';
 
@@ -23,6 +25,8 @@ export default async function VerificationsPage({ params }: { params: { locale: 
 
   return (
     <div className="space-y-5">
+      {/* New submissions + other admins' decisions appear live, no refresh. */}
+      <AdminLiveRefresh />
       <header>
         <h1 className="text-2xl font-bold tracking-tight">{t('pendingVerifications')}</h1>
         <p className="text-sm text-muted-foreground">{t('verificationsSubtitle')}</p>
@@ -37,6 +41,8 @@ export default async function VerificationsPage({ params }: { params: { locale: 
               key={v.id}
               className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center"
             >
+              {/* The actual National ID the reviewer is judging. */}
+              <IdPhoto requestId={v.id} />
               <Link href={`/profile/${v.user.id}`} className="flex flex-1 items-center gap-3">
                 <Avatar>
                   {v.user.avatarUrl && <AvatarImage src={v.user.avatarUrl} alt={v.user.fullName} />}

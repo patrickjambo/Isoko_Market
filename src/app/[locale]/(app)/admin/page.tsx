@@ -15,6 +15,7 @@ import { prisma } from '@/lib/prisma';
 import { formatRWF, cn } from '@/lib/utils';
 import { Sparkline, Trend } from '@/components/admin/sparkline';
 import { AdminActivityTicker } from '@/components/admin/admin-activity-ticker';
+import { AdminLiveRefresh } from '@/components/admin/admin-live-refresh';
 import { getHealth } from '@/lib/metrics';
 import { connectionCount } from '@/lib/realtime';
 
@@ -96,6 +97,8 @@ export default async function AdminOverviewPage({ params }: { params: { locale: 
 
   return (
     <div className="space-y-8">
+      {/* Live KPIs — cards re-fetch on any admin event, no manual refresh. */}
+      <AdminLiveRefresh />
       <header>
         <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
         <p className="text-sm text-muted-foreground">{t('overviewSubtitle')}</p>

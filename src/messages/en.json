@@ -862,7 +862,11 @@
     "resetPasswordDone": "New temporary password",
     "resetPasswordHint": "Share this with the staff member. It replaces their old password and signs them out of other sessions. They should change it under Admin → Account.",
     "copy": "Copy",
-    "copied": "Copied"
+    "copied": "Copied",
+    "viewId": "View ID",
+    "idDocument": "National ID",
+    "idUnavailable": "ID unavailable",
+    "openFull": "Open full size"
   },
   "trust": {
     "verifiedSeller": "Verified seller",
