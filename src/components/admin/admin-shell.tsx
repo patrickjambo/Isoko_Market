@@ -128,7 +128,7 @@ export function AdminShell({
     item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
   const NavList = ({ collapsedView }: { collapsedView: boolean }) => (
-    <nav className="flex flex-col gap-1 p-2" aria-label="Admin">
+    <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-2" aria-label="Admin">
       {items.map((item) => {
         const active = isActive(item);
         const Icon = item.icon;
@@ -173,7 +173,7 @@ export function AdminShell({
           mounted && collapsed ? 'w-16' : 'w-60'
         )}
       >
-        <div className="flex h-14 items-center justify-between border-b border-border px-3">
+        <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-3">
           {!collapsed && (
             <span className="text-sm font-semibold text-muted-foreground">{t('title')}</span>
           )}
@@ -200,8 +200,8 @@ export function AdminShell({
             onClick={() => setMobileOpen(false)}
             aria-hidden
           />
-          <aside className="absolute left-0 top-0 h-full w-64 border-r border-border bg-card shadow-xl">
-            <div className="flex h-14 items-center justify-between border-b border-border px-3">
+          <aside className="absolute left-0 top-0 flex h-full w-64 flex-col border-r border-border bg-card shadow-xl">
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-3">
               <span className="text-sm font-semibold">{t('title')}</span>
               <button
                 onClick={() => setMobileOpen(false)}
