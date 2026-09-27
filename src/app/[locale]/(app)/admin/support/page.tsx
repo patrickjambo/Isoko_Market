@@ -92,8 +92,8 @@ export default async function AdminSupportPage({
         {stats.map((s) => {
           const Icon = s.icon;
           return (
-            <div key={s.label} className="rounded-xl border border-border bg-card p-4">
-              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-primary">
+            <div key={s.label} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="h-5 w-5" />
               </div>
               <div className="text-2xl font-extrabold tracking-tight">{s.value.toLocaleString()}</div>
@@ -131,7 +131,7 @@ export default async function AdminSupportPage({
             <li key={ticket.id}>
               <Link
                 href={`/admin/support/${ticket.id}`}
-                className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/30"
+                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
               >
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">{ticket.subject}</p>

@@ -47,7 +47,7 @@ export default async function AdminDisputesPage({ params }: { params: { locale: 
             <li key={d.id}>
               <Link
                 href={`/admin/disputes/${d.id}`}
-                className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/30"
+                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
               >
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">{d.listing.title}</p>

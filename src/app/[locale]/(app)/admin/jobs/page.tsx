@@ -80,8 +80,8 @@ export default async function AdminJobsPage({
         {stats.map((s) => {
           const Icon = s.icon;
           return (
-            <div key={s.label} className="rounded-xl border border-border bg-card p-4">
-              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-primary">
+            <div key={s.label} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="h-5 w-5" />
               </div>
               <div className="text-2xl font-extrabold tracking-tight">{s.value.toLocaleString()}</div>

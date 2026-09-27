@@ -85,7 +85,7 @@ export default async function AdminDisputePage({
           { label: t('disputeBuyer'), person: order.buyer },
           { label: t('disputeSeller'), person: order.seller },
         ].map((p) => (
-          <div key={p.label} className="rounded-xl border border-border bg-card p-4">
+          <div key={p.label} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{p.label}</p>
             <Link
               href={`/profile/${p.person.id}`}
@@ -99,7 +99,7 @@ export default async function AdminDisputePage({
 
       {/* Payment timeline (captured when the dispute was opened) */}
       {report?.details && (
-        <div className="rounded-xl border border-border bg-card p-4">
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
           <h3 className="mb-2 font-semibold">{t('disputeTimeline')}</h3>
           <pre className="whitespace-pre-wrap break-words font-sans text-sm text-muted-foreground">
             {report.details}
@@ -109,7 +109,7 @@ export default async function AdminDisputePage({
 
       {/* Proof of payment */}
       {order.buyerPaymentProofUrl && (
-        <div className="rounded-xl border border-border bg-card p-4">
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
           <h3 className="mb-2 font-semibold">{t('paymentProof')}</h3>
           <SecureImage
             src={`/api/admin/disputes/${order.id}/proof`}
