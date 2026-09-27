@@ -37,7 +37,40 @@ const schema = z.object({
   SMS_API_KEY: z.string().optional().default(''),
   SMS_SENDER_ID: z.string().default('ZENOVA'),
 
-  PAYMENTS_PROVIDER: z.enum(['mock', 'mtn_momo', 'airtel_money']).default('mock'),
+  // ─────────────────────────── Payments ───────────────────────────
+  // 'auto' (recommended) picks a real provider automatically from whichever
+  // credentials below are filled in — MTN and/or Airtel by the payer's carrier,
+  // else CentriPay if configured, else the mock. Force one with the explicit
+  // values. NOTHING else in the codebase needs editing to go live: paste keys,
+  // set PAYMENTS_ENV=production, redeploy.
+  PAYMENTS_PROVIDER: z.enum(['auto', 'mock', 'mtn_momo', 'airtel_money', 'centripay']).default('auto'),
+  PAYMENTS_ENV: z.enum(['sandbox', 'production']).default('sandbox'),
+
+  // MTN MoMo — Collections (charge the buyer) + Disbursements (pay the seller).
+  // Get these from the MTN MoMo developer portal / your market's MoMo API team.
+  MTN_MOMO_BASE_URL: z.string().optional().default('https://sandbox.momodeveloper.mtn.com'),
+  MTN_MOMO_TARGET_ENV: z.string().optional().default('sandbox'), // 'mtnrwanda' in production
+  MTN_MOMO_CURRENCY: z.string().optional().default('EUR'), // 'RWF' in production
+  MTN_MOMO_SUBSCRIPTION_KEY: z.string().optional().default(''),
+  MTN_MOMO_API_USER: z.string().optional().default(''),
+  MTN_MOMO_API_KEY: z.string().optional().default(''),
+  // Disbursement product keys (payouts to sellers). If blank, MoMo payouts are
+  // skipped and settlement stays manual for that leg.
+  MTN_DISBURSE_SUBSCRIPTION_KEY: z.string().optional().default(''),
+  MTN_DISBURSE_API_USER: z.string().optional().default(''),
+  MTN_DISBURSE_API_KEY: z.string().optional().default(''),
+
+  // Airtel Money — Open API (Collections + Disbursements).
+  AIRTEL_BASE_URL: z.string().optional().default('https://openapiuat.airtel.africa'),
+  AIRTEL_CLIENT_ID: z.string().optional().default(''),
+  AIRTEL_CLIENT_SECRET: z.string().optional().default(''),
+  AIRTEL_COUNTRY: z.string().optional().default('RW'),
+  AIRTEL_CURRENCY: z.string().optional().default('RWF'),
+  AIRTEL_PIN: z.string().optional().default(''), // encrypted PIN, disbursements only
+
+  // CentriPay — free/fallback aggregator, used when no MTN/Airtel keys are set.
+  CENTRIPAY_BASE_URL: z.string().optional().default(''),
+  CENTRIPAY_API_KEY: z.string().optional().default(''),
 
   // `local` writes to /public/uploads (dev only — a serverless host has no
   // persistent disk). `vercel_blob` stores objects in Vercel Blob (prod). `r2`

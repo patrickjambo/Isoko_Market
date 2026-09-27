@@ -99,6 +99,7 @@ enum TransactionStatus {
 enum PaymentProviderName {
   MTN_MOMO
   AIRTEL_MONEY
+  CENTRIPAY
   MOCK
 }
 
