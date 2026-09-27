@@ -64,13 +64,15 @@ export const updateProfileSchema = z.object({
   longitude: z.coerce.number().min(-180).max(180).optional().nullable(),
   locale: z.enum(['rw', 'en', 'fr']).optional(),
   avatarUrl: z.string().url().optional(),
-  // Seller payout details for the manual peer-to-peer payment flow.
-  paymentNumber: z
-    .string()
-    .trim()
-    .refine(isValidRwandaPhone, { message: 'Enter a valid Rwandan phone number.' })
-    .optional(),
+  // Seller payout destination: a phone number OR a merchant MoMo code.
+  paymentNumber: z.string().trim().max(30).optional(),
+  payoutKind: z.enum(['PHONE', 'MOMO_CODE']).optional(),
   paymentProvider: z.enum(['mtn_momo', 'airtel_money']).optional(),
+}).superRefine((val, ctx) => {
+  // Only enforce phone formatting when the payout is a phone (not a MoMo code).
+  if (val.paymentNumber && (val.payoutKind ?? 'PHONE') === 'PHONE' && !isValidRwandaPhone(val.paymentNumber)) {
+    ctx.addIssue({ code: 'custom', path: ['paymentNumber'], message: 'Enter a valid Rwandan phone number.' });
+  }
 });
 
 export type SendMessageInput = z.infer<typeof sendMessageSchema>;

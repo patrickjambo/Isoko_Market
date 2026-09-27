@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { notify } from '@/lib/notifications';
 import { publish, publishTopic } from '@/lib/realtime';
 import { emitAdmin } from '@/lib/admin-realtime';
+import { settleOrder } from '@/lib/settlement';
 
 const TERMINAL_STATUSES = ['SUCCESS', 'FAILED', 'REFUNDED'];
 
@@ -86,22 +87,29 @@ export const POST = route(async (req: NextRequest) => {
   if (!order) return jsonOk({ ok: true, status });
 
   if (status === 'SUCCESS' && order.status === 'PAYMENT_SENT') {
-    await Promise.all([
-      notify({
-        userId: order.sellerId,
-        type: 'PAYMENT',
-        title: 'Payment received (in escrow)',
-        body: `Payment for "${order.listing.title}" confirmed. Hand over the item; the buyer then confirms receipt.`,
-        href: `/orders/${order.id}`,
-      }),
-      notify({
-        userId: order.buyerId,
-        type: 'PAYMENT',
-        title: 'Payment confirmed',
-        body: `Your payment for "${order.listing.title}" is held in escrow until you confirm receipt.`,
-        href: `/orders/${order.id}`,
-      }),
-    ]);
+    // Option A: the platform has now collected the buyer's money. Split it —
+    // pay the seller their net, take the platform commission — and complete the
+    // order (settleOrder is idempotent + sends its own notifications).
+    if (order.escrow) {
+      await settleOrder(order.id);
+    } else {
+      await Promise.all([
+        notify({
+          userId: order.sellerId,
+          type: 'PAYMENT',
+          title: 'Payment received (in escrow)',
+          body: `Payment for "${order.listing.title}" confirmed. Hand over the item; the buyer then confirms receipt.`,
+          href: `/orders/${order.id}`,
+        }),
+        notify({
+          userId: order.buyerId,
+          type: 'PAYMENT',
+          title: 'Payment confirmed',
+          body: `Your payment for "${order.listing.title}" is held in escrow until you confirm receipt.`,
+          href: `/orders/${order.id}`,
+        }),
+      ]);
+    }
   } else if (status === 'FAILED' && (order.status === 'PAYMENT_SENT' || order.status === 'SELLER_CONFIRMED')) {
     await prisma.$transaction([
       prisma.order.update({ where: { id: order.id }, data: { status: 'CANCELLED' } }),

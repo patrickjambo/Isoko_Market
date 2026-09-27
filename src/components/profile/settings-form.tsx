@@ -27,6 +27,7 @@ export function SettingsForm({
     avatarUrl: string | null;
     paymentNumber: string | null;
     paymentProvider: string | null;
+    payoutKind: string | null;
   };
 }) {
   const t = useTranslations('profile');
@@ -78,9 +79,13 @@ export function SettingsForm({
           latitude: coords?.latitude ?? null,
           longitude: coords?.longitude ?? null,
           ...(avatarUrl ? { avatarUrl } : {}),
-          // Only send payout details when a number is provided (schema validates it).
+          // Only send payout details when a number/code is provided (schema validates it).
           ...(paymentNumber
-            ? { paymentNumber, paymentProvider: form.get('paymentProvider') || 'mtn_momo' }
+            ? {
+                paymentNumber,
+                paymentProvider: form.get('paymentProvider') || 'mtn_momo',
+                payoutKind: form.get('payoutKind') || 'PHONE',
+              }
             : {}),
         }),
       });
@@ -167,13 +172,19 @@ export function SettingsForm({
             </Select>
           </div>
           <div className="space-y-1.5">
+            <Label htmlFor="payoutKind">{t('payoutKindLabel')}</Label>
+            <Select name="payoutKind" defaultValue={initial.payoutKind ?? 'PHONE'}>
+              <option value="PHONE">{t('payoutKindPhone')}</option>
+              <option value="MOMO_CODE">{t('payoutKindCode')}</option>
+            </Select>
+          </div>
+          <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="paymentNumber">{t('paymentNumberLabel')}</Label>
             <Input
               name="paymentNumber"
-              type="tel"
-              inputMode="tel"
+              inputMode="text"
               defaultValue={initial.paymentNumber ?? ''}
-              placeholder="07XX XXX XXX"
+              placeholder="07XX XXX XXX  /  MoMo code"
             />
           </div>
         </div>

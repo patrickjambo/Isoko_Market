@@ -630,7 +630,10 @@
     "applicationsSubtitle": "Jobs you've applied to, and where they stand",
     "businessNameLabel": "Business / store name (optional)",
     "businessNameHint": "Sell as a shop — buyers who search this name find all your products together.",
-    "openPositions": "Open positions"
+    "openPositions": "Open positions",
+    "payoutKindLabel": "Payout type",
+    "payoutKindPhone": "Phone number",
+    "payoutKindCode": "MoMo code"
   },
   "verification": {
     "title": "Get verified",

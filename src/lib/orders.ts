@@ -5,6 +5,7 @@ import { ApiError } from './api';
 import { notify } from './notifications';
 import { publishTopic } from './realtime';
 import { emitAdmin } from './admin-realtime';
+import { getProvider, startPayment } from './payments';
 
 const rwf = (minor: number) => Math.round(minor / 100).toLocaleString();
 
@@ -78,6 +79,49 @@ export async function createOrder(params: {
 
   // Propagate to anyone viewing the listing (Section 10).
   publishTopic(`listing:${listing.id}`, { type: 'entity_update', entity: 'listing', id: listing.id, status: 'SOLD', reason: 'sold' });
+
+  // Automatic collection (Option A): when a REAL provider is configured and the
+  // buyer has a mobile-money phone, charge them now and let the webhook settle
+  // (pay seller net + platform commission). With no provider (mock/dev) we fall
+  // straight through to the manual peer-to-peer flow below — nothing changes.
+  const buyer = await prisma.user.findUnique({
+    where: { id: params.buyerId },
+    select: { phone: true },
+  });
+  const payProvider = buyer?.phone ? getProvider(buyer.phone) : null;
+  if (payProvider && payProvider.name !== 'MOCK') {
+    const { transaction } = await startPayment({
+      userId: params.buyerId,
+      phone: buyer!.phone!,
+      type: 'ESCROW',
+      amount: listing.price,
+      metadata: { orderId: order.id },
+    });
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { transactionId: transaction.id, escrow: true, status: 'PAYMENT_SENT' },
+    });
+    await Promise.all([
+      notify({
+        userId: params.buyerId,
+        type: 'PAYMENT',
+        title: 'Approve your payment',
+        body: `Approve the prompt on your phone to pay RWF ${rwf(listing.price)} for "${listing.title}".`,
+        href: `/orders/${order.id}`,
+        payload: { orderId: order.id },
+      }),
+      notify({
+        userId: listing.sellerId,
+        type: 'PAYMENT',
+        title: 'New order',
+        body: `${params.buyerName} is paying for "${listing.title}" (RWF ${rwf(listing.price)}). You'll be paid automatically once it clears.`,
+        href: `/orders/${order.id}`,
+        payload: { orderId: order.id },
+      }),
+    ]);
+    await emitAdmin('order.created', `Auto order — RWF ${rwf(listing.price)}`);
+    return order;
+  }
 
   await Promise.all([
     notify({

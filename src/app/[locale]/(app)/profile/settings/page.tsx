@@ -27,6 +27,7 @@ export default async function SettingsPage({ params }: { params: { locale: strin
           avatarUrl: user.avatarUrl,
           paymentNumber: user.paymentNumber,
           paymentProvider: user.paymentProvider,
+          payoutKind: user.payoutKind,
         }}
       />
     </div>

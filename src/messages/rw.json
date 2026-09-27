@@ -630,7 +630,10 @@
     "applicationsSubtitle": "Akazi wasabye, n'aho bigeze",
     "businessNameLabel": "Izina ry'ubucuruzi / iduka (si ngombwa)",
     "businessNameHint": "Curisha nk'iduka — abaguzi bashakisha iri zina babona ibicuruzwa byawe byose hamwe.",
-    "openPositions": "Imyanya y'akazi ifunguye"
+    "openPositions": "Imyanya y'akazi ifunguye",
+    "payoutKindLabel": "Ubwoko bwo kwishyurwa",
+    "payoutKindPhone": "Numero ya telefone",
+    "payoutKindCode": "Kode ya MoMo"
   },
   "verification": {
     "title": "Wemezwe",

@@ -630,7 +630,10 @@
     "applicationsSubtitle": "Les offres auxquelles vous avez postulé, et leur statut",
     "businessNameLabel": "Nom de l'entreprise / boutique (facultatif)",
     "businessNameHint": "Vendez comme une boutique — en cherchant ce nom, les acheteurs trouvent tous vos produits.",
-    "openPositions": "Postes ouverts"
+    "openPositions": "Postes ouverts",
+    "payoutKindLabel": "Type de paiement",
+    "payoutKindPhone": "Numéro de téléphone",
+    "payoutKindCode": "Code MoMo"
   },
   "verification": {
     "title": "Se faire vérifier",
