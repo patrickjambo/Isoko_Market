@@ -11,6 +11,7 @@ import {
   ShoppingBag,
   Briefcase,
   LifeBuoy,
+  Scale,
   BarChart3,
   MessageSquareWarning,
   Languages,
@@ -44,7 +45,7 @@ export function AdminShell({
   permissions,
   children,
 }: {
-  counts: { reports: number; verifications: number; support: number };
+  counts: { reports: number; verifications: number; support: number; disputes: number };
   permissions: string[];
   children: React.ReactNode;
 }) {
@@ -90,6 +91,13 @@ export function AdminShell({
         label: t('moderation'),
         icon: Flag,
         badge: counts.reports,
+        perm: 'moderation.view',
+      },
+      {
+        href: '/admin/disputes',
+        label: t('disputesTitle'),
+        icon: Scale,
+        badge: counts.disputes,
         perm: 'moderation.view',
       },
       { href: '/admin/listings', label: t('cardListings'), icon: ShoppingBag, perm: 'listings.view' },
