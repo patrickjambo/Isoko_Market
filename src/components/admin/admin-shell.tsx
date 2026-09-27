@@ -10,6 +10,7 @@ import {
   CreditCard,
   ShoppingBag,
   Briefcase,
+  LifeBuoy,
   BarChart3,
   MessageSquareWarning,
   Languages,
@@ -43,7 +44,7 @@ export function AdminShell({
   permissions,
   children,
 }: {
-  counts: { reports: number; verifications: number };
+  counts: { reports: number; verifications: number; support: number };
   permissions: string[];
   children: React.ReactNode;
 }) {
@@ -97,6 +98,13 @@ export function AdminShell({
       { href: '/admin/transactions', label: t('transactions'), icon: CreditCard, perm: 'transactions.view' },
       { href: '/admin/analytics', label: t('analytics'), icon: BarChart3, perm: 'analytics.view' },
       { href: '/admin/messages', label: t('messagesOversight'), icon: MessageSquareWarning, perm: 'messages.oversight' },
+      {
+        href: '/admin/support',
+        label: t('supportTitle'),
+        icon: LifeBuoy,
+        badge: counts.support,
+        perm: 'support.view',
+      },
       { href: '/admin/partners', label: t('partners'), icon: Handshake, perm: 'partners.view' },
       { href: '/admin/content', label: t('content'), icon: Languages, perm: 'content.view' },
       { href: '/admin/roles', label: t('rolesPanel'), icon: KeyRound, perm: 'roles.view' },

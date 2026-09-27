@@ -36,15 +36,16 @@ export default async function AdminLayout({
   const adminRole = user.adminRole; // may be null → least privilege
   const permissions = [...(await effectivePermissions(user))];
 
-  const [reports, verifications] = await Promise.all([
+  const [reports, verifications, support] = await Promise.all([
     prisma.report.count({ where: { status: { in: ['OPEN', 'REVIEWING'] } } }),
     prisma.verificationRequest.count({ where: { status: 'PENDING' } }),
+    prisma.supportTicket.count({ where: { status: { in: ['OPEN', 'PENDING'] } } }),
   ]);
 
   return (
     <AdminPermissionsProvider permissions={permissions} adminRole={adminRole}>
       <AdminLive />
-      <AdminShell counts={{ reports, verifications }} permissions={permissions}>
+      <AdminShell counts={{ reports, verifications, support }} permissions={permissions}>
         {children}
       </AdminShell>
     </AdminPermissionsProvider>

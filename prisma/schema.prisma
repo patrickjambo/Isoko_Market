@@ -262,6 +262,8 @@ model User {
   referrals           User[]                    @relation("Referrals")
   permissionOverrides UserPermissionOverride[]
   auditLogs           AuditLog[]                @relation("AuditActor")
+  supportTickets      SupportTicket[]           @relation("SupportTickets")
+  supportMessages     SupportMessage[]          @relation("SupportMessages")
   listingDraft        ListingDraft?
   favorites           Favorite[]
   ordersBought        Order[]                   @relation("Buyer")
@@ -713,6 +715,62 @@ model Notification {
 
   @@index([userId, readAt])
   @@index([userId, createdAt])
+}
+
+// ─────────────────────── Support / Help desk ────────────────
+
+enum SupportCategory {
+  PAYMENT
+  ACCOUNT
+  LISTING
+  JOBS
+  VERIFICATION
+  OTHER
+}
+
+enum SupportPriority {
+  LOW
+  NORMAL
+  HIGH
+}
+
+enum SupportStatus {
+  OPEN // awaiting a staff reply
+  PENDING // staff replied — awaiting the user
+  RESOLVED
+  CLOSED
+}
+
+/// A help-desk ticket opened by a user; a threaded conversation with staff.
+model SupportTicket {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation("SupportTickets", fields: [userId], references: [id], onDelete: Cascade)
+  subject     String
+  category    SupportCategory  @default(OTHER)
+  priority    SupportPriority  @default(NORMAL)
+  status      SupportStatus    @default(OPEN)
+  lastReplyAt DateTime         @default(now())
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  messages SupportMessage[]
+
+  @@index([status, lastReplyAt])
+  @@index([userId, lastReplyAt])
+}
+
+model SupportMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User          @relation("SupportMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  body      String
+  fromStaff Boolean       @default(false) // true when a staff member wrote it
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
 }
 
 // ─────────────────── Payments, Reviews, Reports ──────────────
