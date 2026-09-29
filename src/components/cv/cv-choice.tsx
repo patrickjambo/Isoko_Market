@@ -57,6 +57,9 @@ export function CvChoice({
 
   return (
     <div className="space-y-5">
+      <p className="rounded-lg border border-border bg-secondary/40 px-3 py-2 text-sm text-muted-foreground">
+        {t('choiceHint')}
+      </p>
       <div className="grid gap-3 sm:grid-cols-2" aria-label={t('choiceTitle')}>
         {cards.map((card) => {
           const Icon = card.icon;
