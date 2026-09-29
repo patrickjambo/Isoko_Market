@@ -25,6 +25,7 @@ export function ApplyButton({
   alreadyApplied,
   requiredDocs = [],
   missingDocs = [],
+  documents = [],
 }: {
   jobId: string;
   /** True when the seeker has a structured CV OR at least one uploaded document. */
@@ -33,6 +34,8 @@ export function ApplyButton({
   /** Documents this job asks for, and which of them the seeker still lacks. */
   requiredDocs?: string[];
   missingDocs?: string[];
+  /** The seeker's vault documents they can attach to this application. */
+  documents?: { id: string; type: string; label: string }[];
 }) {
   const t = useTranslations('jobs');
   const tc = useTranslations('common');
@@ -43,8 +46,13 @@ export function ApplyButton({
   const [open, setOpen] = useState(false);
   // Pre-filled with an editable suggested opener (§6 one-click apply).
   const [coverNote, setCoverNote] = useState(() => t('coverNoteSuggested'));
+  // Attach all vault documents by default; the applicant can uncheck any.
+  const [selectedDocs, setSelectedDocs] = useState<string[]>(() => documents.map((d) => d.id));
   const [loading, setLoading] = useState(false);
   const [applied, setApplied] = useState(alreadyApplied);
+
+  const toggleDoc = (id: string) =>
+    setSelectedDocs((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   if (applied) {
     return (
@@ -88,7 +96,7 @@ export function ApplyButton({
       const res = await fetch(`/api/jobs/${jobId}/apply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ coverNote }),
+        body: JSON.stringify({ coverNote, documentIds: selectedDocs }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message ?? 'error');
@@ -145,6 +153,34 @@ export function ApplyButton({
                 <FileText className="h-3.5 w-3.5" /> {t('uploadMissingDocs')}
               </Link>
             )}
+          </div>
+        )}
+
+        {/* Supporting documents — pick which vault files to attach. Each selected
+            file is snapshotted with the application (immutable). */}
+        {documents.length > 0 && (
+          <div className="space-y-1.5 rounded-lg border border-border p-3">
+            <p className="text-xs font-semibold">{t('attachDocsTitle')}</p>
+            <ul className="space-y-1">
+              {documents.map((d) => (
+                <li key={d.id}>
+                  <label className="flex cursor-pointer items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedDocs.includes(d.id)}
+                      onChange={() => toggleDoc(d.id)}
+                      className="h-4 w-4 accent-[hsl(var(--primary))]"
+                    />
+                    <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="min-w-0 flex-1 truncate">{d.label}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">{tcv(docTypeKey(d.type))}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+            <Link href="/cv" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+              <FileText className="h-3.5 w-3.5" /> {t('attachDocsAddMore')}
+            </Link>
           </div>
         )}
 

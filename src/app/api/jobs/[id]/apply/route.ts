@@ -12,7 +12,7 @@ import { notify } from '@/lib/notifications';
  */
 export const POST = route(async (req: NextRequest, ctx: { params: { id: string } }) => {
   const user = await requireUser();
-  const { coverNote } = applyJobSchema.parse(await req.json().catch(() => ({})));
+  const { coverNote, documentIds } = applyJobSchema.parse(await req.json().catch(() => ({})));
 
   const job = await prisma.job.findUnique({
     where: { id: ctx.params.id },
@@ -40,6 +40,16 @@ export const POST = route(async (req: NextRequest, ctx: { params: { id: string }
   });
   if (existing) throw new ApiError('CONFLICT', 'You already applied to this job.');
 
+  // Snapshot the chosen vault documents — freeze label + storage key at apply
+  // time so replacing/deleting the vault copy later never changes what this
+  // employer received (§10, like the CV snapshot). Only the applicant's own docs.
+  const selectedDocs = documentIds?.length
+    ? await prisma.seekerDocument.findMany({
+        where: { id: { in: documentIds }, userId: user.id },
+        select: { type: true, label: true, key: true, mimeType: true, sizeBytes: true },
+      })
+    : [];
+
   const application = await prisma.application.create({
     data: {
       jobId: job.id,
@@ -54,6 +64,19 @@ export const POST = route(async (req: NextRequest, ctx: { params: { id: string }
           }
         : {}),
       coverNote,
+      ...(selectedDocs.length
+        ? {
+            documents: {
+              create: selectedDocs.map((d) => ({
+                type: d.type,
+                label: d.label,
+                key: d.key,
+                mimeType: d.mimeType,
+                sizeBytes: d.sizeBytes,
+              })),
+            },
+          }
+        : {}),
     },
     select: { id: true },
   });

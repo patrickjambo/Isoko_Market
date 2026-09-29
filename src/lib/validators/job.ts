@@ -50,6 +50,8 @@ export const jobFilterSchema = z.object({
 
 export const applyJobSchema = z.object({
   coverNote: z.string().trim().max(1000).optional(),
+  // Vault SeekerDocument ids the applicant chose to attach (snapshotted at apply).
+  documentIds: z.array(z.string()).max(20).optional(),
 });
 
 // Employer-settable statuses. POSITION_FILLED is system-only (job-filled cascade).

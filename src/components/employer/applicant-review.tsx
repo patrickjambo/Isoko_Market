@@ -223,7 +223,7 @@ export function ApplicantReview({
                     return doc ? (
                       <a
                         key={reqType}
-                        href={`/api/documents/${doc.id}/file`}
+                        href={`/api/applications/${a.id}/documents/${doc.id}/file`}
                         target="_blank"
                         rel="noopener noreferrer"
                         title={doc.label}
@@ -250,7 +250,7 @@ export function ApplicantReview({
                   {a.documents.map((doc) => (
                     <a
                       key={doc.id}
-                      href={`/api/documents/${doc.id}/file`}
+                      href={`/api/applications/${a.id}/documents/${doc.id}/file`}
                       target="_blank"
                       rel="noopener noreferrer"
                       title={doc.label}

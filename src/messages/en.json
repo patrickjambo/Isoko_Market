@@ -426,7 +426,9 @@
     "editSubtitle": "Update the details, requirements or documents. Changes are saved to this posting.",
     "eyebrow": "Hire · Get hired",
     "companiesHiring": "Companies hiring matching your search",
-    "viewCompanyJobs": "View all jobs"
+    "viewCompanyJobs": "View all jobs",
+    "attachDocsTitle": "Attach supporting documents",
+    "attachDocsAddMore": "Upload another document"
   },
   "cv": {
     "title": "CV builder",

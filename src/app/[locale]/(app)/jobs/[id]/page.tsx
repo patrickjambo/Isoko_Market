@@ -48,8 +48,12 @@ export default async function JobDetailPage({
     // structured builder. Fetch the types they hold to check against what the job
     // requires.
     user
-      ? prisma.seekerDocument.findMany({ where: { userId: user.id }, select: { type: true } })
-      : Promise.resolve([] as { type: string }[]),
+      ? prisma.seekerDocument.findMany({
+          where: { userId: user.id },
+          select: { id: true, type: true, label: true },
+          orderBy: { createdAt: 'desc' },
+        })
+      : Promise.resolve([] as { id: string; type: string; label: string }[]),
     user
       ? prisma.application.findUnique({
           where: { jobId_applicantId: { jobId: job.id, applicantId: user.id } },
@@ -135,6 +139,7 @@ export default async function JobDetailPage({
                   alreadyApplied={Boolean(existingApplication)}
                   requiredDocs={job.requiredDocuments}
                   missingDocs={missingDocs}
+                  documents={myDocs}
                 />
                 <MessageSellerButton
                   jobId={job.id}

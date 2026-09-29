@@ -426,7 +426,9 @@
     "editSubtitle": "Vugurura amakuru, ibisabwa cyangwa inyandiko. Impinduka zibikwa kuri iri tangazo.",
     "eyebrow": "Gushaka · Guhabwa akazi",
     "companiesHiring": "Amasosiyete ari gushaka abakozi ahuye n'ishakisha",
-    "viewCompanyJobs": "Reba akazi kose"
+    "viewCompanyJobs": "Reba akazi kose",
+    "attachDocsTitle": "Omeka inyandiko z’inyongera",
+    "attachDocsAddMore": "Ohereza indi nyandiko"
   },
   "cv": {
     "title": "Kubaka CV",

@@ -663,9 +663,30 @@ model Application {
   appliedAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
+  documents ApplicationDocument[]
+
   @@unique([jobId, applicantId]) // one application per job per applicant
   @@index([applicantId])
   @@index([jobId, status])
+}
+
+/// A supporting document the applicant attached to THIS application — an
+/// immutable snapshot of a vault SeekerDocument (label + storage key frozen at
+/// apply time). Editing/deleting the vault copy later never changes what the
+/// employer received (mirrors Application.cvSnapshot). The storage object at
+/// `key` is never overwritten, so the file stays exactly as submitted.
+model ApplicationDocument {
+  id            String             @id @default(cuid())
+  applicationId String
+  application   Application        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  type          SeekerDocumentType @default(OTHER)
+  label         String
+  key           String // private storage key (shared with the vault copy)
+  mimeType      String
+  sizeBytes     Int
+  createdAt     DateTime           @default(now())
+
+  @@index([applicationId])
 }
 
 // A seeker's stored "notify me" search (Section 8). Evaluated against every new

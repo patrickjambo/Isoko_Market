@@ -55,17 +55,14 @@ export async function getEmployerApplicants(
       coverNote: true,
       cvSnapshot: true,
       job: { select: { id: true, title: true, skills: true, requiredDocuments: true } },
+      // Documents the applicant attached to THIS application (immutable snapshot),
+      // not their current vault — the employer sees exactly what was submitted.
+      documents: {
+        orderBy: { createdAt: 'asc' },
+        select: { id: true, type: true, label: true, sizeBytes: true },
+      },
       applicant: {
-        select: {
-          fullName: true,
-          avatarUrl: true,
-          isVerified: true,
-          // Documents the seeker uploaded (CV, cover letter, certificates, ID).
-          documents: {
-            orderBy: { createdAt: 'desc' },
-            select: { id: true, type: true, label: true, sizeBytes: true },
-          },
-        },
+        select: { fullName: true, avatarUrl: true, isVerified: true },
       },
     },
   });
@@ -87,7 +84,7 @@ export async function getEmployerApplicants(
       match: { score: m.score, tier: m.tier, overlap: m.overlap.map((k) => labelForSkill(k, locale)) },
       summary,
       snapshot: (a.cvSnapshot ?? null) as CvData | null,
-      documents: a.applicant.documents,
+      documents: a.documents,
       requiredDocuments: a.job.requiredDocuments,
     };
   });
