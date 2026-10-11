@@ -1,5 +1,5 @@
 /*
- * Isoko service worker — an offline app shell for a mobile-first, low-connectivity
+ * Zenova service worker — an offline app shell for a mobile-first, low-connectivity
  * audience. Strategy:
  *   - static assets (/_next/static, icons, fonts, images): stale-while-revalidate,
  *     so an installed app opens instantly and its shell loads offline;
@@ -9,9 +9,16 @@
  *     and authenticated data must not be served stale or across users.
  * Bump VERSION on each deploy that changes precached assets to drop old caches.
  */
-const VERSION = 'v1';
-const STATIC_CACHE = `isoko-static-${VERSION}`;
-const PRECACHE = ['/offline.html', '/icon.svg', '/manifest.webmanifest'];
+const VERSION = 'v2';
+const STATIC_CACHE = `zenova-static-${VERSION}`;
+const PRECACHE = [
+  '/offline.html',
+  '/icon.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png',
+  '/manifest.webmanifest',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -39,8 +46,7 @@ self.addEventListener('message', (event) => {
 function isStaticAsset(url) {
   return (
     url.pathname.startsWith('/_next/static/') ||
-    url.pathname === '/icon.svg' ||
-    url.pathname === '/apple-icon' ||
+    url.pathname === '/manifest.webmanifest' ||
     /\.(?:css|js|woff2?|png|jpe?g|gif|svg|webp|ico)$/.test(url.pathname)
   );
 }

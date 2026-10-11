@@ -42,7 +42,7 @@ export default async function JobDetailPage({
 
   const [hasCv, myDocs, existingApplication, ratingAgg, cvSkills] = await Promise.all([
     user
-      ? prisma.cV.findUnique({ where: { userId: user.id }, select: { id: true } })
+      ? prisma.cV.findFirst({ where: { userId: user.id }, orderBy: { updatedAt: 'desc' }, select: { id: true } })
       : Promise.resolve(null),
     // Seekers can also apply with an uploaded document (CV/letter) — not only the
     // structured builder. Fetch the types they hold to check against what the job

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Upload, Trash2, Loader2, FileText, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
@@ -29,9 +30,14 @@ function humanSize(bytes: number): string {
  * cover letter, certificate, ID, etc. from the device. Files are private and
  * only visible to employers the seeker has applied to (gated download route).
  */
-export function DocumentManager() {
+export function DocumentManager({
+  onCountChange,
+}: {
+  onCountChange?: (count: number) => void;
+} = {}) {
   const t = useTranslations('cv');
   const tc = useTranslations('common');
+  const router = useRouter();
   const { toast } = useToast();
   const [docs, setDocs] = useState<Doc[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,10 +49,14 @@ export function DocumentManager() {
   useEffect(() => {
     fetch('/api/documents')
       .then((r) => r.json())
-      .then((j) => setDocs(j.items ?? []))
+      .then((j) => {
+        const items: Doc[] = j.items ?? [];
+        setDocs(items);
+        onCountChange?.(items.length);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [onCountChange]);
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -59,7 +69,13 @@ export function DocumentManager() {
       const res = await fetch('/api/documents', { method: 'POST', body: fd });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error?.message ?? 'error');
-      setDocs((d) => [j as Doc, ...d]);
+      const newDoc = j as Doc;
+      setDocs((d) => {
+        const next = [newDoc, ...d];
+        onCountChange?.(next.length);
+        return next;
+      });
+      router.refresh();
       toast(t('docUploaded'), 'success');
     } catch (err) {
       toast(err instanceof Error ? err.message : 'error', 'error');
@@ -74,7 +90,12 @@ export function DocumentManager() {
     try {
       const res = await fetch(`/api/documents/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
-      setDocs((d) => d.filter((x) => x.id !== id));
+      setDocs((d) => {
+        const next = d.filter((x) => x.id !== id);
+        onCountChange?.(next.length);
+        return next;
+      });
+      router.refresh();
       toast(tc('deleted'), 'success');
     } catch {
       toast(tc('error'), 'error');

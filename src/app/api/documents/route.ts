@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { saveDocument } from '@/lib/storage';
 import { rateLimit } from '@/lib/rate-limit';
 
-const TYPES = ['CV', 'COVER_LETTER', 'CERTIFICATE', 'ID_DOCUMENT', 'OTHER'] as const;
+const TYPES = ['CV', 'COVER_LETTER', 'CERTIFICATE', 'ID_DOCUMENT', 'DRIVING_LICENSE', 'OTHER'] as const;
 type DocType = (typeof TYPES)[number];
 const MAX_DOCS = 30;
 

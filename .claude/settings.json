@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node -e \"const j=require\\('./src/messages/en.json'\\); console.log\\('profile.noApplicationsHint:', j.profile.noApplicationsHint\\)\")"
+      "Bash(node -e \"const j=require\\('./src/messages/en.json'\\); console.log\\('profile.noApplicationsHint:', j.profile.noApplicationsHint\\)\")",
+      "Bash(node -e ' *)"
     ]
   }
 }

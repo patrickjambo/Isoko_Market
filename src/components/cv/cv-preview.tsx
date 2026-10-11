@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { MapPin } from 'lucide-react';
+import { MapPin, FileText } from 'lucide-react';
 import type { CvData } from '@/lib/validators/cv';
 import { labelForSkill } from '@/lib/skills';
 import { formatEducation, sortEducation, formatLanguages } from '@/lib/cv-format';
@@ -80,10 +80,23 @@ export function CvPreview({ data, fullName }: { data: CvData; fullName: string }
                   <p className="font-semibold">{f.title}</p>
                   {f.years && <p className="shrink-0 text-xs text-slate-500">{f.years}</p>}
                 </div>
-                <p className="text-sm text-slate-600">
-                  {f.institution}
-                  {f.classification && <span className="text-slate-500"> — {f.classification}</span>}
-                </p>
+                <div className="flex items-center justify-between gap-2 text-sm text-slate-600">
+                  <p>
+                    {f.institution}
+                    {f.classification && <span className="text-slate-500"> — {f.classification}</span>}
+                  </p>
+                  {ed.certificateUrl && (
+                    <a
+                      href={ed.certificateUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-teal-700 hover:underline"
+                    >
+                      <FileText className="h-3.5 w-3.5" />
+                      {t('certificate')}
+                    </a>
+                  )}
+                </div>
               </div>
             );
           })}

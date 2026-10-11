@@ -50,6 +50,8 @@ export const jobFilterSchema = z.object({
 
 export const applyJobSchema = z.object({
   coverNote: z.string().trim().max(1000).optional(),
+  // Which CV from the applicant's library to apply with (defaults to most recent).
+  cvId: z.string().optional(),
   // Vault SeekerDocument ids the applicant chose to attach (snapshotted at apply).
   documentIds: z.array(z.string()).max(20).optional(),
 });

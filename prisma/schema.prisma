@@ -283,7 +283,7 @@ model User {
   listings            Listing[]
   jobs                Job[]
   applications        Application[]
-  cv                  CV?
+  cvs                 CV[]
   documents           SeekerDocument[]
   messages            Message[]
   conversationLinks   ConversationParticipant[]
@@ -575,8 +575,11 @@ model SeekerDocument {
 
 model CV {
   id             String   @id @default(cuid())
-  userId         String   @unique
+  userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // A short name for the seeker's own organisation/selection (e.g. "Software
+  // Developer CV"). Not necessarily printed on the document.
+  name           String   @default("My CV")
   // { headline, summary, contact, education[], experience[], skills[],
   //   languages[{code,level}], certifications[], references[], … } — education
   //   entries hold selected reference-table ids + raw "add new" fallbacks.
@@ -593,6 +596,8 @@ model CV {
   createdAt        DateTime @default(now())
 
   applications Application[]
+
+  @@index([userId])
 }
 
 // ─────────────── CV reference data (seeded, autocomplete-backed) ───────────────

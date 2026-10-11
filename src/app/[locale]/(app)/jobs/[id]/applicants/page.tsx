@@ -7,7 +7,7 @@ import { ApplicantReview } from '@/components/employer/applicant-review';
 import { getCurrentUser } from '@/lib/auth';
 import { can } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
-import { getEmployerApplicants } from '@/lib/employer-applicants';
+import { getEmployerApplicantsAll } from '@/lib/employer-applicants';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +33,7 @@ export default async function ApplicantsPage({
   if (!job) notFound();
   if (!(await can(user, 'job:viewApplicants', job))) notFound(); // employer-only (§10, rule 5)
 
-  const applicants = await getEmployerApplicants(user.id, params.locale, job.id);
+  const applicants = await getEmployerApplicantsAll(user.id, params.locale, job.id);
 
   return (
     <div className="container max-w-3xl py-6">

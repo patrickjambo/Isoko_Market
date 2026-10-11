@@ -18,11 +18,15 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: '#ffffff',
     theme_color: '#0b6b62',
     categories: ['shopping', 'business'],
-    // The Zenova logo (1024×1024, full-bleed brand field so it also works
-    // maskable) — renders crisp at any home-screen size.
+    // The Zenova logo in standard PWA sizes (192, 512, 1024) for both any
+    // and maskable displays — required by Android Chrome to generate home-screen WebAPKs.
     icons: [
-      { src: '/icon.png', sizes: '1024x1024', type: 'image/png', purpose: 'any' },
-      { src: '/icon.png', sizes: '1024x1024', type: 'image/png', purpose: 'maskable' },
+      { src: '/icon-192.png?v=2', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/icon-192.png?v=2', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+      { src: '/icon-512.png?v=2', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: '/icon-512.png?v=2', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      { src: '/icon.png?v=2', sizes: '1024x1024', type: 'image/png', purpose: 'any' },
+      { src: '/icon.png?v=2', sizes: '1024x1024', type: 'image/png', purpose: 'maskable' },
     ],
   };
 }

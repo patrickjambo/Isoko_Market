@@ -13,8 +13,12 @@ export function ServiceWorkerRegister() {
     if (process.env.NODE_ENV !== 'production') return;
     if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
 
-    const register = () => {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    const register = async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('/sw.js');
+        // Actively check for worker updates so returning phones get new assets immediately
+        await reg.update();
+      } catch {}
     };
     if (document.readyState === 'complete') register();
     else {

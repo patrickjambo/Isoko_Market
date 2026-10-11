@@ -18,11 +18,16 @@ export default async function CvPage({ params }: { params: { locale: string } })
   }
 
   const t = await getTranslations('cv');
-  const [cv, docCount] = await Promise.all([
-    prisma.cV.findUnique({ where: { userId: user.id } }),
+  const [cvs, docCount] = await Promise.all([
+    prisma.cV.findMany({
+      where: { userId: user.id },
+      orderBy: { updatedAt: 'desc' },
+      select: { id: true, name: true, structuredData: true, updatedAt: true },
+    }),
     prisma.seekerDocument.count({ where: { userId: user.id } }),
   ]);
-  const parsed = cv ? cvDataSchema.safeParse(cv.structuredData) : null;
+  const activeCv = cvs[0] ?? null;
+  const parsed = activeCv ? cvDataSchema.safeParse(activeCv.structuredData) : null;
   const initial: CvData | null = parsed?.success ? parsed.data : null;
   // Open on whichever path the seeker has already used; default to the builder.
   const initialMode = !initial && docCount > 0 ? 'upload' : 'build';
@@ -36,6 +41,13 @@ export default async function CvPage({ params }: { params: { locale: string } })
         initialMode={initialMode}
         hasCv={Boolean(initial)}
         docCount={docCount}
+        cvId={activeCv?.id ?? null}
+        cvName={activeCv?.name ?? 'My CV'}
+        cvList={cvs.map((c) => ({
+          id: c.id,
+          name: c.name,
+          updatedAt: c.updatedAt.toISOString(),
+        }))}
       />
     </div>
   );

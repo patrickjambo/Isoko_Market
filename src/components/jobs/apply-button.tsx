@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Loader2, Send, Check, FileText, AlertCircle } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Loader2, Send, Check, FileText, AlertCircle, Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
@@ -47,12 +47,48 @@ export function ApplyButton({
   // Pre-filled with an editable suggested opener (§6 one-click apply).
   const [coverNote, setCoverNote] = useState(() => t('coverNoteSuggested'));
   // Attach all vault documents by default; the applicant can uncheck any.
+  const [currentDocs, setCurrentDocs] = useState(documents);
+  const [currentMissingDocs, setCurrentMissingDocs] = useState(missingDocs);
   const [selectedDocs, setSelectedDocs] = useState<string[]>(() => documents.map((d) => d.id));
   const [loading, setLoading] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
   const [applied, setApplied] = useState(alreadyApplied);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const pendingTypeRef = useRef<string>('OTHER');
 
   const toggleDoc = (id: string) =>
     setSelectedDocs((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+
+  async function onDirectUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const uploadType = pendingTypeRef.current;
+    setUploadingDoc(uploadType);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('type', uploadType);
+      const res = await fetch('/api/documents', { method: 'POST', body: fd });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error?.message ?? 'Upload failed');
+      const newDoc = j as { id: string; type: string; label: string };
+      setCurrentDocs((prev) => [newDoc, ...prev]);
+      setSelectedDocs((prev) => [newDoc.id, ...prev]);
+      setCurrentMissingDocs((prev) => prev.filter((x) => x !== uploadType));
+      router.refresh();
+      toast(tcv('docUploaded'), 'success');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Upload failed', 'error');
+    } finally {
+      setUploadingDoc(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
+  function triggerUpload(type: string) {
+    pendingTypeRef.current = type;
+    fileInputRef.current?.click();
+  }
 
   if (applied) {
     return (
@@ -126,13 +162,13 @@ export function ApplyButton({
         </div>
 
         {/* Required-documents checklist — show what the job asks for and flag
-            anything the seeker hasn't uploaded, with a shortcut to add it. */}
+            anything the seeker hasn't uploaded, with an inline upload shortcut. */}
         {requiredDocs.length > 0 && (
           <div className="space-y-1.5 rounded-lg border border-border p-3">
             <p className="text-xs font-semibold">{t('requiredDocsTitle')}</p>
             <ul className="space-y-1">
               {requiredDocs.map((d) => {
-                const missing = missingDocs.includes(d);
+                const missing = currentMissingDocs.includes(d);
                 return (
                   <li key={d} className="flex items-center gap-2 text-sm">
                     {missing ? (
@@ -143,26 +179,47 @@ export function ApplyButton({
                     <span className={missing ? 'text-foreground' : 'text-muted-foreground'}>
                       {tcv(docTypeKey(d))}
                     </span>
-                    {missing && <span className="text-xs text-accent">{t('docMissing')}</span>}
+                    {missing && (
+                      <button
+                        type="button"
+                        onClick={() => triggerUpload(d)}
+                        disabled={uploadingDoc === d}
+                        className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline disabled:opacity-50"
+                      >
+                        {uploadingDoc === d ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Upload className="h-3.5 w-3.5" />
+                        )}
+                        {t('docMissing')}
+                      </button>
+                    )}
                   </li>
                 );
               })}
             </ul>
-            {missingDocs.length > 0 && (
-              <Link href="/cv" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
-                <FileText className="h-3.5 w-3.5" /> {t('uploadMissingDocs')}
-              </Link>
+            {currentMissingDocs.length > 0 && (
+              <p className="text-xs text-muted-foreground">{t('uploadMissingDocs')}</p>
             )}
           </div>
         )}
 
+        {/* Hidden file input shared by all inline upload triggers */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.doc,.docx,image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={onDirectUpload}
+        />
+
         {/* Supporting documents — pick which vault files to attach. Each selected
             file is snapshotted with the application (immutable). */}
-        {documents.length > 0 && (
+        {currentDocs.length > 0 && (
           <div className="space-y-1.5 rounded-lg border border-border p-3">
             <p className="text-xs font-semibold">{t('attachDocsTitle')}</p>
             <ul className="space-y-1">
-              {documents.map((d) => (
+              {currentDocs.map((d) => (
                 <li key={d.id}>
                   <label className="flex cursor-pointer items-center gap-2 text-sm">
                     <input

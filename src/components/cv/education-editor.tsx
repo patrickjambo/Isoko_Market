@@ -27,9 +27,11 @@ const YEARS = Array.from({ length: 60 }, (_, i) => String(new Date().getFullYear
 export function EducationEditor({
   value,
   onChange,
+  errors,
 }: {
   value: Education[];
   onChange: (entries: Education[]) => void;
+  errors?: Record<string, string>;
 }) {
   const t = useTranslations('cv');
   const locale = useLocale();
@@ -72,7 +74,9 @@ export function EducationEditor({
         <EducationEntry
           key={i}
           entry={entry}
+          index={i}
           locale={locale}
+          instError={errors?.[`edu_${i}_institution`]}
           onPatch={(c) => patch(i, c)}
           onRemove={() => remove(i)}
         />
@@ -83,12 +87,16 @@ export function EducationEditor({
 
 function EducationEntry({
   entry,
+  index: _index,
   locale,
+  instError,
   onPatch,
   onRemove,
 }: {
   entry: Education;
+  index: number;
   locale: string;
+  instError?: string;
   onPatch: (changes: Partial<Education>) => void;
   onRemove: () => void;
 }) {
@@ -207,16 +215,21 @@ function EducationEntry({
 
       {/* Institution */}
       <div className="space-y-1">
-        <Label className="text-xs text-muted-foreground">{t('institution')}</Label>
-        <RefAutocomplete
-          value={entry.institutionId ? { id: entry.institutionId, label: entry.institutionName ?? '' } : null}
-          onChange={(o) =>
-            onPatch({ institutionId: o?.id ?? '', institutionName: o?.label ?? '', facultyId: '', facultyName: '' })
-          }
-          fetchOptions={fetchInstitutions}
-          onAdd={addInstitution}
-          placeholder={t('institutionPlaceholder')}
-        />
+        <Label className="text-xs text-muted-foreground">
+          {t('institution')} <span className="text-destructive">*</span>
+        </Label>
+        <div className={instError ? 'rounded-lg border border-destructive p-0.5' : ''}>
+          <RefAutocomplete
+            value={entry.institutionId ? { id: entry.institutionId, label: entry.institutionName ?? '' } : null}
+            onChange={(o) =>
+              onPatch({ institutionId: o?.id ?? '', institutionName: o?.label ?? '', facultyId: '', facultyName: '' })
+            }
+            fetchOptions={fetchInstitutions}
+            onAdd={addInstitution}
+            placeholder={t('institutionPlaceholder')}
+          />
+        </div>
+        {instError && <p className="text-xs text-destructive">{instError}</p>}
       </div>
 
       {/* Secondary → combination */}
@@ -312,9 +325,19 @@ function EducationEntry({
             <span className="inline-flex items-center gap-1.5 text-success">
               <Check className="h-4 w-4" /> {t('certAttached')}
             </span>
-            <a href={entry.certificateUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
-              <FileText className="h-4 w-4" /> {t('view')}
-            </a>
+            <div className="flex items-center gap-2">
+              <a href={entry.certificateUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                <FileText className="h-4 w-4" /> {t('view')}
+              </a>
+              <button
+                type="button"
+                onClick={() => onPatch({ certificateUrl: '' })}
+                className="text-muted-foreground hover:text-destructive"
+                title={t('removeCertificate')}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         ) : (
           <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border px-3 py-3 text-sm text-muted-foreground hover:bg-secondary/40">

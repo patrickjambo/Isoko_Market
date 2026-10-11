@@ -12,7 +12,7 @@ import { notify } from '@/lib/notifications';
  */
 export const POST = route(async (req: NextRequest, ctx: { params: { id: string } }) => {
   const user = await requireUser();
-  const { coverNote, documentIds } = applyJobSchema.parse(await req.json().catch(() => ({})));
+  const { coverNote, cvId, documentIds } = applyJobSchema.parse(await req.json().catch(() => ({})));
 
   const job = await prisma.job.findUnique({
     where: { id: ctx.params.id },
@@ -26,8 +26,13 @@ export const POST = route(async (req: NextRequest, ctx: { params: { id: string }
 
   // A seeker can apply with the structured CV OR uploaded documents (the employer
   // sees whichever they have). Require at least one so an application is never empty.
+  // Use the chosen CV from their library (validated as theirs), else the most recent.
   const [cv, docCount] = await Promise.all([
-    prisma.cV.findUnique({ where: { userId: user.id }, select: { id: true, structuredData: true } }),
+    prisma.cV.findFirst({
+      where: { userId: user.id, ...(cvId ? { id: cvId } : {}) },
+      orderBy: { updatedAt: 'desc' },
+      select: { id: true, structuredData: true },
+    }),
     prisma.seekerDocument.count({ where: { userId: user.id } }),
   ]);
   if (!cv && docCount === 0) {

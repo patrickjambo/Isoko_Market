@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import {
   Star,
   Check,
@@ -55,16 +55,44 @@ export function ApplicantReview({
   const [docsCompleteOnly, setDocsCompleteOnly] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [cv, setCv] = useState<ApplicantItem | null>(null);
+  // Lazily-fetched snapshot: null = not yet loaded, false = no CV.
+  const [snapshot, setSnapshot] = useState<CvData | false | null>(null);
+  const [snapshotLoading, setSnapshotLoading] = useState(false);
   // Optimistic status overrides so a triaged card updates instantly.
   const [overrides, setOverrides] = useState<Record<string, string>>({});
 
-  // Did the applicant provide EVERY document the job asked for? (A structured CV
-  // counts as a "CV".)
+  /**
+   * Open the CV modal. The snapshot is NOT baked into the applicant list
+   * (excluded to keep large jobs from bloating the server response). Fetch it
+   * on demand so only the one currently being reviewed is loaded.
+   */
+  const openCvModal = useCallback(async (a: ApplicantItem) => {
+    setCv(a);
+    setSnapshot(null);
+    setSnapshotLoading(true);
+    try {
+      const res = await fetch(`/api/applications/${a.id}/cv/snapshot`);
+      if (res.status === 404) { setSnapshot(false); return; }
+      if (!res.ok) throw new Error();
+      const body = await res.json();
+      const raw = body.data?.snapshot ?? body.snapshot ?? {};
+      const parsed = cvDataSchema.safeParse(raw);
+      setSnapshot(parsed.success ? parsed.data : false);
+    } catch {
+      setSnapshot(false);
+    } finally {
+      setSnapshotLoading(false);
+    }
+  }, []);
+
+  // Did the applicant provide every document the job asked for? Since snapshot
+  // is now fetched lazily, we check documents list only (CV type or structural CV).
   const hasAllRequired = (a: ApplicantItem) =>
     a.requiredDocuments.every(
       (reqType) =>
-        a.documents.some((d) => d.type === reqType) || (reqType === 'CV' && a.snapshot != null)
+        a.documents.some((d) => d.type === reqType)
     );
+
   // Only offer the "complete documents" filter when a job actually requires some.
   const anyRequiresDocs = applicants.some((a) => a.requiredDocuments.length > 0);
 
@@ -264,7 +292,7 @@ export function ApplicantReview({
 
               {/* Inline triage actions */}
               <div className="mt-2.5 flex flex-wrap gap-1.5">
-                <Button size="sm" variant="outline" onClick={() => setCv(a)} disabled={isBusy}>
+                <Button size="sm" variant="outline" onClick={() => openCvModal(a)} disabled={isBusy}>
                   <FileText className="h-4 w-4" /> {t('viewCv')}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => message(a)} disabled={isBusy}>
@@ -306,32 +334,71 @@ export function ApplicantReview({
         })}
       </ul>
 
-      {/* Full CV — same renderer the seeker sees, from the immutable snapshot */}
-      <Dialog open={!!cv} onOpenChange={(o) => !o && setCv(null)}>
+      {/* Full applicant profile — CV snapshot, cover note and uploaded documents */}
+      <Dialog open={!!cv} onOpenChange={(o) => { if (!o) { setCv(null); setSnapshot(null); } }}>
         <DialogContent className="max-h-[90dvh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{cv?.name}</DialogTitle>
           </DialogHeader>
-          {cv?.snapshot ? (
+
+          {/* Cover note */}
+          {cv?.coverNote && (
+            <div className="rounded-lg border border-border bg-secondary/40 p-3">
+              <p className="mb-1 text-xs font-semibold text-muted-foreground">{t('coverNoteLabel')}</p>
+              <p className="text-sm">{cv.coverNote}</p>
+            </div>
+          )}
+
+          {/* Uploaded documents — each opens in a new tab */}
+          {cv && cv.documents.length > 0 && (
+            <div className="space-y-1.5 rounded-lg border border-border p-3">
+              <p className="text-xs font-semibold text-muted-foreground">{tcv('documentsTitle')}</p>
+              <ul className="space-y-1">
+                {cv.documents.map((doc) => (
+                  <li key={doc.id}>
+                    <a
+                      href={`/api/applications/${cv.id}/documents/${doc.id}/file`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-secondary hover:underline"
+                    >
+                      <FileText className="h-4 w-4 shrink-0" />
+                      <span className="min-w-0 flex-1 truncate">{doc.label}</span>
+                      <span className="shrink-0 text-xs text-muted-foreground">{tcv(docTypeKey(doc.type))}</span>
+                      <Download className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Structured CV snapshot (loaded lazily on demand) */}
+          {snapshotLoading ? (
+            <div className="flex items-center justify-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : snapshot ? (
             <>
               <div className="flex justify-end">
                 {/* Static, immutable snapshot — a plain download link, no save race */}
                 <Button variant="outline" size="sm" asChild>
-                  <a href={`/api/applications/${cv.id}/cv/pdf`} download>
+                  <a href={`/api/applications/${cv?.id}/cv/pdf`} download>
                     <Download className="h-4 w-4" /> {tcv('downloadPdf')}
                   </a>
                 </Button>
               </div>
-              <CvPreview data={normalizeCv(cv.snapshot)} fullName={cv.name} />
+              <CvPreview data={normalizeCv(snapshot)} fullName={cv?.name ?? ''} />
             </>
-          ) : (
+          ) : cv && cv.documents.length === 0 && !cv.coverNote ? (
             <p className="py-6 text-center text-sm text-muted-foreground">{t('noCvSnapshot')}</p>
-          )}
+          ) : null}
         </DialogContent>
       </Dialog>
     </div>
   );
 }
+
 
 /** Normalize any (possibly legacy/partial) snapshot into the current CvData
  *  shape via the schema, so old and new snapshots both render. */

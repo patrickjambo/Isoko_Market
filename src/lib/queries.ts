@@ -533,7 +533,7 @@ export async function favoritedSet(userId: string, listingIds: string[]): Promis
 
 /** The stored skill keys on a user's CV (empty if no CV). Powers match scoring. */
 export async function getCvSkills(userId: string): Promise<string[]> {
-  const cv = await prisma.cV.findUnique({ where: { userId }, select: { structuredData: true } });
+  const cv = await prisma.cV.findFirst({ where: { userId }, orderBy: { updatedAt: 'desc' }, select: { structuredData: true } });
   const data = cv?.structuredData as { skills?: unknown } | null;
   const skills = Array.isArray(data?.skills) ? (data!.skills as unknown[]) : [];
   return skills.filter((s): s is string => typeof s === 'string');
@@ -568,7 +568,7 @@ export function cvCompleteness(data: {
  * All from real data — recommendations reflect true CV↔job skill overlap (§4).
  */
 export async function getSeekerHome(userId: string, location?: string | null) {
-  const cv = await prisma.cV.findUnique({ where: { userId }, select: { structuredData: true } });
+  const cv = await prisma.cV.findFirst({ where: { userId }, orderBy: { updatedAt: 'desc' }, select: { structuredData: true } });
   const cvData = (cv?.structuredData ?? null) as Parameters<typeof cvCompleteness>[0];
   const completeness = cvCompleteness(cvData);
   const skills = (Array.isArray(cvData?.skills) ? cvData!.skills : []).filter(

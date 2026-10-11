@@ -3,7 +3,7 @@ import { Users } from 'lucide-react';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ApplicantReview } from '@/components/employer/applicant-review';
 import { requireWorkspace } from '@/lib/workspace-guard';
-import { getEmployerApplicants } from '@/lib/employer-applicants';
+import { getEmployerApplicantsAll } from '@/lib/employer-applicants';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +12,7 @@ export default async function EmployerApplicantsPage({ params }: { params: { loc
   const t = await getTranslations('employer');
 
   const user = await requireWorkspace('employer', params.locale);
-  const applicants = await getEmployerApplicants(user.id, params.locale);
+  const applicants = await getEmployerApplicantsAll(user.id, params.locale);
 
   return (
     <div className="space-y-4">

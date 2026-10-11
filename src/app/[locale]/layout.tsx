@@ -26,8 +26,16 @@ export const metadata: Metadata = {
   // favicon and the Apple touch icon use the Zenova logo (a raster PNG — iOS
   // ignores SVG apple-touch-icons, so a raster is required for a clean install).
   icons: {
-    icon: '/icon.png',
-    apple: '/icon.png',
+    icon: [
+      { url: '/favicon.ico?v=2', sizes: 'any' },
+      { url: '/icon-192.png?v=2', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png?v=2', sizes: '512x512', type: 'image/png' },
+      { url: '/icon.png?v=2', sizes: '1024x1024', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png?v=2', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico?v=2',
   },
   appleWebApp: {
     capable: true,

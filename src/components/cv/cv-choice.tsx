@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PencilLine, Upload, CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
@@ -16,21 +16,43 @@ type Mode = 'build' | 'upload';
  * plus a reusable document library). Both persist on the seeker's profile and
  * are shown to every employer they apply to, so nothing is uploaded twice.
  */
+export type CvListItem = {
+  id: string;
+  name: string;
+  updatedAt: string;
+};
+
 export function CvChoice({
   initial,
   fullName,
   initialMode,
   hasCv,
   docCount,
+  cvId = null,
+  cvName = 'My CV',
+  cvList = [],
 }: {
   initial: CvData | null;
   fullName: string;
   initialMode: Mode;
   hasCv: boolean;
   docCount: number;
+  cvId?: string | null;
+  cvName?: string;
+  cvList?: CvListItem[];
 }) {
   const t = useTranslations('cv');
   const [mode, setMode] = useState<Mode>(initialMode);
+  const [currentDocCount, setCurrentDocCount] = useState(docCount);
+  const [currentHasCv, setCurrentHasCv] = useState(hasCv);
+
+  useEffect(() => {
+    setCurrentDocCount(docCount);
+  }, [docCount]);
+
+  useEffect(() => {
+    setCurrentHasCv(hasCv);
+  }, [hasCv]);
 
   const cards: {
     key: Mode;
@@ -44,14 +66,14 @@ export function CvChoice({
       label: t('tabBuild'),
       hint: t('tabBuildHint'),
       icon: PencilLine,
-      status: hasCv ? t('cvCreated') : undefined,
+      status: currentHasCv ? t('cvCreated') : undefined,
     },
     {
       key: 'upload',
       label: t('tabUpload'),
       hint: t('tabUploadHint'),
       icon: Upload,
-      status: docCount > 0 ? t('docsUploadedCount', { count: docCount }) : undefined,
+      status: currentDocCount > 0 ? t('docsUploadedCount', { count: currentDocCount }) : undefined,
     },
   ];
 
@@ -100,9 +122,16 @@ export function CvChoice({
       </div>
 
       {mode === 'build' ? (
-        <CvBuilder initial={initial} fullName={fullName} />
+        <CvBuilder
+          initial={initial}
+          fullName={fullName}
+          cvId={cvId}
+          name={cvName}
+          cvList={cvList}
+          onSaveSuccess={() => setCurrentHasCv(true)}
+        />
       ) : (
-        <DocumentManager />
+        <DocumentManager onCountChange={setCurrentDocCount} />
       )}
     </div>
   );

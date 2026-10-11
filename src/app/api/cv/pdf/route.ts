@@ -9,7 +9,7 @@ import { formatPhoneDisplay } from '@/lib/phone';
 /** GET /api/cv/pdf — stream the current user's CV as a downloadable PDF. */
 export const GET = route(async () => {
   const user = await requireUser();
-  const cv = await prisma.cV.findUnique({ where: { userId: user.id } });
+  const cv = await prisma.cV.findFirst({ where: { userId: user.id }, orderBy: { updatedAt: 'desc' } });
   if (!cv) throw new ApiError('NOT_FOUND', 'Build your CV first.');
 
   const data = cvDataSchema.parse(cv.structuredData);
