@@ -1,23 +1,28 @@
 import { getCurrentUser } from '@/lib/auth';
-import { subscribe, markConnected, markDisconnected, bumpConnections } from '@/lib/realtime';
+import {
+  subscribe,
+  subscribeGlobal,
+  markConnected,
+  markDisconnected,
+  bumpConnections,
+} from '@/lib/realtime';
 
 // This stream must stay open — never statically optimized or cached.
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 /**
- * Server-Sent Events stream for the logged-in user (Section 9.1). The browser's
- * EventSource auto-reconnects, which satisfies the "polling fallback if the
- * socket drops" requirement without extra code.
+ * Server-Sent Events stream for the browser (Section 9.1). Logged-in users receive
+ * their personal notifications/messages/updates, and all clients (including guests)
+ * receive global platform events (like feature flag toggles) so UI updates
+ * seamlessly in real time without manual page refresh.
  */
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user) {
-    return new Response('Unauthorized', { status: 401 });
-  }
 
   const encoder = new TextEncoder();
-  let unsubscribe: (() => void) | null = null;
+  let unsubscribeUser: (() => void) | null = null;
+  let unsubscribeGlobal: (() => void) | null = null;
   let heartbeat: ReturnType<typeof setInterval> | null = null;
 
   const stream = new ReadableStream({
@@ -32,10 +37,18 @@ export async function GET() {
 
       // Initial comment opens the stream immediately.
       send(': connected\n\n');
-      markConnected(user.id); // presence — drives SMS-fallback decisions
+      if (user) {
+        markConnected(user.id); // presence — drives SMS-fallback decisions
+      }
       bumpConnections(1);
 
-      unsubscribe = subscribe(user.id, (event) => {
+      if (user) {
+        unsubscribeUser = subscribe(user.id, (event) => {
+          send(`data: ${JSON.stringify(event)}\n\n`);
+        });
+      }
+
+      unsubscribeGlobal = subscribeGlobal((event) => {
         send(`data: ${JSON.stringify(event)}\n\n`);
       });
 
@@ -43,8 +56,11 @@ export async function GET() {
       heartbeat = setInterval(() => send(': ping\n\n'), 25_000);
     },
     cancel() {
-      unsubscribe?.();
-      markDisconnected(user.id);
+      unsubscribeUser?.();
+      unsubscribeGlobal?.();
+      if (user) {
+        markDisconnected(user.id);
+      }
       bumpConnections(-1);
       if (heartbeat) clearInterval(heartbeat);
     },

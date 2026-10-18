@@ -1,8 +1,10 @@
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { adminRoute } from '@/lib/admin-route';
 import { prisma } from '@/lib/prisma';
 import { audit } from '@/lib/audit';
 import { emitAdmin } from '@/lib/admin-realtime';
+import { broadcastGlobal } from '@/lib/realtime';
 import { getPlatformSettings } from '@/lib/commission';
 
 /** GET /api/admin/settings/feature-flags — current feature flag state. */
@@ -55,6 +57,19 @@ export const PATCH = adminRoute('settings.manage', async (req, _ctx, { admin }) 
   });
 
   await emitAdmin('settings.updated', 'Feature flags updated');
+
+  // Broadcast to all active client connections (both logged-in and guests)
+  broadcastGlobal({
+    type: 'feature_flags_updated',
+    flags: {
+      jobsEnabled: settings.jobsEnabled,
+      hiringEnabled: settings.hiringEnabled,
+      cvBuilderEnabled: settings.cvBuilderEnabled,
+    },
+  });
+
+  // Revalidate Server Components across all routes and locales
+  revalidatePath('/', 'layout');
 
   return {
     data: {

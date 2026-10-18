@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { Briefcase, FileText, Users, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
+import { broadcastFeatureFlagChange } from '@/components/providers/feature-flags-provider';
 
 type Flags = {
   jobsEnabled: boolean;
@@ -75,12 +76,15 @@ export function FeatureFlagsForm({ initial }: { initial: Flags }) {
       const data = await res.json();
       setFlags(data.data);
       setLastSaved(key);
+      broadcastFeatureFlagChange(data.data);
       startTransition(() => router.refresh());
       // Clear the "saved" indicator after 3 s
       setTimeout(() => setLastSaved(null), 3000);
     } catch (err) {
       // Revert optimistic update
-      setFlags((prev) => ({ ...prev, [key]: !newValue }));
+      const reverted = { ...flags, [key]: !newValue };
+      setFlags(reverted);
+      broadcastFeatureFlagChange(reverted);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setSaving(null);

@@ -7,6 +7,7 @@ import { getCurrentUser, touchLastActive } from '@/lib/auth';
 import { toSessionUser } from '@/lib/serialize';
 import { env } from '@/lib/env';
 import { Providers } from '@/components/providers';
+import { getFeatureFlags } from '@/lib/feature-flags';
 import { ServiceWorkerRegister } from '@/components/shared/service-worker-register';
 import '../globals.css';
 
@@ -68,15 +69,20 @@ export default async function LocaleLayout({
   }
   setRequestLocale(locale);
 
-  const messages = await getMessages();
-  const user = await getCurrentUser();
+  const [messages, user, flags] = await Promise.all([
+    getMessages(),
+    getCurrentUser(),
+    getFeatureFlags(),
+  ]);
   if (user) void touchLastActive(user.id);
 
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className="min-h-dvh bg-background font-sans">
         <NextIntlClientProvider messages={messages}>
-          <Providers user={user ? toSessionUser(user) : null}>{children}</Providers>
+          <Providers user={user ? toSessionUser(user) : null} initialFlags={flags}>
+            {children}
+          </Providers>
         </NextIntlClientProvider>
         <ServiceWorkerRegister />
       </body>

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
+import { useFeatureFlags } from '@/components/providers';
 
 const BASE_LINKS = [
   { href: '/', key: 'home', exact: true, feature: null },
@@ -12,11 +13,13 @@ const BASE_LINKS = [
 
 type Feature = 'jobs' | null;
 
-export function DesktopNavLinks({ jobsEnabled = true }: { jobsEnabled?: boolean }) {
+export function DesktopNavLinks({ jobsEnabled: initialJobsEnabled }: { jobsEnabled?: boolean }) {
   const t = useTranslations('nav');
   const pathname = usePathname();
+  const liveFlags = useFeatureFlags();
 
-  const featureOn: Record<string, boolean> = { jobs: jobsEnabled };
+  const effectiveJobsEnabled = liveFlags?.jobsEnabled ?? initialJobsEnabled ?? false;
+  const featureOn: Record<string, boolean> = { jobs: effectiveJobsEnabled };
 
   const links = BASE_LINKS.filter((l) => l.feature === null || featureOn[l.feature]);
 

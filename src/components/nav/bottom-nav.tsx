@@ -4,7 +4,7 @@ import { Home, Store, Briefcase, MessageCircle, User, Plus } from 'lucide-react'
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
-import { useSession } from '@/components/providers';
+import { useSession, useFeatureFlags } from '@/components/providers';
 
 const TABS = [
   { href: '/', key: 'home', icon: Home, exact: true, feature: null },
@@ -18,14 +18,16 @@ const TABS = [
 /**
  * Mobile bottom tab bar (Section 8.2). A prominent central "+ Post" merges the
  * commerce and employment paths under one entry point.
- * Tabs gated by disabled feature flags are hidden automatically.
+ * Tabs gated by disabled feature flags are hidden automatically in real time.
  */
-export function BottomNav({ jobsEnabled = true }: { jobsEnabled?: boolean }) {
+export function BottomNav({ jobsEnabled: initialJobsEnabled }: { jobsEnabled?: boolean }) {
   const t = useTranslations('nav');
   const pathname = usePathname();
   const user = useSession();
+  const liveFlags = useFeatureFlags();
 
-  const featureOn: Record<string, boolean> = { jobs: jobsEnabled };
+  const effectiveJobsEnabled = liveFlags?.jobsEnabled ?? initialJobsEnabled ?? false;
+  const featureOn: Record<string, boolean> = { jobs: effectiveJobsEnabled };
 
   const tabs = TABS.filter((tab) => {
     if ('auth' in tab && tab.auth && !user) return false;

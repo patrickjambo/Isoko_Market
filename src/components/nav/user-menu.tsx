@@ -14,15 +14,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
-import { useSession } from '@/components/providers';
+import { useSession, useFeatureFlags } from '@/components/providers';
 import { adoptedWorkspaces, type Workspace } from '@/lib/onboarding';
 import { initials } from '@/lib/utils';
 import type { FeatureFlags } from '@/lib/feature-flags';
 
-export function UserMenu({ flags }: { flags?: FeatureFlags }) {
+export function UserMenu({ flags: initialFlags }: { flags?: FeatureFlags }) {
   const t = useTranslations();
   const router = useRouter();
   const user = useSession();
+  const liveFlags = useFeatureFlags();
   if (!user) return null;
 
   async function logout() {
@@ -31,10 +32,10 @@ export function UserMenu({ flags }: { flags?: FeatureFlags }) {
     router.refresh();
   }
 
-  // Filter workspace links based on feature flags.
-  // If no flags are provided (e.g. in tests), default to showing everything.
-  const cvEnabled = !flags || flags.cvBuilderEnabled;
-  const hiringEnabled = !flags || flags.hiringEnabled;
+  // Filter workspace links based on feature flags in real time.
+  const cvEnabled = liveFlags?.cvBuilderEnabled ?? initialFlags?.cvBuilderEnabled ?? false;
+  const hiringEnabled = liveFlags?.hiringEnabled ?? initialFlags?.hiringEnabled ?? false;
+  const jobsEnabled = liveFlags?.jobsEnabled ?? initialFlags?.jobsEnabled ?? false;
 
   // Only the workspaces the user has actually ADOPTED appear here — a buyer sees
   // none and starts selling/hiring from the "+ Post" button (see adoptedWorkspaces).
@@ -104,7 +105,7 @@ export function UserMenu({ flags }: { flags?: FeatureFlags }) {
         })}
 
         {/* A job seeker's applications — only shown when jobs feature is on */}
-        {isSeeker && cvEnabled && (
+        {isSeeker && jobsEnabled && (
           <DropdownMenuItem asChild>
             <Link href="/profile/applications">
               <Send /> {t('profile.myApplications')}

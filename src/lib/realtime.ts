@@ -28,7 +28,15 @@ export type RealtimeEvent =
       reason?: string; // sold | filled | closed | reopened | cancelled | relisted |
       // manual-P2P order flow: buyer_paid | seller_confirmed | item_received | disputed
     }
-  | { type: 'admin_event'; name: string; label: string; at: string };
+  | { type: 'admin_event'; name: string; label: string; at: string }
+  | {
+      type: 'feature_flags_updated';
+      flags: {
+        jobsEnabled: boolean;
+        hiringEnabled: boolean;
+        cvBuilderEnabled: boolean;
+      };
+    };
 
 export type SerializedMessage = {
   id: string;
@@ -130,3 +138,21 @@ export function subscribeTopic(
   bus.on(topicChannel(topic), handler);
   return () => bus.off(topicChannel(topic), handler);
 }
+
+// ── Global platform channel ─────────────────────────────────
+// Broadcasts platform-wide configuration and state changes (such as feature
+// flags toggled by admin) to all active client connections (both guests and
+// signed-in users) without requiring page refresh.
+const GLOBAL_CHANNEL = 'global:broadcast';
+
+export function broadcastGlobal(event: RealtimeEvent): void {
+  bus.emit(GLOBAL_CHANNEL, event);
+}
+
+export function subscribeGlobal(
+  handler: (event: RealtimeEvent) => void
+): () => void {
+  bus.on(GLOBAL_CHANNEL, handler);
+  return () => bus.off(GLOBAL_CHANNEL, handler);
+}
+
