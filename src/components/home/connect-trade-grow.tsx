@@ -4,10 +4,16 @@ import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 
 /**
- * "Connect · Trade · Hire · Grow" — the four things you can do on Zenova, as
- * tappable entry points. Recreated from the brand banner as live components.
+ * "Connect · Trade · Hire · Grow" — the primary feature pathways on Zenova.
+ * Gated dynamically by feature flags so disabled features are cleanly hidden.
  */
-export async function ConnectTradeGrow() {
+export async function ConnectTradeGrow({
+  jobsEnabled = false,
+  hiringEnabled = false,
+}: {
+  jobsEnabled?: boolean;
+  hiringEnabled?: boolean;
+}) {
   const t = await getTranslations('home');
 
   const cards = [
@@ -17,6 +23,7 @@ export async function ConnectTradeGrow() {
       title: t('cardBuyTitle'),
       desc: t('cardBuyDesc'),
       href: '/marketplace',
+      enabled: true,
     },
     {
       icon: Handshake,
@@ -24,6 +31,7 @@ export async function ConnectTradeGrow() {
       title: t('cardHireTitle'),
       desc: t('cardHireDesc'),
       href: '/jobs',
+      enabled: hiringEnabled,
     },
     {
       icon: Home,
@@ -31,6 +39,7 @@ export async function ConnectTradeGrow() {
       title: t('cardRentTitle'),
       desc: t('cardRentDesc'),
       href: '/marketplace?kind=SERVICE',
+      enabled: true,
     },
     {
       icon: Briefcase,
@@ -38,19 +47,31 @@ export async function ConnectTradeGrow() {
       title: t('cardJobsTitle'),
       desc: t('cardJobsDesc'),
       href: '/jobs',
+      enabled: jobsEnabled,
     },
-  ];
+  ].filter((c) => c.enabled);
+
+  const gridCols =
+    cards.length === 2
+      ? 'sm:grid-cols-2 max-w-2xl mx-auto'
+      : cards.length === 3
+        ? 'sm:grid-cols-3 max-w-4xl mx-auto'
+        : 'sm:grid-cols-2 lg:grid-cols-4';
 
   return (
     <section className="container py-14">
-      {/* Connect · Trade · Hire · Grow */}
+      {/* Dynamic kicker headline */}
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
           <span>{t('ctgConnect')}</span>
           <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
           <span>{t('ctgTrade')}</span>
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-          <span>{t('ctgHire')}</span>
+          {(hiringEnabled || jobsEnabled) && (
+            <>
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+              <span>{t('ctgHire')}</span>
+            </>
+          )}
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           <span>{t('ctgGrow')}</span>
         </h2>
@@ -59,7 +80,7 @@ export async function ConnectTradeGrow() {
         </p>
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className={cn('mt-8 grid gap-4', gridCols)}>
         {cards.map((c) => {
           const Icon = c.icon;
           return (

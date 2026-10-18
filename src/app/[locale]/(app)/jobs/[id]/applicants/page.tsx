@@ -8,6 +8,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { can } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
 import { getEmployerApplicantsAll } from '@/lib/employer-applicants';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +18,9 @@ export default async function ApplicantsPage({
   params: { locale: string; id: string };
 }) {
   setRequestLocale(params.locale);
+  const flags = await getFeatureFlags();
+  if (!flags.hiringEnabled) notFound();
+
   const t = await getTranslations('jobs');
   const te = await getTranslations('employer');
 

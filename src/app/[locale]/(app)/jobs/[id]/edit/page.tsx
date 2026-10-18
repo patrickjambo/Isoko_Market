@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { asContact } from '@/lib/contact';
 import { CreateJobForm } from '@/components/jobs/create-job-form';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,6 +15,9 @@ export default async function EditJobPage({
   params: { locale: string; id: string };
 }) {
   setRequestLocale(params.locale);
+  const flags = await getFeatureFlags();
+  if (!flags.hiringEnabled) notFound();
+
   const user = await getCurrentUser();
   if (!user) {
     redirect({ href: '/login', locale: params.locale });

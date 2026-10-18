@@ -1,11 +1,16 @@
+import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link, redirect } from '@/i18n/routing';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { CreateJobForm } from '@/components/jobs/create-job-form';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export default async function NewJobPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
+  const flags = await getFeatureFlags();
+  if (!flags.hiringEnabled) notFound();
+
   const user = await getCurrentUser();
   if (!user) {
     redirect({ href: '/login', locale: params.locale });

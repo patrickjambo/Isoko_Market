@@ -32,22 +32,27 @@ import {
   getPlatformStats,
 } from '@/lib/queries';
 import { getCurrentUser } from '@/lib/auth';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export default async function HomePage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
   const t = await getTranslations('home');
 
-  const [listings, services, jobs, stats, user] = await Promise.all([
+  const [flags, listings, services, stats, user] = await Promise.all([
+    getFeatureFlags(),
     getFeaturedListings(8),
     getLatestServices(4),
-    getLatestJobs(6),
     getPlatformStats(),
     getCurrentUser(),
   ]);
 
+  const jobs = flags.jobsEnabled ? await getLatestJobs(6) : [];
+
   const pillars = [
     { icon: ShieldCheck, title: t('pillarVerifiedTitle'), body: t('pillarVerifiedBody') },
-    { icon: Briefcase, title: t('pillarJobsTitle'), body: t('pillarJobsBody') },
+    ...(flags.jobsEnabled
+      ? [{ icon: Briefcase, title: t('pillarJobsTitle'), body: t('pillarJobsBody') }]
+      : []),
     { icon: Smartphone, title: t('pillarPayTitle'), body: t('pillarPayBody') },
     { icon: Languages, title: t('pillarLangTitle'), body: t('pillarLangBody') },
   ];
@@ -139,16 +144,18 @@ export default async function HomePage({ params }: { params: { locale: string } 
                 </Button>
               )}
               {/* Browse without signing up — lets skeptics evaluate first (§2). */}
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
-                asChild
-              >
-                <Link href="/jobs">
-                  <Briefcase className="h-5 w-5" /> {t('ctaJobs')}
-                </Link>
-              </Button>
+              {flags.jobsEnabled && (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+                  asChild
+                >
+                  <Link href="/jobs">
+                    <Briefcase className="h-5 w-5" /> {t('ctaJobs')}
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -156,7 +163,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
       )}
 
       {/* Connect · Trade · Hire · Grow — the four things you can do here. */}
-      <ConnectTradeGrow />
+      <ConnectTradeGrow jobsEnabled={flags.jobsEnabled} hiringEnabled={flags.hiringEnabled} />
 
       {/* Stats band — social proof for new visitors (guests only). Omits any
           hollow zero and the whole band if the platform is brand new. */}
@@ -170,9 +177,10 @@ export default async function HomePage({ params }: { params: { locale: string } 
             value: stats.transactions,
             label: t('statsTransactions'),
           },
-          stats.filled > 0
-            ? { icon: Briefcase, value: stats.filled, label: t('statsHired') }
-            : stats.jobs > 0 && { icon: Briefcase, value: stats.jobs, label: t('statsJobs') },
+          flags.jobsEnabled &&
+            (stats.filled > 0
+              ? { icon: Briefcase, value: stats.filled, label: t('statsHired') }
+              : stats.jobs > 0 && { icon: Briefcase, value: stats.jobs, label: t('statsJobs') }),
         ].filter(Boolean) as { icon: LucideIcon; value: number; label: string }[];
         if (items.length === 0) return null;
         return (
@@ -250,7 +258,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
       )}
 
       {/* Latest jobs — live */}
-      {jobs.length > 0 && (
+      {flags.jobsEnabled && jobs.length > 0 && (
         <section className="container py-10">
           <SectionHeader title={t('latestJobs')} href="/jobs" live={t('live')} />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -300,16 +308,18 @@ export default async function HomePage({ params }: { params: { locale: string } 
                 {user ? t('ctaBrowse') : t('ctaGetStarted')} <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
-              asChild
-            >
-              <Link href="/jobs">
-                <Briefcase className="h-5 w-5" /> {t('ctaJobs')}
-              </Link>
-            </Button>
+            {flags.jobsEnabled && (
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+                asChild
+              >
+                <Link href="/jobs">
+                  <Briefcase className="h-5 w-5" /> {t('ctaJobs')}
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </section>

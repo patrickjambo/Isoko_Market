@@ -3,8 +3,13 @@ import { route, jsonOk, ApiError } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { cvDataSchema } from '@/lib/validators/cv';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 async function ownCv(userId: string, id: string) {
+  const flags = await getFeatureFlags();
+  if (!flags.cvBuilderEnabled) {
+    throw new ApiError('FORBIDDEN', 'CV Builder is currently disabled.');
+  }
   const cv = await prisma.cV.findFirst({ where: { id, userId }, select: { id: true } });
   if (!cv) throw new ApiError('NOT_FOUND', 'CV not found.');
   return cv;
@@ -12,6 +17,10 @@ async function ownCv(userId: string, id: string) {
 
 /** GET /api/cv/[id] — one CV's data + name (for the builder). */
 export const GET = route(async (_req, ctx: { params: { id: string } }) => {
+  const flags = await getFeatureFlags();
+  if (!flags.cvBuilderEnabled) {
+    throw new ApiError('FORBIDDEN', 'CV Builder is currently disabled.');
+  }
   const user = await requireUser();
   const cv = await prisma.cV.findFirst({
     where: { id: ctx.params.id, userId: user.id },

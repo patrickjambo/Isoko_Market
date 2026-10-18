@@ -7,24 +7,31 @@ import { cn } from '@/lib/utils';
 import { useSession } from '@/components/providers';
 
 const TABS = [
-  { href: '/', key: 'home', icon: Home, exact: true },
-  { href: '/marketplace', key: 'marketplace', icon: Store },
-  { href: '/post', key: 'post', icon: Plus, center: true },
-  { href: '/jobs', key: 'jobs', icon: Briefcase },
-  { href: '/messages', key: 'messages', icon: MessageCircle, auth: true },
-  { href: '/profile', key: 'profile', icon: User, auth: true },
+  { href: '/', key: 'home', icon: Home, exact: true, feature: null },
+  { href: '/marketplace', key: 'marketplace', icon: Store, feature: null },
+  { href: '/post', key: 'post', icon: Plus, center: true, feature: null },
+  { href: '/jobs', key: 'jobs', icon: Briefcase, feature: 'jobs' as const },
+  { href: '/messages', key: 'messages', icon: MessageCircle, auth: true, feature: null },
+  { href: '/profile', key: 'profile', icon: User, auth: true, feature: null },
 ] as const;
 
 /**
  * Mobile bottom tab bar (Section 8.2). A prominent central "+ Post" merges the
  * commerce and employment paths under one entry point.
+ * Tabs gated by disabled feature flags are hidden automatically.
  */
-export function BottomNav() {
+export function BottomNav({ jobsEnabled = true }: { jobsEnabled?: boolean }) {
   const t = useTranslations('nav');
   const pathname = usePathname();
   const user = useSession();
 
-  const tabs = TABS.filter((tab) => !('auth' in tab && tab.auth) || user);
+  const featureOn: Record<string, boolean> = { jobs: jobsEnabled };
+
+  const tabs = TABS.filter((tab) => {
+    if ('auth' in tab && tab.auth && !user) return false;
+    if ('feature' in tab && tab.feature && !featureOn[tab.feature]) return false;
+    return true;
+  });
 
   return (
     <nav
@@ -52,17 +59,19 @@ export function BottomNav() {
             );
           }
           return (
-            <li key={tab.href} className="flex-1">
+            <li key={tab.href} className="min-w-0 flex-1">
               <Link
                 href={tab.href}
                 className={cn(
-                  'flex min-h-[56px] flex-col items-center justify-center gap-0.5 py-1.5 text-[11px] font-medium',
+                  'flex min-h-[56px] flex-col items-center justify-center gap-0.5 py-1.5 text-[10px] font-medium sm:text-[11px]',
                   active ? 'text-primary' : 'text-muted-foreground'
                 )}
                 aria-current={active ? 'page' : undefined}
               >
-                <Icon className={cn('h-5 w-5', active && 'text-primary')} />
-                {t(tab.key)}
+                <Icon className={cn('h-5 w-5 shrink-0', active && 'text-primary')} />
+                <span className="max-w-full truncate px-0.5 text-center leading-tight">
+                  {t(tab.key)}
+                </span>
               </Link>
             </li>
           );

@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { getCategories } from '@/lib/queries';
 import { categoryName } from '@/lib/i18n-helpers';
+import { getFeatureFlags } from '@/lib/feature-flags';
 import { Logo } from '@/components/brand/logo';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from './search-bar';
@@ -21,12 +22,13 @@ export async function Header() {
   const locale = await getLocale();
   const user = await getCurrentUser();
 
-  const [unread, saved, categories] = await Promise.all([
+  const [unread, saved, categories, flags] = await Promise.all([
     user
       ? prisma.notification.count({ where: { userId: user.id, readAt: null } })
       : Promise.resolve(0),
     user ? prisma.favorite.count({ where: { userId: user.id } }) : Promise.resolve(0),
     getCategories(),
+    getFeatureFlags(),
   ]);
 
   const productCategories = categories
@@ -38,13 +40,13 @@ export async function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="container flex h-16 items-center gap-3">
+      <div className="container flex h-16 items-center gap-2 px-3 sm:gap-3 sm:px-4">
         <Link href="/" aria-label="Zenova home" className="shrink-0">
           <Logo />
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
-          <DesktopNavLinks />
+          <DesktopNavLinks jobsEnabled={flags.jobsEnabled} />
           <CategoriesMenu products={productCategories} services={serviceCategories} variant="nav" />
         </div>
 
@@ -52,7 +54,7 @@ export async function Header() {
           <SearchBar />
         </div>
 
-        <div className="ml-auto flex items-center gap-1 lg:ml-3">
+        <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1 lg:ml-3">
           {/* Categories reachable on mobile too — the desktop nav (with its text
               dropdown) is hidden below md, so surface a compact icon trigger. */}
           <CategoriesMenu
@@ -71,7 +73,7 @@ export async function Header() {
           {user ? (
             <>
               <div className="hidden sm:block">
-                <PostMenu />
+                <PostMenu flags={flags} />
               </div>
               {/* Cart — products the buyer saved to buy later (the /saved list). */}
               <Button variant="ghost" size="icon" asChild aria-label={t('cart')} className="relative">
@@ -85,14 +87,14 @@ export async function Header() {
                 </Link>
               </Button>
               <NotificationBell initialUnread={unread} />
-              <UserMenu />
+              <UserMenu flags={flags} />
             </>
           ) : (
             <>
-              <Button variant="ghost" size="sm" asChild>
+              <Button variant="ghost" size="sm" className="h-9 px-2 sm:px-3 text-xs sm:text-sm" asChild>
                 <Link href="/login">{t('login')}</Link>
               </Button>
-              <Button variant="default" size="sm" asChild>
+              <Button variant="default" size="sm" className="h-9 px-2.5 sm:px-3 text-xs sm:text-sm" asChild>
                 <Link href="/register">{t('register')}</Link>
               </Button>
             </>

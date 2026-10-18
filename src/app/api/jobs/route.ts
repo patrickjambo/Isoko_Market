@@ -10,9 +10,13 @@ import { searchJobs } from '@/lib/queries';
 import { canonicalSkill } from '@/lib/skills';
 import { notifyMatchingSavedSearches } from '@/lib/saved-search';
 import { emitAdmin } from '@/lib/admin-realtime';
+import { getFeatureFlags } from '@/lib/feature-flags';
+import { ApiError } from '@/lib/api';
 
 /** GET /api/jobs — public filtered search. */
 export const GET = route(async (req: NextRequest) => {
+  const flags = await getFeatureFlags();
+  if (!flags.jobsEnabled) return jsonOk({ items: [], total: 0, page: 1, pageSize: 20 });
   const params = Object.fromEntries(new URL(req.url).searchParams);
   const filter = jobFilterSchema.parse(params);
   return jsonOk(await searchJobs(filter));
@@ -20,6 +24,10 @@ export const GET = route(async (req: NextRequest) => {
 
 /** POST /api/jobs — post a job/gig (free core action; any logged-in user). */
 export const POST = route(async (req: NextRequest) => {
+  const flags = await getFeatureFlags();
+  if (!flags.hiringEnabled) {
+    throw new ApiError('FORBIDDEN', 'Hiring and job posting is currently disabled.');
+  }
   const user = await requireUser();
   const input = createJobSchema.parse(await req.json().catch(() => ({})));
 

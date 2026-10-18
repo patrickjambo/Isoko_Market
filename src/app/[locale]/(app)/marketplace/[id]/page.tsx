@@ -331,7 +331,7 @@ export default async function ListingDetailPage({
       {similar.length > 0 && (
         <section className="mt-10">
           <h2 className="mb-3 text-lg font-bold tracking-tight">{t('similarListings')}</h2>
-          <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
+          <div className="flex max-w-full gap-3 overflow-x-auto pb-2">
             {similar.map((s) => (
               <div key={s.id} className="w-40 shrink-0">
                 <ListingCard listing={s} />

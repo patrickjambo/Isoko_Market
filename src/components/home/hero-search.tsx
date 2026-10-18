@@ -20,7 +20,7 @@ export function HeroSearch() {
 
   return (
     <form onSubmit={submit} className="flex w-full max-w-xl gap-2">
-      <div className="relative flex-1">
+      <div className="relative min-w-0 flex-1">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
         <input
           value={q}
@@ -32,7 +32,7 @@ export function HeroSearch() {
       </div>
       <button
         type="submit"
-        className="h-12 shrink-0 rounded-xl bg-accent px-5 font-semibold text-accent-foreground shadow-lg transition-colors hover:bg-accent/90"
+        className="h-12 shrink-0 rounded-xl bg-accent px-4 font-semibold text-accent-foreground shadow-lg transition-colors hover:bg-accent/90 text-sm sm:px-5 sm:text-base"
       >
         {tc('search')}
       </button>

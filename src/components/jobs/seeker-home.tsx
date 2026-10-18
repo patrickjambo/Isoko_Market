@@ -14,9 +14,11 @@ import { matchScore } from '@/lib/skills';
 export async function SeekerHome({
   userId,
   location,
+  cvBuilderEnabled = false,
 }: {
   userId: string;
   location?: string | null;
+  cvBuilderEnabled?: boolean;
 }) {
   const t = await getTranslations('jobs');
   const { skills, completeness, statusCounts, recommended, nearbyGigs } = await getSeekerHome(
@@ -30,33 +32,35 @@ export async function SeekerHome({
   return (
     <div className="mb-6 space-y-6">
       {/* Top row: CV completeness + application status */}
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className={cvBuilderEnabled ? 'grid gap-3 sm:grid-cols-2' : 'grid gap-3'}>
         {/* CV Completeness */}
-        <Link
-          href="/cv"
-          className="group flex flex-col justify-between gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary/40"
-        >
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2 text-sm font-semibold">
-              <FileText className="h-4 w-4 text-primary" /> {t('cvCompleteness')}
+        {cvBuilderEnabled && (
+          <Link
+            href="/cv"
+            className="group flex flex-col justify-between gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary/40"
+          >
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-2 text-sm font-semibold">
+                <FileText className="h-4 w-4 text-primary" /> {t('cvCompleteness')}
+              </span>
+              <span className="text-sm font-bold text-primary">{completeness.percent}%</span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${completeness.percent}%` }}
+              />
+            </div>
+            <span className="flex items-center gap-1 text-xs text-muted-foreground group-hover:text-foreground">
+              {completeness.percent >= 100
+                ? t('cvComplete')
+                : completeness.nextStep
+                  ? t('cvNextStep', { step: t(`boostStep_${completeness.nextStep}`) })
+                  : t('cvKeepGoing')}
+              <ArrowRight className="h-3 w-3" />
             </span>
-            <span className="text-sm font-bold text-primary">{completeness.percent}%</span>
-          </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-            <div
-              className="h-full rounded-full bg-primary transition-all"
-              style={{ width: `${completeness.percent}%` }}
-            />
-          </div>
-          <span className="flex items-center gap-1 text-xs text-muted-foreground group-hover:text-foreground">
-            {completeness.percent >= 100
-              ? t('cvComplete')
-              : completeness.nextStep
-                ? t('cvNextStep', { step: t(`boostStep_${completeness.nextStep}`) })
-                : t('cvKeepGoing')}
-            <ArrowRight className="h-3 w-3" />
-          </span>
-        </Link>
+          </Link>
+        )}
 
         {/* Application Status */}
         <Link
@@ -102,7 +106,7 @@ export async function SeekerHome({
       {recommended.length > 0 && (
         <section>
           <SectionHeader icon={Sparkles} title={t('recommendedForYou')} />
-          <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
+          <div className="flex max-w-full gap-3 overflow-x-auto pb-2">
             {recommended.map((job) => (
               <div key={job.id} className="w-64 shrink-0">
                 <JobCard job={job} match={matchScore(skills, job.skills ?? []).tier} />
@@ -116,7 +120,7 @@ export async function SeekerHome({
       {nearbyGigs.length > 0 && (
         <section>
           <SectionHeader icon={Clock} title={t('nearbyGigsToday')} />
-          <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
+          <div className="flex max-w-full gap-3 overflow-x-auto pb-2">
             {nearbyGigs.map((job) => (
               <div key={job.id} className="w-64 shrink-0">
                 <JobCard job={job} match={matchScore(skills, job.skills ?? []).tier} />

@@ -128,11 +128,11 @@ export default async function MarketplacePage({
         </div>
       )}
 
-      <div className="mb-5 flex items-center justify-between gap-2">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <span className="text-sm text-muted-foreground">
           {total} {t('title').toLowerCase()}
         </span>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <NearMeButton params={searchParams} />
           <SaveSearchButton
             current={{

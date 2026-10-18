@@ -1450,5 +1450,21 @@
     "save": "Bika igenamiterere",
     "saved": "Igenamiterere rya komisiyo ryabitswe",
     "errDestination": "Shyiraho aho komisiyo ijya (numero cyangwa kode) mbere yo gukoresha."
+  },
+  "featureFlags": {
+    "title": "Ibirango by Imikino",
+    "subtitle": "Fungura cyangwa funga serivisi za platform nonaha — nta guhindura kode. Serivisi zafunzwe zizibwa abakoresha bose.",
+    "jobsLabel": "Akazi",
+    "jobsDesc": "Abasaka akazi bashobora kureba no gusaba akazi. Bifunzwe, urupapuro rwa /jobs ruzibwa.",
+    "hiringLabel": "Gushaka Akazi",
+    "hiringDesc": "Abashaka abakozi bashobora gutangaza akazi. Bifunzwe, dashboard ya employer izibwa.",
+    "cvBuilderLabel": "Gukora CV",
+    "cvBuilderDesc": "Abasaka akazi bashobora gukora CV. Bifunzwe, ubukaniro bwa CV buzibwa.",
+    "statusOn": "Bifunguye",
+    "statusOff": "Bifunzwe",
+    "enableBtn": "Fungura",
+    "disableBtn": "Funga",
+    "saving": "Bigabika…",
+    "hint": "Impinduka zifata ako kanya kuri abakoresha bose."
   }
 }

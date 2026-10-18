@@ -1,10 +1,15 @@
 import type { NextRequest } from 'next/server';
-import { route, jsonOk } from '@/lib/api';
+import { route, jsonOk, ApiError } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 /** GET /api/cv — the user's CV library (id, name, updatedAt), newest first. */
 export const GET = route(async () => {
+  const flags = await getFeatureFlags();
+  if (!flags.cvBuilderEnabled) {
+    throw new ApiError('FORBIDDEN', 'CV Builder is currently disabled.');
+  }
   const user = await requireUser();
   const cvs = await prisma.cV.findMany({
     where: { userId: user.id },
@@ -16,6 +21,10 @@ export const GET = route(async () => {
 
 /** POST /api/cv — create a new, empty named CV. Returns its id. */
 export const POST = route(async (req: NextRequest) => {
+  const flags = await getFeatureFlags();
+  if (!flags.cvBuilderEnabled) {
+    throw new ApiError('FORBIDDEN', 'CV Builder is currently disabled.');
+  }
   const user = await requireUser();
   const body = (await req.json().catch(() => ({}))) as { name?: unknown };
   const name =

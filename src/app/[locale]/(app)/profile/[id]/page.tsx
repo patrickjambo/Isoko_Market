@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { initials, timeAgo } from '@/lib/utils';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,9 +23,10 @@ export default async function PublicProfilePage({
   setRequestLocale(params.locale);
   const t = await getTranslations('profile');
 
-  const [person, viewer] = await Promise.all([
+  const [person, viewer, flags] = await Promise.all([
     prisma.user.findUnique({ where: { id: params.id } }),
     getCurrentUser(),
+    getFeatureFlags(),
   ]);
   if (!person) notFound();
 
@@ -44,7 +46,7 @@ export default async function PublicProfilePage({
         seller: { select: { fullName: true, isVerified: true, verificationStatus: true } },
       },
     }),
-    getEmployerOpenJobs(person.id),
+    flags.jobsEnabled ? getEmployerOpenJobs(person.id) : Promise.resolve([]),
     prisma.review.aggregate({ where: { revieweeId: person.id }, _avg: { rating: true } }),
     prisma.review.findMany({
       where: { revieweeId: person.id },

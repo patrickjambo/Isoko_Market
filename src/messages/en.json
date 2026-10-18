@@ -1450,5 +1450,21 @@
     "save": "Save settings",
     "saved": "Commission settings saved",
     "errDestination": "Set a destination (phone or MoMo code) before enabling."
+  },
+  "featureFlags": {
+    "title": "Feature Flags",
+    "subtitle": "Enable or disable platform features in real time — no code deployment needed. Disabled features are hidden from all users immediately.",
+    "jobsLabel": "Job Board",
+    "jobsDesc": "Allows job seekers to browse and apply for jobs. When disabled, the /jobs page and all job-related navigation are hidden.",
+    "hiringLabel": "Employer Hiring",
+    "hiringDesc": "Allows employers to post jobs and review applicants. When disabled, the employer dashboard and 'Post a Job' option are hidden.",
+    "cvBuilderLabel": "CV Builder",
+    "cvBuilderDesc": "Allows job seekers to build and export their CV. When disabled, the CV workspace is hidden from the profile menu.",
+    "statusOn": "Enabled",
+    "statusOff": "Disabled",
+    "enableBtn": "Enable",
+    "disableBtn": "Disable",
+    "saving": "Saving…",
+    "hint": "Changes take effect immediately for all users. The page refreshes automatically after each toggle."
   }
 }

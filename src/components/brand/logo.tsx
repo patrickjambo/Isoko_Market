@@ -15,7 +15,7 @@ export function LogoMark({ className }: { className?: string }) {
       width={102}
       height={108}
       priority
-      className={cn('h-12 w-auto object-contain', className)}
+      className={cn('h-9 w-auto shrink-0 object-contain sm:h-11 md:h-12', className)}
     />
   );
 }
@@ -28,10 +28,10 @@ export function Logo({
   showText?: boolean;
 }) {
   return (
-    <span className={cn('inline-flex items-center gap-2', className)}>
+    <span className={cn('inline-flex items-center gap-1.5 sm:gap-2 shrink-0', className)}>
       <LogoMark />
       {showText && (
-        <span className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
+        <span className="hidden min-[380px]:inline text-xl font-extrabold tracking-tight text-foreground sm:text-2xl md:text-3xl">
           Zenova
         </span>
       )}

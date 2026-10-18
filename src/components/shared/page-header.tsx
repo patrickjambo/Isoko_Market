@@ -27,14 +27,14 @@ export function PageHeader({
             <Icon className="h-6 w-6" />
           </span>
         )}
-        <div>
+        <div className="min-w-0 flex-1">
           {eyebrow && (
             <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">
               {eyebrow}
             </p>
           )}
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
-          {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+          <h1 className="break-words text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+          {subtitle && <p className="mt-1 break-words text-sm text-muted-foreground">{subtitle}</p>}
         </div>
       </div>
       {action && <div className="shrink-0">{action}</div>}

@@ -4,6 +4,7 @@ import { requireUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { applyJobSchema } from '@/lib/validators/job';
 import { notify } from '@/lib/notifications';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 /**
  * POST /api/jobs/[id]/apply — one-click apply using the applicant's stored CV
@@ -11,6 +12,10 @@ import { notify } from '@/lib/notifications';
  * apply twice.
  */
 export const POST = route(async (req: NextRequest, ctx: { params: { id: string } }) => {
+  const flags = await getFeatureFlags();
+  if (!flags.jobsEnabled) {
+    throw new ApiError('FORBIDDEN', 'Job applications are currently disabled.');
+  }
   const user = await requireUser();
   const { coverNote, cvId, documentIds } = applyJobSchema.parse(await req.json().catch(() => ({})));
 

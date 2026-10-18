@@ -4,19 +4,25 @@ import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 
-const LINKS = [
-  { href: '/', key: 'home', exact: true },
-  { href: '/marketplace', key: 'marketplace' },
-  { href: '/jobs', key: 'jobs' },
+const BASE_LINKS = [
+  { href: '/', key: 'home', exact: true, feature: null },
+  { href: '/marketplace', key: 'marketplace', feature: null },
+  { href: '/jobs', key: 'jobs', feature: 'jobs' as const },
 ] as const;
 
-export function DesktopNavLinks() {
+type Feature = 'jobs' | null;
+
+export function DesktopNavLinks({ jobsEnabled = true }: { jobsEnabled?: boolean }) {
   const t = useTranslations('nav');
   const pathname = usePathname();
 
+  const featureOn: Record<string, boolean> = { jobs: jobsEnabled };
+
+  const links = BASE_LINKS.filter((l) => l.feature === null || featureOn[l.feature]);
+
   return (
     <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
-      {LINKS.map((link) => {
+      {links.map((link) => {
         const active =
           'exact' in link && link.exact
             ? pathname === link.href

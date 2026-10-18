@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { FileText, MapPin, Send, Eye, Star, CalendarClock, CheckCircle2, X, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -11,6 +12,7 @@ import { WithdrawApplicationButton } from '@/components/jobs/withdraw-applicatio
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { timeAgo } from '@/lib/utils';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,6 +42,9 @@ const STAGES: ApplicationStatus[] = ['APPLIED', 'VIEWED', 'SHORTLISTED', 'INTERV
 
 export default async function MyApplicationsPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
+  const flags = await getFeatureFlags();
+  if (!flags.jobsEnabled) notFound();
+
   const user = await getCurrentUser();
   if (!user) {
     redirect({ href: '/login', locale: params.locale });

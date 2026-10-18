@@ -19,6 +19,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { timeAgo } from '@/lib/utils';
 import { matchScore, labelForSkill } from '@/lib/skills';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,8 +36,12 @@ export default async function JobDetailPage({
   const tContact = await getTranslations('contact');
   const locale = await getLocale();
 
-  const [job, user] = await Promise.all([getJob(params.id), getCurrentUser()]);
-  if (!job) notFound();
+  const [flags, job, user] = await Promise.all([
+    getFeatureFlags(),
+    getJob(params.id),
+    getCurrentUser(),
+  ]);
+  if (!flags.jobsEnabled || !job) notFound();
 
   const isOwner = user?.id === job.employer.id;
 
@@ -119,18 +124,20 @@ export default async function JobDetailPage({
 
           <div className="flex flex-wrap gap-2">
             {isOwner ? (
-              <>
-                <Button asChild>
-                  <Link href={`/jobs/${job.id}/applicants`}>
-                    <Users className="h-4 w-4" /> {t('manageApplicants')}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline">
-                  <Link href={`/jobs/${job.id}/edit`}>
-                    <Pencil className="h-4 w-4" /> {tc('edit')}
-                  </Link>
-                </Button>
-              </>
+              flags.hiringEnabled ? (
+                <>
+                  <Button asChild>
+                    <Link href={`/jobs/${job.id}/applicants`}>
+                      <Users className="h-4 w-4" /> {t('manageApplicants')}
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link href={`/jobs/${job.id}/edit`}>
+                      <Pencil className="h-4 w-4" /> {tc('edit')}
+                    </Link>
+                  </Button>
+                </>
+              ) : null
             ) : (
               <>
                 <ApplyButton

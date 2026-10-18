@@ -17,8 +17,9 @@ import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { useSession } from '@/components/providers';
 import { adoptedWorkspaces, type Workspace } from '@/lib/onboarding';
 import { initials } from '@/lib/utils';
+import type { FeatureFlags } from '@/lib/feature-flags';
 
-export function UserMenu() {
+export function UserMenu({ flags }: { flags?: FeatureFlags }) {
   const t = useTranslations();
   const router = useRouter();
   const user = useSession();
@@ -30,15 +31,22 @@ export function UserMenu() {
     router.refresh();
   }
 
+  // Filter workspace links based on feature flags.
+  // If no flags are provided (e.g. in tests), default to showing everything.
+  const cvEnabled = !flags || flags.cvBuilderEnabled;
+  const hiringEnabled = !flags || flags.hiringEnabled;
+
   // Only the workspaces the user has actually ADOPTED appear here — a buyer sees
   // none and starts selling/hiring from the "+ Post" button (see adoptedWorkspaces).
-  const wsLink: Record<Exclude<Workspace, 'buyer'>, { href: string; icon: LucideIcon; label: string }> = {
-    employer: { href: '/employer', icon: Briefcase, label: t('employer.dashboard') },
+  const wsLink: Record<Exclude<Workspace, 'buyer'>, { href: string; icon: LucideIcon; label: string; flagged?: boolean }> = {
+    employer: { href: '/employer', icon: Briefcase, label: t('employer.dashboard'), flagged: !hiringEnabled },
     seller: { href: '/dashboard', icon: Store, label: t('seller.dashboard') },
-    seeker: { href: '/cv', icon: FileText, label: t('cv.title') },
+    seeker: { href: '/cv', icon: FileText, label: t('cv.title'), flagged: !cvEnabled },
   };
   const adopted = adoptedWorkspaces(user);
-  const workspaces = adopted.map((w) => wsLink[w]);
+  const workspaces = adopted
+    .map((w) => wsLink[w])
+    .filter((ws) => !ws.flagged);
   const isSeeker = adopted.includes('seeker');
 
   // A persistent "who you are" indicator: everyone is a buyer, plus each
@@ -49,8 +57,8 @@ export function UserMenu() {
       : [
           t('roles.buyer'),
           ...(adopted.includes('seller') ? [t('roles.seller')] : []),
-          ...(adopted.includes('seeker') ? [t('roles.seeker')] : []),
-          ...(adopted.includes('employer') ? [t('roles.employer')] : []),
+          ...(adopted.includes('seeker') && cvEnabled ? [t('roles.seeker')] : []),
+          ...(adopted.includes('employer') && hiringEnabled ? [t('roles.employer')] : []),
         ];
 
   return (
@@ -83,7 +91,7 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {/* Adopted workspaces only (role-aware) — a buyer sees none */}
+        {/* Adopted workspaces only (role-aware, feature-flag-gated) */}
         {workspaces.map((l) => {
           const Icon = l.icon;
           return (
@@ -95,9 +103,8 @@ export function UserMenu() {
           );
         })}
 
-        {/* A job seeker's applications — where shortlisted/interview/hired/rejected
-            statuses land live (the CV workspace link is separate). */}
-        {isSeeker && (
+        {/* A job seeker's applications — only shown when jobs feature is on */}
+        {isSeeker && cvEnabled && (
           <DropdownMenuItem asChild>
             <Link href="/profile/applications">
               <Send /> {t('profile.myApplications')}

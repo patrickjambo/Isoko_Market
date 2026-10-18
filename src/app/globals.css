@@ -88,9 +88,16 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     scroll-behavior: smooth;
+    max-width: 100%;
+    overflow-x: clip;
   }
   body {
     @apply bg-background text-foreground antialiased;
+    max-width: 100%;
+    overflow-x: clip;
+    position: relative;
+    overscroll-behavior-x: none;
+    touch-action: pan-y pinch-zoom;
     font-feature-settings: 'rlig' 1, 'calt' 1;
     /* Faint brand-tinted glows in the top corners give the page depth instead of
        a flat fill — subtle enough to read as "polished", not decorative. Sits
@@ -100,6 +107,32 @@
       radial-gradient(60rem 32rem at 108% -8%, hsl(176 84% 22% / 0.06), transparent 60%),
       radial-gradient(48rem 28rem at -10% -6%, hsl(24 90% 48% / 0.045), transparent 58%);
     background-repeat: no-repeat;
+  }
+
+  @supports not (overflow-x: clip) {
+    html, body {
+      overflow-x: hidden;
+    }
+  }
+
+  /* Prevent media and embeds from overflowing parent boxes */
+  img, svg, video, canvas, audio, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Stop long unbroken strings, hashes or URLs from forcing horizontal expansion */
+  p, h1, h2, h3, h4, h5, h6, span, a, li, blockquote, label {
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  /* Scrollable horizontal rows: contain scroll chaining so swiping never slides the window */
+  .overflow-x-auto, [class*="overflow-x-auto"], [class*="overflow-x-scroll"] {
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    max-width: 100%;
   }
   .dark body {
     background-image:

@@ -37,7 +37,7 @@ export function CategoryChips({
     );
 
   return (
-    <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" role="tablist" aria-label="Categories">
+    <div className="flex max-w-full gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Categories">
       <Link href={hrefFor()} className={chip(!current)} role="tab" aria-selected={!current}>
         {t('all')}
       </Link>

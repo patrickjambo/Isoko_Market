@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { redirect } from '@/i18n/routing';
 import { FileText } from 'lucide-react';
@@ -6,11 +7,15 @@ import { prisma } from '@/lib/prisma';
 import { cvDataSchema, type CvData } from '@/lib/validators/cv';
 import { CvChoice } from '@/components/cv/cv-choice';
 import { PageHeader } from '@/components/shared/page-header';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CvPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
+  const flags = await getFeatureFlags();
+  if (!flags.cvBuilderEnabled) notFound();
+
   const user = await getCurrentUser();
   if (!user) {
     redirect({ href: '/login', locale: params.locale });

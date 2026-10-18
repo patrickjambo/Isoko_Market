@@ -52,7 +52,7 @@ export async function BuyerStrips({
       {activeOrders.length > 0 && (
         <section>
           <SectionHeader icon={Package} title={t('activeOrders')} href="/orders" />
-          <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1">
+          <div className="flex max-w-full gap-3 overflow-x-auto pb-1">
             {activeOrders.map((o) => (
               <Link
                 key={o.id}
@@ -83,7 +83,7 @@ export async function BuyerStrips({
       {recentlyViewed.length > 0 && (
         <section>
           <SectionHeader icon={Clock} title={t('continueViewing')} action={<ClearRecentButton />} />
-          <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
+          <div className="flex max-w-full gap-3 overflow-x-auto pb-2">
             {recentlyViewed.slice(0, 8).map((l) => (
               <div key={l.id} className="w-36 shrink-0">
                 <ListingCard listing={{ ...l, favorited: favIds.has(l.id) }} showFavorite />
@@ -97,7 +97,7 @@ export async function BuyerStrips({
       {trending.length > 0 && (
         <section>
           <SectionHeader icon={TrendingUp} title={t('trendingNear')} href="/marketplace" />
-          <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
+          <div className="flex max-w-full gap-3 overflow-x-auto pb-2">
             {trending.map((l) => (
               <div key={l.id} className="w-36 shrink-0">
                 <ListingCard listing={{ ...l, favorited: favIds.has(l.id) }} showFavorite />
@@ -111,7 +111,7 @@ export async function BuyerStrips({
       {recommendedSellers.length > 0 && (
         <section>
           <SectionHeader icon={Star} title={t('recommendedSellers')} />
-          <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1">
+          <div className="flex max-w-full gap-3 overflow-x-auto pb-1">
             {recommendedSellers.map((s) => (
               <Link
                 key={s.id}

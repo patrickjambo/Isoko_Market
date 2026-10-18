@@ -12,12 +12,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import type { FeatureFlags } from '@/lib/feature-flags';
 
 /**
  * The single "+ Post" entry point that unifies the commerce and employment
  * paths (Section 8.2) — sell an item, offer a service, or post a job.
+ * Items that are disabled by admin feature flags are automatically hidden.
  */
-export function PostMenu({ full = false }: { full?: boolean }) {
+export function PostMenu({
+  full = false,
+  flags,
+}: {
+  full?: boolean;
+  flags?: Pick<FeatureFlags, 'hiringEnabled'>;
+}) {
   const t = useTranslations('nav');
   return (
     <DropdownMenu>
@@ -42,12 +50,15 @@ export function PostMenu({ full = false }: { full?: boolean }) {
             {t('postService')}
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/jobs/new">
-            <Briefcase className="text-accent" />
-            {t('postJob')}
-          </Link>
-        </DropdownMenuItem>
+        {/* Only show "Post a Job" when hiring is enabled */}
+        {(!flags || flags.hiringEnabled) && (
+          <DropdownMenuItem asChild>
+            <Link href="/jobs/new">
+              <Briefcase className="text-accent" />
+              {t('postJob')}
+            </Link>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

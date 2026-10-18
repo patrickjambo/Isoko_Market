@@ -9,6 +9,8 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { LogoMark } from '@/components/brand/logo';
 import { prisma } from '@/lib/prisma';
 
+import { getFeatureFlags } from '@/lib/feature-flags';
+
 export const dynamic = 'force-dynamic';
 
 async function getBoard(slug: string) {
@@ -52,6 +54,9 @@ export default async function BoardPage({
   params: { locale: string; slug: string };
 }) {
   setRequestLocale(params.locale);
+  const flags = await getFeatureFlags();
+  if (!flags.jobsEnabled) notFound();
+
   const t = await getTranslations('boards');
   const board = await getBoard(params.slug);
   if (!board) notFound();

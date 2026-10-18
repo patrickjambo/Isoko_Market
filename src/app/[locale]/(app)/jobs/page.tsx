@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 import { Briefcase, Plus } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { storeName } from '@/lib/store';
 import { matchScore } from '@/lib/skills';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,11 +32,16 @@ export default async function JobsPage({
   setRequestLocale(params.locale);
   const t = await getTranslations('jobs');
 
-  const filter = jobFilterSchema.parse(searchParams);
-  const [{ items, total, page, pageSize }, user] = await Promise.all([
-    searchJobs(filter),
+  const [{ items, total, page, pageSize }, user, flags] = await Promise.all([
+    searchJobs(jobFilterSchema.parse(searchParams)),
     getCurrentUser(),
+    getFeatureFlags(),
   ]);
+
+  // Return 404 when the job board is disabled by the admin.
+  if (!flags.jobsEnabled) notFound();
+
+  const filter = jobFilterSchema.parse(searchParams);
 
   // Signed-in seekers get real match badges on every card (§4/§5).
   const cvSkills = user ? await getCvSkills(user.id) : [];
@@ -69,16 +76,24 @@ export default async function JobsPage({
         title={t('title')}
         subtitle={t('subtitle')}
         action={
-          <Button asChild variant="accent">
-            <Link href="/jobs/new">
-              <Plus className="h-4 w-4" /> {t('createTitle')}
-            </Link>
-          </Button>
+          flags.hiringEnabled ? (
+            <Button asChild variant="accent">
+              <Link href="/jobs/new">
+                <Plus className="h-4 w-4" /> {t('createTitle')}
+              </Link>
+            </Button>
+          ) : undefined
         }
       />
 
       {/* Personalized job-seeker home for signed-in users (§2). */}
-      {user && <SeekerHome userId={user.id} location={user.location} />}
+      {user && (
+        <SeekerHome
+          userId={user.id}
+          location={user.location}
+          cvBuilderEnabled={flags.cvBuilderEnabled}
+        />
+      )}
 
       <div className="mb-5 flex flex-wrap items-center gap-2">
         <div className="min-w-0 flex-1">
@@ -99,11 +114,13 @@ export default async function JobsPage({
           title={t('empty')}
           description={t('emptyHint')}
           action={
-            <Button asChild variant="accent">
-              <Link href="/jobs/new">
-                <Plus className="h-4 w-4" /> {t('createTitle')}
-              </Link>
-            </Button>
+            flags.hiringEnabled ? (
+              <Button asChild variant="accent">
+                <Link href="/jobs/new">
+                  <Plus className="h-4 w-4" /> {t('createTitle')}
+                </Link>
+              </Button>
+            ) : undefined
           }
         />
       ) : (

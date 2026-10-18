@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Store, Wrench, Briefcase, ChevronRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 /**
  * The unified "+ Post" chooser (Section 8.2) — one entry point for both the
@@ -8,7 +9,7 @@ import { Link } from '@/i18n/routing';
  */
 export default async function PostPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
-  const t = await getTranslations();
+  const [t, flags] = await Promise.all([getTranslations(), getFeatureFlags()]);
 
   const options = [
     { href: '/dashboard/sell', icon: Store, label: t('nav.postItem'), tone: 'primary' as const },
@@ -18,7 +19,9 @@ export default async function PostPage({ params }: { params: { locale: string } 
       label: t('nav.postService'),
       tone: 'primary' as const,
     },
-    { href: '/jobs/new', icon: Briefcase, label: t('nav.postJob'), tone: 'accent' as const },
+    ...(flags.hiringEnabled
+      ? [{ href: '/jobs/new', icon: Briefcase, label: t('nav.postJob'), tone: 'accent' as const }]
+      : []),
   ];
 
   return (

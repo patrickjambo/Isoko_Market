@@ -132,6 +132,12 @@ model PlatformSettings {
   chargingStartsAt  DateTime?
   // New sellers pay no commission for this many days after they sign up.
   freePeriodDays    Int            @default(0)
+  // ── Feature flags ─────────────────────────────────────────────────────────
+  // Admins can enable/disable these features from the dashboard without a
+  // code deployment. Disabled features are hidden from the UI automatically.
+  jobsEnabled       Boolean        @default(false) // job-seeker browse & apply
+  hiringEnabled     Boolean        @default(false) // employers post & manage jobs
+  cvBuilderEnabled  Boolean        @default(false) // CV builder & PDF export
   updatedById       String?
   updatedAt         DateTime       @updatedAt
   createdAt         DateTime       @default(now())

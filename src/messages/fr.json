@@ -1450,5 +1450,21 @@
     "save": "Enregistrer",
     "saved": "Paramètres de commission enregistrés",
     "errDestination": "Définissez une destination (numéro ou code MoMo) avant d’activer."
+  },
+  "featureFlags": {
+    "title": "Fonctionnalités",
+    "subtitle": "Activez ou désactivez les fonctionnalités de la plateforme en temps réel — sans redéploiement.",
+    "jobsLabel": "Offres d'emploi",
+    "jobsDesc": "Permet aux demandeurs de parcourir et postuler. Désactivé, la page /jobs est masquée.",
+    "hiringLabel": "Recrutement employeur",
+    "hiringDesc": "Permet aux employeurs de publier des offres. Désactivé, le tableau de bord employeur est masqué.",
+    "cvBuilderLabel": "Générateur de CV",
+    "cvBuilderDesc": "Permet aux demandeurs de créer et exporter leur CV. Désactivé, l espace CV est masqué.",
+    "statusOn": "Activé",
+    "statusOff": "Désactivé",
+    "enableBtn": "Activer",
+    "disableBtn": "Désactiver",
+    "saving": "Enregistrement…",
+    "hint": "Les modifications prennent effet immédiatement pour tous les utilisateurs."
   }
 }

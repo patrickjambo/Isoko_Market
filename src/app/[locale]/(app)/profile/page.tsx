@@ -8,6 +8,7 @@ import { PaymentButton } from '@/components/payments/payment-button';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { PRICING, SUBSCRIPTION_DURATION_DAYS } from '@/lib/pricing';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,8 @@ export default async function ProfilePage({ params }: { params: { locale: string
   const t = await getTranslations('profile');
   const tp = await getTranslations('premium');
 
-  const [listings, ratingAgg, reviewCount, counts] = await Promise.all([
+  const [flags, listings, ratingAgg, reviewCount, counts] = await Promise.all([
+    getFeatureFlags(),
     prisma.listing.findMany({
       where: { sellerId: user.id, status: { not: 'REMOVED' } },
       orderBy: { createdAt: 'desc' },
@@ -49,8 +51,12 @@ export default async function ProfilePage({ params }: { params: { locale: string
   const [applicationCount, jobCount] = counts;
 
   const links = [
-    { href: '/profile/applications', icon: FileText, label: t('myApplications'), count: applicationCount },
-    { href: '/jobs/new', icon: Briefcase, label: t('myJobs'), count: jobCount },
+    ...(flags.jobsEnabled
+      ? [{ href: '/profile/applications', icon: FileText, label: t('myApplications'), count: applicationCount }]
+      : []),
+    ...(flags.hiringEnabled
+      ? [{ href: '/jobs/new', icon: Briefcase, label: t('myJobs'), count: jobCount }]
+      : []),
     { href: '/wallet', icon: Wallet, label: t('transactionHistory') },
   ];
 
