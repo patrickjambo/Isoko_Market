@@ -27,9 +27,14 @@ export function isRealGoogleConfigured(): boolean {
   return Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET);
 }
 
+/** True when simulation / dev fallback is permitted (local dev, test, or ENABLE_DEV_AUTH=true). */
+export function isDevFallbackAllowed(): boolean {
+  return env.NODE_ENV !== 'production' || process.env.ENABLE_DEV_AUTH === 'true';
+}
+
 /** True when Google OAuth is usable (production configured or development/test fallback). */
 export function isGoogleOAuthEnabled(): boolean {
-  return isRealGoogleConfigured() || env.NODE_ENV !== 'production';
+  return isRealGoogleConfigured() || isDevFallbackAllowed();
 }
 
 /** Opaque CSRF state token — stored in a short-lived cookie. */
@@ -44,8 +49,8 @@ export function callbackUrl(): string {
 
 /** Build the Google authorization URL to send the user to. */
 export function buildAuthUrl(state: string, returnTo?: string): string {
-  if (!isRealGoogleConfigured() && env.NODE_ENV !== 'production') {
-    // In local dev without credentials, route directly to callback with dev mock
+  if (!isRealGoogleConfigured() && isDevFallbackAllowed()) {
+    // In local dev/staging without credentials, route directly to callback with dev mock
     const params = new URLSearchParams({
       code: 'dev_google_mock',
       state,
@@ -77,7 +82,7 @@ export type GoogleUserInfo = {
 
 /** Exchange the authorization code for tokens and return the user profile. */
 export async function fetchGoogleUser(code: string): Promise<GoogleUserInfo> {
-  if (code === 'dev_google_mock' && env.NODE_ENV !== 'production' && !isRealGoogleConfigured()) {
+  if (code === 'dev_google_mock' && isDevFallbackAllowed() && !isRealGoogleConfigured()) {
     return {
       id: 'google_dev_mock_id_9901',
       email: 'user.google@gmail.com',

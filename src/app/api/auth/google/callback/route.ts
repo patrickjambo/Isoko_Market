@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   const appUrl = req.nextUrl?.origin || env.NEXT_PUBLIC_APP_URL;
 
   if (!isGoogleOAuthEnabled()) {
-    return NextResponse.redirect(`${appUrl}/login?error=google_disabled`);
+    return NextResponse.redirect(new URL('/login?error=google_disabled', appUrl).toString());
   }
 
   const { searchParams } = new URL(req.url);
@@ -36,13 +36,13 @@ export async function GET(req: NextRequest) {
 
   // User denied access on the consent screen
   if (errorParam === 'access_denied' || !code) {
-    return NextResponse.redirect(`${appUrl}/login?error=google_denied`);
+    return NextResponse.redirect(new URL('/login?error=google_denied', appUrl).toString());
   }
 
   // CSRF check — state must match the cookie we set in the initiate route
   const storedState = req.cookies.get('google_oauth_state')?.value;
   if (!state || !storedState || state !== storedState) {
-    return NextResponse.redirect(`${appUrl}/login?error=google_state`);
+    return NextResponse.redirect(new URL('/login?error=google_state', appUrl).toString());
   }
 
   // Decode returnTo from the state payload
@@ -62,12 +62,12 @@ export async function GET(req: NextRequest) {
   try {
     googleUser = await fetchGoogleUser(code);
   } catch {
-    return NextResponse.redirect(`${appUrl}/login?error=google_failed`);
+    return NextResponse.redirect(new URL('/login?error=google_failed', appUrl).toString());
   }
 
   // Reject unverified Google email addresses (very rare, but guard anyway)
   if (!googleUser.verified_email) {
-    return NextResponse.redirect(`${appUrl}/login?error=google_unverified`);
+    return NextResponse.redirect(new URL('/login?error=google_unverified', appUrl).toString());
   }
 
   // ── Upsert the Zenova user ──────────────────────────────────────────────
@@ -131,7 +131,7 @@ export async function GET(req: NextRequest) {
 
   // Enforce account status (suspended users are blocked at this point too)
   if (user.accountStatus !== 'ACTIVE') {
-    return NextResponse.redirect(`${appUrl}/login?error=account_suspended`);
+    return NextResponse.redirect(new URL('/login?error=account_suspended', appUrl).toString());
   }
 
   // Bootstrap staff role (same as OTP flow)

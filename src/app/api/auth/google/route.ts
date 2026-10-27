@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { generateState, buildAuthUrl, isGoogleOAuthEnabled } from '@/lib/google-oauth';
+import { env } from '@/lib/env';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,8 +16,10 @@ export const dynamic = 'force-dynamic';
  * round-trip on the callback and prevent CSRF.
  */
 export async function GET(req: NextRequest) {
+  const appUrl = req.nextUrl?.origin || env.NEXT_PUBLIC_APP_URL;
+
   if (!isGoogleOAuthEnabled()) {
-    return NextResponse.json({ error: 'Google OAuth is not configured' }, { status: 503 });
+    return NextResponse.redirect(new URL('/login?error=google_disabled', appUrl));
   }
 
   const { searchParams } = new URL(req.url);
