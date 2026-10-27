@@ -201,7 +201,14 @@
     "passwordLabel": "Password",
     "passwordPlaceholder": "Your password",
     "staffPasswordSubtitle": "Enter the password for {email}",
-    "useCodeInstead": "Log in with a code instead"
+    "useCodeInstead": "Log in with a code instead",
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWithEmail": "or continue with email",
+    "googleFailed": "Failed to authenticate with Google. Please try again.",
+    "googleDenied": "Google access was denied. Please allow permissions to log in.",
+    "googleUnverified": "Your Google account email is not verified.",
+    "googleDisabled": "Google sign-in is temporarily unavailable.",
+    "accountSuspended": "Your account is currently suspended. Please contact support."
   },
   "marketplace": {
     "title": "Marketplace",

@@ -249,6 +249,7 @@ model User {
   // number is the separate paymentNumber + paymentProvider below.
   email              String?            @unique
   phone              String?            @unique
+  googleId           String?            @unique
   paymentNumber      String? // seller's MoMo/Airtel number OR merchant code for payouts
   payoutKind         PayoutTargetKind @default(PHONE) // is paymentNumber a phone or a MoMo code?
   paymentProvider    String? // mtn_momo | airtel_money — which app the buyer pays with

@@ -18,12 +18,22 @@ export default async function LoginPage({
   // Magic-link handler bounces expired/used links here (?error=link) and rate-limited
   // attempts (?error=rate) — tell the user so "request a new code" is the obvious next step.
   const t = await getTranslations('auth');
-  const errorMsg =
-    searchParams.error === 'link'
-      ? t('linkExpired')
-      : searchParams.error === 'rate'
-        ? t('tooManyAttempts')
-        : null;
+  let errorMsg: string | null = null;
+  if (searchParams.error === 'link') {
+    errorMsg = t('linkExpired');
+  } else if (searchParams.error === 'rate') {
+    errorMsg = t('tooManyAttempts');
+  } else if (searchParams.error === 'google_denied') {
+    errorMsg = t('googleDenied');
+  } else if (searchParams.error === 'google_failed' || searchParams.error === 'google_state') {
+    errorMsg = t('googleFailed');
+  } else if (searchParams.error === 'google_unverified') {
+    errorMsg = t('googleUnverified');
+  } else if (searchParams.error === 'google_disabled') {
+    errorMsg = t('googleDisabled');
+  } else if (searchParams.error === 'account_suspended') {
+    errorMsg = t('accountSuspended');
+  }
 
   return (
     <div className="space-y-4">

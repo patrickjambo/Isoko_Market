@@ -201,7 +201,14 @@
     "passwordLabel": "Ijambobanga",
     "passwordPlaceholder": "Ijambobanga ryawe",
     "staffPasswordSubtitle": "Andika ijambobanga rya {email}",
-    "useCodeInstead": "Injira ukoresheje kode"
+    "useCodeInstead": "Injira ukoresheje kode",
+    "continueWithGoogle": "Komeza na Google",
+    "orContinueWithEmail": "cyangwa komeza na imeyili",
+    "googleFailed": "Kwinjira na Google byanze. Ongera ugerageze.",
+    "googleDenied": "Uburenganzira bwa Google bwanze. Bwemerere kugira ngo winjire.",
+    "googleUnverified": "Imeyili yawe ya Google ntiyemejwe.",
+    "googleDisabled": "Kwinjira na Google ntibikora muri aka kanya.",
+    "accountSuspended": "Konti yawe yahagaritswe by'agateganyo. Vugana n'ubufasha."
   },
   "marketplace": {
     "title": "Zenova",

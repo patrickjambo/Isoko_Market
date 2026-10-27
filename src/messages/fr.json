@@ -201,7 +201,14 @@
     "passwordLabel": "Mot de passe",
     "passwordPlaceholder": "Votre mot de passe",
     "staffPasswordSubtitle": "Saisissez le mot de passe pour {email}",
-    "useCodeInstead": "Se connecter avec un code"
+    "useCodeInstead": "Se connecter avec un code",
+    "continueWithGoogle": "Continuer avec Google",
+    "orContinueWithEmail": "ou continuer avec l'e-mail",
+    "googleFailed": "Échec de l'authentification avec Google. Veuillez réessayer.",
+    "googleDenied": "L'accès Google a été refusé. Veuillez accorder les autorisations pour vous connecter.",
+    "googleUnverified": "L'adresse e-mail de votre compte Google n'est pas vérifiée.",
+    "googleDisabled": "La connexion avec Google est temporairement indisponible.",
+    "accountSuspended": "Votre compte est actuellement suspendu. Veuillez contacter l'assistance."
   },
   "marketplace": {
     "title": "Marché",

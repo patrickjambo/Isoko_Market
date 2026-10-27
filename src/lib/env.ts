@@ -8,6 +8,13 @@ const schema = z.object({
   DATABASE_URL: z.string().url(),
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
   AUTH_SECRET: z.string().min(16, 'AUTH_SECRET must be at least 16 chars'),
+
+  // Google OAuth — optional. When both keys are set, a "Continue with Google"
+  // button appears on login/register. The callback writes a standard session
+  // cookie, identical to the OTP flow, so no other code needs to know about OAuth.
+  GOOGLE_CLIENT_ID: z.string().optional().default(''),
+  GOOGLE_CLIENT_SECRET: z.string().optional().default(''),
+
   // Shared secret for scheduled jobs (Vercel Cron). Falls back to AUTH_SECRET.
   CRON_SECRET: z.string().optional(),
   // Shared secret a payment-provider webhook must present. Falls back to

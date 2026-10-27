@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
 import { intentHome, type Intent } from '@/lib/onboarding';
+import { GoogleButton } from './google-button';
 
 type Mode = 'login' | 'register';
 type Step = 'email' | 'otp' | 'password';
@@ -186,7 +187,19 @@ export function AuthForm({
       )}
 
       {step === 'email' ? (
-        <form onSubmit={requestOtp} className="space-y-4" noValidate>
+        <div className="space-y-4">
+          <GoogleButton returnTo={returnTo} />
+
+          <div className="relative my-4 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <span className="relative bg-background px-3 text-xs uppercase tracking-wider text-muted-foreground">
+              {t('orContinueWithEmail')}
+            </span>
+          </div>
+
+          <form onSubmit={requestOtp} className="space-y-4" noValidate>
           {mode === 'register' && (
             <div className="space-y-1.5">
               <Label htmlFor="fullName">{t('fullNameLabel')}</Label>
@@ -234,6 +247,7 @@ export function AuthForm({
             {loading ? t('sendingCode') : t('sendCode')}
           </Button>
         </form>
+        </div>
       ) : step === 'password' ? (
         <form onSubmit={loginWithPassword} className="space-y-4" noValidate>
           <div className="space-y-1.5">
