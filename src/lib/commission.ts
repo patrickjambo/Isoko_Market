@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import type { PlatformSettings } from '@prisma/client';
 import { prisma } from './prisma';
 
@@ -6,16 +7,24 @@ const SINGLETON_ID = 'singleton';
 
 /**
  * The platform settings row (commission config). Created on first read so the
- * admin dashboard always has something to edit. Read directly (no cache) so an
- * admin's change takes effect immediately for the next transaction.
+ * admin dashboard always has something to edit. Wrapped in React's `cache()` so
+ * that multiple Server Components that call this within a single request (e.g.
+ * the root locale layout, the app-shell layout, and the home page all fetch
+ * feature flags, which all call here) share a single DB round-trip instead of
+ * hitting the database three times for the same data.
+ *
+ * Admin changes still take effect immediately on the NEXT request — the cache is
+ * per-request only, not global. For transaction-time commission reads the fresh
+ * data is always available via `quoteCommission()` which goes through this same
+ * per-request cache (one read per request is sufficient).
  */
-export async function getPlatformSettings(): Promise<PlatformSettings> {
+export const getPlatformSettings = cache(async (): Promise<PlatformSettings> => {
   return prisma.platformSettings.upsert({
     where: { id: SINGLETON_ID },
     create: { id: SINGLETON_ID },
     update: {},
   });
-}
+});
 
 export type CommissionReason = 'DISABLED' | 'BEFORE_LAUNCH' | 'FREE_PERIOD' | 'CHARGED';
 export type CommissionResult = { fee: number; applies: boolean; reason: CommissionReason };

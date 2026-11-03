@@ -3,14 +3,26 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Animated number that tweens from its previously shown value to the new one.
- * On first mount it counts up from zero; on every later render (e.g. a
- * poll-refresh brings a higher stat) it animates from the last displayed value,
- * so the homepage visibly "ticks" as new listings/orders land — no page reload.
+ * Animated number that displays its value immediately without starting from 0,
+ * and smoothly animates upward from that value as new stats arrive (e.g. from
+ * poll-refresh intervals).
  */
-export function CountUp({ value, durationMs = 900 }: { value: number; durationMs?: number }) {
-  const [display, setDisplay] = useState(0);
-  const fromRef = useRef(0); // value currently on screen — the tween's starting point
+export function CountUp({
+  value,
+  durationMs = 900,
+  startFrom,
+  suffix = '',
+  prefix = '',
+}: {
+  value: number;
+  durationMs?: number;
+  startFrom?: number;
+  suffix?: string;
+  prefix?: string;
+}) {
+  const initial = startFrom ?? value;
+  const [display, setDisplay] = useState(initial);
+  const fromRef = useRef(initial);
 
   useEffect(() => {
     const from = fromRef.current;
@@ -32,5 +44,11 @@ export function CountUp({ value, durationMs = 900 }: { value: number; durationMs
     return () => cancelAnimationFrame(raf);
   }, [value, durationMs]);
 
-  return <>{display.toLocaleString()}</>;
+  return (
+    <>
+      {prefix}
+      {display.toLocaleString()}
+      {suffix}
+    </>
+  );
 }

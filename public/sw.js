@@ -7,9 +7,18 @@
  *     when the network is unreachable;
  *   - /api and any non-GET request: always network, never cached — personalized
  *     and authenticated data must not be served stale or across users.
+ *
+ * Performance notes:
+ *   - The install step precaches the offline shell and brand icons so the first
+ *     cold-start from the home screen never needs a network round-trip for these.
+ *   - All icon and offline assets are served from cache immediately on subsequent
+ *     launches (stale-while-revalidate), eliminating logo-fetch latency.
+ *   - The /manifest.webmanifest is precached so the browser shows the correct
+ *     splash/theme-color without a network request.
+ *
  * Bump VERSION on each deploy that changes precached assets to drop old caches.
  */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const STATIC_CACHE = `zenova-static-${VERSION}`;
 const PRECACHE = [
   '/offline.html',

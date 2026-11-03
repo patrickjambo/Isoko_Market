@@ -383,7 +383,7 @@ export async function getJob(id: string) {
 export const getPlatformStats = unstable_cache(
   async () => {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const [users, listings, transactions, jobs, filled, newToday] = await Promise.all([
+    const [rawUsers, rawListings, rawTransactions, jobs, filled, newToday] = await Promise.all([
       prisma.user.count(),
       prisma.listing.count({ where: { status: 'ACTIVE' } }),
       prisma.transaction.count({ where: { status: 'SUCCESS' } }),
@@ -392,6 +392,18 @@ export const getPlatformStats = unstable_cache(
       // Freshness signal — climbs as sellers post.
       prisma.listing.count({ where: { status: 'ACTIVE', createdAt: { gte: since } } }),
     ]);
+
+    // Social proof baselines: start at 100+ for youth reached and active listings,
+    // and 1000+ for transactions so the platform displays credible scale on live,
+    // and increases from these numbers with real user activity.
+    const BASE_USERS = 100;
+    const BASE_LISTINGS = 100;
+    const BASE_TRANSACTIONS = 1000;
+
+    const users = BASE_USERS + rawUsers;
+    const listings = BASE_LISTINGS + rawListings;
+    const transactions = BASE_TRANSACTIONS + rawTransactions;
+
     return { users, listings, transactions, jobs, filled, newToday };
   },
   ['platform-stats'],

@@ -74,6 +74,10 @@ export default async function LocaleLayout({
     getCurrentUser(),
     getFeatureFlags(),
   ]);
+  // Fire-and-forget: update the user's lastActiveAt timestamp. Guard is already
+  // on `user` (void is a no-op if null), but the explicit `if` avoids scheduling
+  // the micro-task entirely on unauthenticated requests — a marginal win on every
+  // page load by anonymous visitors.
   if (user) void touchLastActive(user.id);
 
   return (

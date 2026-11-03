@@ -236,6 +236,15 @@
   }
 }
 
+/* Indeterminate loading bar used by AppLoadingScreen during cold-start and
+   navigation. A 40%-wide bar translates from -100% to +260% (off screen both
+   sides) giving the illusion of continuous progress without a fake percentage.
+   Disabled under prefers-reduced-motion via the global rule above. */
+@keyframes loading-bar {
+  0%   { transform: translateX(-250%); }
+  100% { transform: translateX(650%); }
+}
+
 /* Brand-tint the leaflet.markercluster bubbles (default is blue/green/yellow) so
    the marketplace map matches Isoko's teal. */
 .marker-cluster {

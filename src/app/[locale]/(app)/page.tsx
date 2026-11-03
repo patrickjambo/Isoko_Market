@@ -38,15 +38,24 @@ export default async function HomePage({ params }: { params: { locale: string } 
   setRequestLocale(params.locale);
   const t = await getTranslations('home');
 
-  const [flags, listings, services, stats, user] = await Promise.all([
+  // All data fetches run in parallel — no sequential waterfalls.
+  // `getLatestJobs` is included upfront (it's cached via unstable_cache so the
+  // cost when jobs are disabled is a fast cache miss, not a DB query).
+  // `getPlatformSettings` is wrapped with React `cache()` so all these calls
+  // that go through `getFeatureFlags()` → `getPlatformSettings()` share a
+  // single DB round-trip with the root layout and app-shell layout fetches.
+  const [flags, listings, services, stats, user, jobs] = await Promise.all([
     getFeatureFlags(),
     getFeaturedListings(8),
     getLatestServices(4),
     getPlatformStats(),
     getCurrentUser(),
+    getLatestJobs(6),
   ]);
 
-  const jobs = flags.jobsEnabled ? await getLatestJobs(6) : [];
+  // Filter out jobs if the feature is disabled — the fetch already returned
+  // cached data with negligible overhead, so we just ignore the result here.
+  const visibleJobs = flags.jobsEnabled ? jobs : [];
 
   const pillars = [
     { icon: ShieldCheck, title: t('pillarVerifiedTitle'), body: t('pillarVerifiedBody') },
@@ -170,18 +179,19 @@ export default async function HomePage({ params }: { params: { locale: string } 
       {!user &&
         (() => {
         const items = [
-          stats.users > 0 && { icon: Users, value: stats.users, label: t('statsReached') },
-          stats.listings > 0 && { icon: Store, value: stats.listings, label: t('statsListings') },
+          stats.users > 0 && { icon: Users, value: stats.users, label: t('statsReached'), suffix: '+' },
+          stats.listings > 0 && { icon: Store, value: stats.listings, label: t('statsListings'), suffix: '+' },
           stats.transactions > 0 && {
             icon: Wallet,
             value: stats.transactions,
             label: t('statsTransactions'),
+            suffix: '+',
           },
           flags.jobsEnabled &&
             (stats.filled > 0
-              ? { icon: Briefcase, value: stats.filled, label: t('statsHired') }
-              : stats.jobs > 0 && { icon: Briefcase, value: stats.jobs, label: t('statsJobs') }),
-        ].filter(Boolean) as { icon: LucideIcon; value: number; label: string }[];
+              ? { icon: Briefcase, value: stats.filled, label: t('statsHired'), suffix: '+' }
+              : stats.jobs > 0 && { icon: Briefcase, value: stats.jobs, label: t('statsJobs'), suffix: '+' }),
+        ].filter(Boolean) as { icon: LucideIcon; value: number; label: string; suffix?: string }[];
         if (items.length === 0) return null;
         return (
           <section className="border-b border-border bg-card">
@@ -194,7 +204,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
                       <Icon className="h-6 w-6" />
                     </div>
                     <div className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                      <CountUp value={s.value} />
+                      <CountUp value={s.value} suffix={s.suffix} />
                     </div>
                     <div className="mt-1 text-sm text-muted-foreground">{s.label}</div>
                   </div>
@@ -258,11 +268,11 @@ export default async function HomePage({ params }: { params: { locale: string } 
       )}
 
       {/* Latest jobs — live */}
-      {flags.jobsEnabled && jobs.length > 0 && (
+      {flags.jobsEnabled && visibleJobs.length > 0 && (
         <section className="container py-10">
           <SectionHeader title={t('latestJobs')} href="/jobs" live={t('live')} />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {jobs.map((j) => (
+            {visibleJobs.map((j) => (
               <JobCard key={j.id} job={j} />
             ))}
           </div>

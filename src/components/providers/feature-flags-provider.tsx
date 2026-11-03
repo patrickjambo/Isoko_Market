@@ -118,7 +118,10 @@ export function FeatureFlagsProvider({
     return () => window.removeEventListener(WINDOW_EVENT_NAME, handleCustomEvent);
   }, [applyFlags]);
 
-  // 3. SSE stream listener (/api/realtime) — delivers real-time updates to all connected clients
+  // 3. SSE stream listener (/api/realtime) — delivers real-time updates to all connected clients.
+  //    Deferred until after the page `load` event so the SSE connection doesn't compete
+  //    with critical resources during startup. On a cold start this saves one extra HTTP
+  //    connection during the period when the browser is already busy fetching JS/CSS.
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
     let source: EventSource | null = null;
@@ -147,7 +150,13 @@ export function FeatureFlagsProvider({
       };
     };
 
-    connect();
+    // Defer until the page is fully loaded so the SSE connection doesn't
+    // compete with critical resources at cold start.
+    if (document.readyState === 'complete') {
+      connect();
+    } else {
+      window.addEventListener('load', connect, { once: true });
+    }
 
     return () => {
       if (reconnectTimeout) clearTimeout(reconnectTimeout);

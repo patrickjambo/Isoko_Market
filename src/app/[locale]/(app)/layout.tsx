@@ -9,8 +9,12 @@ import { getFeatureFlags } from '@/lib/feature-flags';
 /**
  * Authenticated/app chrome: persistent top nav (desktop) + bottom tab bar
  * (mobile), with a bottom-padding buffer so content clears the mobile tab bar
- * (Section 8.2). Feature flags are fetched once here and distributed to nav
- * components so disabled features are hidden everywhere consistently.
+ * (Section 8.2).
+ *
+ * Feature flags are fetched here for nav rendering. Thanks to React's `cache()`
+ * on `getPlatformSettings`, this is deduplicated with the root locale layout's
+ * flag fetch and the home page's flag fetch — only ONE DB round-trip occurs per
+ * request, regardless of how many components call `getFeatureFlags()`.
  */
 export default async function AppLayout({
   children,

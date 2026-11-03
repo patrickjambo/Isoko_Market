@@ -3,17 +3,20 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b6b62" />
     <title>Offline · Zenova</title>
     <link rel="icon" href="/icon.png" />
     <style>
       :root {
         --brand: #0b6b62;
+        --brand-dark: #095a52;
+        --bg: #f8f7f4;
+        --text: #1c2a29;
+        --muted: #6b7b7a;
+        --bar-bg: #d8e8e6;
       }
-      * {
-        box-sizing: border-box;
-      }
-      html,
-      body {
+      * { box-sizing: border-box; }
+      html, body {
         margin: 0;
         height: 100%;
       }
@@ -26,66 +29,158 @@
         gap: 1.25rem;
         padding: 2rem 1.5rem;
         text-align: center;
-        background: #f8f7f4;
-        color: #1c1c1c;
-        font-family:
-          system-ui,
-          -apple-system,
-          Segoe UI,
-          Roboto,
-          Helvetica,
-          Arial,
-          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
       }
-      .icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 16px;
+      .logo {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        overflow: hidden;
         background: var(--brand);
         display: flex;
         align-items: center;
         justify-content: center;
+        margin-bottom: 0.25rem;
+      }
+      .logo img {
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
       }
       h1 {
         margin: 0;
         font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
       }
       p {
         margin: 0;
-        max-width: 30rem;
-        color: #555;
+        max-width: 28rem;
+        color: var(--muted);
         line-height: 1.5;
+        font-size: 0.95rem;
       }
-      .sub {
-        font-size: 0.9rem;
-        color: #777;
+      .multilang {
+        font-size: 0.85rem;
+        color: #999;
+      }
+      .actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
       }
       button {
-        margin-top: 0.5rem;
         border: 0;
         border-radius: 10px;
         background: var(--brand);
         color: #fff;
         font-weight: 600;
         font-size: 0.95rem;
-        padding: 0.7rem 1.4rem;
+        padding: 0.75rem 1.5rem;
         cursor: pointer;
+        min-width: 9rem;
+        transition: background 0.15s;
       }
-      button:hover {
-        background: #095a52;
+      button:hover { background: var(--brand-dark); }
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      /* Indeterminate loading bar shown when the retry is in progress */
+      .bar-track {
+        width: 10rem;
+        height: 3px;
+        background: var(--bar-bg);
+        border-radius: 99px;
+        overflow: hidden;
+        display: none; /* shown via JS when retrying */
+      }
+      .bar-fill {
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--brand), #16a99a);
+        border-radius: 99px;
+        animation: loadbar 1.5s ease-in-out infinite;
+      }
+      @keyframes loadbar {
+        0%   { transform: translateX(-250%); }
+        100% { transform: translateX(650%); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .bar-fill { animation: none; }
+      }
+
+      /* Status pill that shows once connectivity is detected */
+      .online-pill {
+        display: none;
+        align-items: center;
+        gap: 0.4rem;
+        background: #e6f4f0;
+        color: var(--brand-dark);
+        border-radius: 99px;
+        padding: 0.3rem 0.9rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .online-pill .dot {
+        width: 8px; height: 8px;
+        background: var(--brand);
+        border-radius: 50%;
+        animation: pulse 1.2s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: 0.5; transform: scale(0.8); }
       }
     </style>
   </head>
   <body>
-    <div class="icon" aria-hidden="true">
-      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
+    <div class="logo">
+      <img src="/icon-192.png" alt="Zenova" width="72" height="72" />
     </div>
+
     <h1>You're offline</h1>
     <p>Zenova can't reach the internet right now. Check your connection and try again.</p>
-    <p class="sub">Nta murandasi uhari · Vous êtes hors ligne</p>
-    <button type="button" onclick="location.reload()">Try again</button>
+    <p class="multilang">Nta murandasi uhari · Vous êtes hors ligne</p>
+
+    <div class="actions">
+      <div class="bar-track" id="barTrack">
+        <div class="bar-fill"></div>
+      </div>
+
+      <div class="online-pill" id="onlinePill">
+        <span class="dot"></span>
+        Back online — reloading…
+      </div>
+
+      <button type="button" id="retryBtn" onclick="retry()">Try again</button>
+    </div>
+
+    <script>
+      var retryBtn = document.getElementById('retryBtn');
+      var barTrack = document.getElementById('barTrack');
+      var onlinePill = document.getElementById('onlinePill');
+
+      function retry() {
+        retryBtn.disabled = true;
+        retryBtn.textContent = 'Connecting…';
+        barTrack.style.display = 'block';
+        setTimeout(function() { location.reload(); }, 300);
+      }
+
+      // Auto-reload when the browser detects network connectivity is restored.
+      window.addEventListener('online', function() {
+        onlinePill.style.display = 'flex';
+        retryBtn.style.display = 'none';
+        barTrack.style.display = 'block';
+        setTimeout(function() { location.reload(); }, 1200);
+      });
+    </script>
   </body>
 </html>
