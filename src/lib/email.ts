@@ -42,7 +42,8 @@ const resendProvider: EmailProvider = {
       body: JSON.stringify({ from: env.EMAIL_FROM, to, subject, text, ...(html ? { html } : {}) }),
     });
     if (!res.ok) {
-      throw new Error(`Email send failed (${res.status})`);
+      const detail = await res.text().catch(() => '');
+      throw new Error(`Email send failed (${res.status})${detail ? `: ${detail.slice(0, 300)}` : ''}`);
     }
   },
 };

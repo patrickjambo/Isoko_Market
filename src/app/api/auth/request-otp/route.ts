@@ -39,7 +39,15 @@ export const POST = route(async (req: NextRequest) => {
 
   // Only login gets the one-tap magic link (registration needs code entry so the
   // sign-up form data is present when the code is verified).
-  const code = await issueOtp(email, 'login', { locale, magicLink: mode === 'login' });
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+  const proto = req.headers.get('x-forwarded-proto') || req.nextUrl?.protocol?.replace(':', '') || 'https';
+  const origin = host ? `${proto}://${host}` : req.nextUrl?.origin || env.NEXT_PUBLIC_APP_URL;
+
+  const code = await issueOtp(email, 'login', {
+    locale,
+    magicLink: mode === 'login',
+    origin,
+  });
 
   // In development we surface the fact that the code is in the console; never
   // return the code itself — EXCEPT under the E2E test flag (never production),

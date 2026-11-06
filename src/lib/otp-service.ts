@@ -18,7 +18,7 @@ const MAX_VERIFY_ATTEMPTS = 5;
 export async function issueOtp(
   email: string,
   purpose = 'login',
-  opts?: { locale?: string; magicLink?: boolean }
+  opts?: { locale?: string; magicLink?: boolean; origin?: string }
 ): Promise<string> {
   const code = generateOtp();
   // The magic link is a login convenience only. Registration must go through code
@@ -47,7 +47,8 @@ export async function issueOtp(
     // link only renders a page and consumes nothing; a button-press POST does the
     // actual login. Locale sits in the path (the page is localized).
     const locale = opts?.locale ?? routing.defaultLocale;
-    const url = new URL(`/${locale}/magic-link`, env.NEXT_PUBLIC_APP_URL);
+    const base = (opts?.origin || env.NEXT_PUBLIC_APP_URL).replace(/\/+$/, '');
+    const url = new URL(`/${locale}/magic-link`, base);
     url.searchParams.set('email', email);
     url.searchParams.set('token', token);
     magicUrl = url.toString();

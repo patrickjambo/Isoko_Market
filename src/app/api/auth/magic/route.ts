@@ -25,9 +25,13 @@ export async function POST(req: NextRequest) {
   const token = String(form?.get('token') ?? '');
   const locale = safeLocale(form ? String(form.get('locale') ?? '') : null);
 
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+  const proto = req.headers.get('x-forwarded-proto') || req.nextUrl?.protocol?.replace(':', '') || 'https';
+  const origin = host ? `${proto}://${host}` : req.nextUrl?.origin || env.NEXT_PUBLIC_APP_URL;
+
   // 303 → the browser turns this form POST into a GET on the target.
   const to = (path: string) =>
-    NextResponse.redirect(new URL(`/${locale}${path}`, env.NEXT_PUBLIC_APP_URL), 303);
+    NextResponse.redirect(new URL(`/${locale}${path}`, origin), 303);
 
   // Per-IP flood protection (the token is high-entropy, so this guards the DB
   // against request storms, not brute force).
@@ -62,7 +66,11 @@ export async function POST(req: NextRequest) {
 export function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const locale = safeLocale(searchParams.get('locale'));
-  const url = new URL(`/${locale}/magic-link`, env.NEXT_PUBLIC_APP_URL);
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+  const proto = req.headers.get('x-forwarded-proto') || req.nextUrl?.protocol?.replace(':', '') || 'https';
+  const origin = host ? `${proto}://${host}` : req.nextUrl?.origin || env.NEXT_PUBLIC_APP_URL;
+
+  const url = new URL(`/${locale}/magic-link`, origin);
   const email = searchParams.get('email');
   const token = searchParams.get('token');
   if (email) url.searchParams.set('email', email);

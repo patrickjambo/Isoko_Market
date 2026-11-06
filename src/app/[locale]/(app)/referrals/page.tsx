@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { headers } from 'next/headers';
 import { Gift, Users, Wallet } from 'lucide-react';
 import { redirect } from '@/i18n/routing';
 import { ReferralShare } from '@/components/referral/referral-share';
@@ -36,7 +37,12 @@ export default async function ReferralsPage({ params }: { params: { locale: stri
     }),
   ]);
 
-  const link = `${env.NEXT_PUBLIC_APP_URL}/${params.locale}/register?ref=${code}`;
+  const headerList = headers();
+  const host = headerList.get('x-forwarded-host') || headerList.get('host');
+  const proto = headerList.get('x-forwarded-proto') || 'https';
+  const origin = host ? `${proto}://${host}` : env.NEXT_PUBLIC_APP_URL;
+
+  const link = `${origin}/${params.locale}/register?ref=${code}`;
 
   return (
     <div className="container max-w-lg py-6">
