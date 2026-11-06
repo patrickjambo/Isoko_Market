@@ -989,7 +989,8 @@
     "favourBuyer": "Trancher pour l’acheteur",
     "favourSeller": "Trancher pour le vendeur",
     "disputeResolved": "Litige résolu",
-    "settingsTitle": "Paramètres"
+    "settingsTitle": "Paramètres",
+    "subscriptionsTitle": "Abonnements"
   },
   "trust": {
     "verifiedSeller": "Vendeur vérifié",
@@ -1497,5 +1498,38 @@
     "disableBtn": "Désactiver",
     "saving": "Enregistrement…",
     "hint": "Les modifications prennent effet immédiatement pour tous les utilisateurs."
+  },
+  "subscription": {
+    "adminTitle": "Abonnements vendeurs",
+    "adminSubtitle": "Configurez les plans d'abonnement, les tarifs et la collecte des paiements pour les vendeurs.",
+    "adminPanelTitle": "Gestion des abonnements",
+    "adminPanelSubtitle": "Consultez et gérez les statuts d'abonnement des vendeurs.",
+    "enableLabel": "Activer les abonnements vendeurs",
+    "enableDesc": "Lorsqu'activé, les vendeurs peuvent s'abonner pour débloquer des fonctionnalités premium. La désactivation masque immédiatement l'interface d'abonnement.",
+    "saved": "Enregistré",
+    "monthlyPriceLabel": "Prix mensuel (RWF)",
+    "annualPriceLabel": "Prix annuel (RWF)",
+    "annualSavings": "Économies vs mensuel",
+    "momoNumberLabel": "Numéro / code MoMo",
+    "momoNumberDesc": "Le numéro de téléphone ou le code marchand qui reçoit les paiements d'abonnement.",
+    "momoKindPhone": "Numéro de téléphone",
+    "momoKindCode": "Code MoMo",
+    "requireOnPublishLabel": "Exiger un abonnement pour publier des annonces",
+    "requireOnPublishDesc": "Les vendeurs sans abonnement actif ne peuvent pas publier de nouvelles annonces. Les annonces existantes restent actives.",
+    "autoExpireMonthsLabel": "Expiration automatique après inactivité (mois)",
+    "autoExpireMonthsDesc": "0 = désactivé. Expire l'abonnement si le vendeur n'a eu aucune activité pendant ce nombre de mois.",
+    "autoExpireListingsLabel": "Expiration automatique au-delà du nombre d'annonces",
+    "autoExpireListingsDesc": "0 = désactivé. Exige un abonnement si le vendeur a plus d'annonces que ce nombre.",
+    "statusActive": "Actif",
+    "statusGrace": "Période de grâce",
+    "statusExpired": "Expiré",
+    "statusNone": "Aucun abonnement",
+    "planMonthly": "Mensuel",
+    "planAnnual": "Annuel",
+    "totalActive": "Abonnés actifs",
+    "totalRevenue": "Revenus totaux",
+    "expiringSoon": "Expire bientôt",
+    "grantSub": "Accorder un abonnement",
+    "revokeSub": "Révoquer"
   }
 }

@@ -989,7 +989,8 @@
     "favourBuyer": "Kemurira umuguzi",
     "favourSeller": "Kemurira umugurisha",
     "disputeResolved": "Impaka yakemuwe",
-    "settingsTitle": "Igenamiterere"
+    "settingsTitle": "Igenamiterere",
+    "subscriptionsTitle": "Kwiyandikisha"
   },
   "trust": {
     "verifiedSeller": "Umucuruzi wemejwe",
@@ -1497,5 +1498,38 @@
     "disableBtn": "Funga",
     "saving": "Bigabika…",
     "hint": "Impinduka zifata ako kanya kuri abakoresha bose."
+  },
+  "subscription": {
+    "adminTitle": "Kwiyandikisha kw'Abacuruzi",
+    "adminSubtitle": "Shiraho ibiciro n'uburyo bwo kwiyandikisha kw'abacuruzi.",
+    "adminPanelTitle": "Gucunga Kwiyandikisha",
+    "adminPanelSubtitle": "Reba no gucunga uburyo abacuruzi biyandikishije.",
+    "enableLabel": "Fungura kwiyandikisha kw'abacuruzi",
+    "enableDesc": "Iyo bifunguye, abacuruzi bashobora kwiyandikisha. Iyo bifunzwe, uburyo bwose bwo kwiyandikisha burahisha.",
+    "saved": "Bigabitswe",
+    "monthlyPriceLabel": "Igiciro cy'ukwezi (RWF)",
+    "annualPriceLabel": "Igiciro cy'umwaka (RWF)",
+    "annualSavings": "Icyungu ugereranije n'ukwezi",
+    "momoNumberLabel": "Nomero / kode ya MoMo",
+    "momoNumberDesc": "Nomero ya telefoni cyangwa kode y'umucuruzi itangwa amafaranga y'ukwiyandikisha.",
+    "momoKindPhone": "Nomero ya telefoni",
+    "momoKindCode": "Kode ya MoMo",
+    "requireOnPublishLabel": "Saba kwiyandikisha mbere yo gusohora urutonde",
+    "requireOnPublishDesc": "Abacuruzi badafite kwiyandikisha bikorwa ntibashobora gusohora ibitabo bishya.",
+    "autoExpireMonthsLabel": "Siba igihe nta gikorwa (amezi)",
+    "autoExpireMonthsDesc": "0 = birekuwe. Siba kwiyandikisha nta gikorwa mu mezi angana.",
+    "autoExpireListingsLabel": "Siba iyo urutonde ruruta umubare",
+    "autoExpireListingsDesc": "0 = birekuwe. Saba kwiyandikisha iyo urutonde rugira ibitabo biruta uyu mubare.",
+    "statusActive": "Bikorwa",
+    "statusGrace": "Igihe cy'ineza",
+    "statusExpired": "Byarangiye",
+    "statusNone": "Nta kwiyandikisha",
+    "planMonthly": "Buri kwezi",
+    "planAnnual": "Buri mwaka",
+    "totalActive": "Abiyandikishije bikorwa",
+    "totalRevenue": "Amafaranga yose",
+    "expiringSoon": "Bizarangira vuba",
+    "grantSub": "Ha kwiyandikisha",
+    "revokeSub": "Hagarika"
   }
 }

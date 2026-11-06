@@ -8,6 +8,7 @@ import { toSessionUser } from '@/lib/serialize';
 import { env } from '@/lib/env';
 import { Providers } from '@/components/providers';
 import { getFeatureFlags } from '@/lib/feature-flags';
+import { getPlatformSettings } from '@/lib/commission';
 import { ServiceWorkerRegister } from '@/components/shared/service-worker-register';
 import '../globals.css';
 
@@ -69,10 +70,11 @@ export default async function LocaleLayout({
   }
   setRequestLocale(locale);
 
-  const [messages, user, flags] = await Promise.all([
+  const [messages, user, flags, settings] = await Promise.all([
     getMessages(),
     getCurrentUser(),
     getFeatureFlags(),
+    getPlatformSettings(),
   ]);
   // Fire-and-forget: update the user's lastActiveAt timestamp. Guard is already
   // on `user` (void is a no-op if null), but the explicit `if` avoids scheduling
@@ -84,7 +86,16 @@ export default async function LocaleLayout({
     <html lang={locale} suppressHydrationWarning>
       <body className="min-h-dvh bg-background font-sans">
         <NextIntlClientProvider messages={messages}>
-          <Providers user={user ? toSessionUser(user) : null} initialFlags={flags}>
+          <Providers user={user ? toSessionUser(user) : null} initialFlags={flags} initialSubscriptionSettings={{
+              subscriptionEnabled: settings.subscriptionEnabled,
+              subscriptionMonthlyPrice: settings.subscriptionMonthlyPrice,
+              subscriptionAnnualPrice: settings.subscriptionAnnualPrice,
+              subscriptionMomoNumber: settings.subscriptionMomoNumber,
+              subscriptionMomoKind: settings.subscriptionMomoKind,
+              subscriptionRequireOnPublish: settings.subscriptionRequireOnPublish,
+              subscriptionAutoExpireMonths: settings.subscriptionAutoExpireMonths,
+              subscriptionAutoExpireListings: settings.subscriptionAutoExpireListings,
+            }}>
             {children}
           </Providers>
         </NextIntlClientProvider>

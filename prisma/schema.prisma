@@ -113,6 +113,18 @@ enum PayoutTargetKind {
   MOMO_CODE
 }
 
+enum SubscriptionStatus {
+  NONE    // never subscribed or expired
+  ACTIVE  // has a live subscription
+  EXPIRED // had one, now expired
+  GRACE   // within 7-day grace period
+}
+
+enum SubscriptionPlan {
+  MONTHLY
+  ANNUAL
+}
+
 /// Platform-wide settings (single row, id="singleton"). Commission is configured
 /// entirely from the admin dashboard — no code changes to change the rate,
 /// destination, launch date or free period.
@@ -138,6 +150,15 @@ model PlatformSettings {
   jobsEnabled       Boolean        @default(false) // job-seeker browse & apply
   hiringEnabled     Boolean        @default(false) // employers post & manage jobs
   cvBuilderEnabled  Boolean        @default(false) // CV builder & PDF export
+  // ── Seller Subscription ────────────────────────────────────────────────────
+  subscriptionEnabled         Boolean  @default(false)  // master switch
+  subscriptionMonthlyPrice    Int      @default(5000)   // RWF whole units
+  subscriptionAnnualPrice     Int      @default(50000)  // RWF whole units (≈2 months free)
+  subscriptionMomoNumber      String   @default("")     // phone or merchant code to receive payment
+  subscriptionMomoKind        PayoutTargetKind @default(PHONE)
+  subscriptionRequireOnPublish Boolean  @default(false)  // gate listing publish behind active sub
+  subscriptionAutoExpireMonths Int     @default(3)      // months of inactivity before sub expires
+  subscriptionAutoExpireListings Int   @default(0)      // 0=disabled; >0: expire if listing count exceeds this without sub
   updatedById       String?
   updatedAt         DateTime       @updatedAt
   createdAt         DateTime       @default(now())
@@ -276,6 +297,9 @@ model User {
   verificationStatus VerificationStatus @default(UNVERIFIED)
   idDocumentUrl      String? // encrypted-at-rest object key; served via signed URL
   walletBalance      Int                @default(0) // stored in RWF minor units (centimes)
+  subscriptionStatus SubscriptionStatus @default(NONE)
+  subscriptionExpiresAt DateTime?
+  subscriptionPlan   SubscriptionPlan?
   referralCode       String?            @unique // this user's shareable invite code
   referredById       String? // who invited this user (Phase 5 referral system)
   // Admin RBAC + account lifecycle

@@ -24,6 +24,7 @@ import {
   PanelLeftOpen,
   Menu,
   X,
+  Crown,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -114,6 +115,7 @@ export function AdminShell({
         badge: counts.support,
         perm: 'support.view',
       },
+      { href: '/admin/subscriptions', label: t('subscriptionsTitle'), icon: Crown, perm: 'users.view' },
       { href: '/admin/partners', label: t('partners'), icon: Handshake, perm: 'partners.view' },
       { href: '/admin/settings', label: t('settingsTitle'), icon: Settings, perm: 'settings.view' },
       { href: '/admin/content', label: t('content'), icon: Languages, perm: 'content.view' },

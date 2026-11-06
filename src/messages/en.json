@@ -989,7 +989,8 @@
     "favourBuyer": "Resolve for buyer",
     "favourSeller": "Resolve for seller",
     "disputeResolved": "Dispute resolved",
-    "settingsTitle": "Settings"
+    "settingsTitle": "Settings",
+    "subscriptionsTitle": "Subscriptions"
   },
   "trust": {
     "verifiedSeller": "Verified seller",
@@ -1497,5 +1498,38 @@
     "disableBtn": "Disable",
     "saving": "Saving…",
     "hint": "Changes take effect immediately for all users. The page refreshes automatically after each toggle."
+  },
+  "subscription": {
+    "adminTitle": "Seller Subscriptions",
+    "adminSubtitle": "Configure subscription plans, pricing, and payment collection for sellers.",
+    "adminPanelTitle": "Subscription Management",
+    "adminPanelSubtitle": "View and manage seller subscription statuses.",
+    "enableLabel": "Enable seller subscriptions",
+    "enableDesc": "When enabled, sellers can subscribe to unlock premium features. Disabling hides the subscription UI from all sellers immediately.",
+    "saved": "Saved",
+    "monthlyPriceLabel": "Monthly price (RWF)",
+    "annualPriceLabel": "Annual price (RWF)",
+    "annualSavings": "Savings vs monthly",
+    "momoNumberLabel": "MoMo number / code",
+    "momoNumberDesc": "The phone number or merchant code that receives subscription payments.",
+    "momoKindPhone": "Phone number",
+    "momoKindCode": "MoMo code",
+    "requireOnPublishLabel": "Require subscription to publish listings",
+    "requireOnPublishDesc": "Sellers without an active subscription cannot publish new listings. Existing listings remain live.",
+    "autoExpireMonthsLabel": "Auto-expire after inactivity (months)",
+    "autoExpireMonthsDesc": "0 = disabled. Expire subscription if seller has had no activity for this many months.",
+    "autoExpireListingsLabel": "Auto-expire above listing count",
+    "autoExpireListingsDesc": "0 = disabled. Require subscription if seller has more than this many listings.",
+    "statusActive": "Active",
+    "statusGrace": "Grace period",
+    "statusExpired": "Expired",
+    "statusNone": "No subscription",
+    "planMonthly": "Monthly",
+    "planAnnual": "Annual",
+    "totalActive": "Active subscribers",
+    "totalRevenue": "Total revenue",
+    "expiringSoon": "Expiring soon",
+    "grantSub": "Grant subscription",
+    "revokeSub": "Revoke"
   }
 }

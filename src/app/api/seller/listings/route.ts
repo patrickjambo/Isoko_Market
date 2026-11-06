@@ -8,6 +8,7 @@ import { francsToMinor } from '@/lib/utils';
 import { findDuplicate } from '@/lib/suggestions';
 import { emitAdmin } from '@/lib/admin-realtime';
 import { notifyMatchingListingAlerts } from '@/lib/listing-alert';
+import { getPlatformSettings } from '@/lib/commission';
 
 /**
  * POST /api/seller/listings?force= — publish a listing from the wizard.
@@ -18,6 +19,19 @@ export const POST = route(async (req: NextRequest) => {
   const user = await requireUser();
   const force = new URL(req.url).searchParams.get('force') === '1';
   const input = createListingSchema.parse(await req.json().catch(() => ({})));
+
+  // Subscription gate: if admin requires an active subscription to publish, enforce it.
+  const settings = await getPlatformSettings();
+  if (settings.subscriptionEnabled && settings.subscriptionRequireOnPublish) {
+    const now = new Date();
+    const hasActiveSub =
+      user.subscriptionStatus === 'ACTIVE' &&
+      user.subscriptionExpiresAt !== null &&
+      user.subscriptionExpiresAt > now;
+    if (!hasActiveSub) {
+      return jsonOk({ requiresSubscription: true }, { status: 402 });
+    }
+  }
 
   if (!force) {
     const dup = await findDuplicate(user.id, input.title);

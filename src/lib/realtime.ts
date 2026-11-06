@@ -9,6 +9,18 @@ import { EventEmitter } from 'node:events';
  * publish() against Pusher/Ably and point clients at that channel — the event
  * shapes below stay identical.
  */
+
+/** Subscription settings mirrored to clients via SSE. */
+export type SubscriptionSettings = {
+  subscriptionEnabled: boolean;
+  subscriptionMonthlyPrice: number;
+  subscriptionAnnualPrice: number;
+  subscriptionMomoNumber: string;
+  subscriptionMomoKind: 'PHONE' | 'MOMO_CODE';
+  subscriptionRequireOnPublish: boolean;
+  subscriptionAutoExpireMonths: number;
+  subscriptionAutoExpireListings: number;
+};
 export type RealtimeEvent =
   | { type: 'message'; conversationId: string; message: SerializedMessage }
   | { type: 'message_read'; conversationId: string; readerId: string }
@@ -36,7 +48,8 @@ export type RealtimeEvent =
         hiringEnabled: boolean;
         cvBuilderEnabled: boolean;
       };
-    };
+    }
+  | { type: 'subscription_settings_updated'; settings: SubscriptionSettings };
 
 export type SerializedMessage = {
   id: string;
