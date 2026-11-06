@@ -723,7 +723,17 @@
     "benefit2": "Higher visibility in search",
     "benefit3": "Ability to receive payments",
     "reducedVisibilityNote": "Unverified accounts have reduced visibility and limited transactions.",
-    "howVerificationWorks": "How verification works & is this safe?"
+    "howVerificationWorks": "How verification works & is this safe?",
+    "nudgeTitle": "Verify your identity",
+    "nudgeBody": "Upload your National ID to get a Verified badge and unlock full access to the platform.",
+    "nudgeCta": "Upload ID now",
+    "nudgePendingTitle": "Verification in progress",
+    "nudgePendingBody": "Your ID is under review — we'll notify you within 24 hours.",
+    "nudgeRejectedTitle": "Re-upload your ID",
+    "nudgeRejectedBody": "We couldn't verify your last submission. Please try again with a clearer photo.",
+    "nudgeRejectedCta": "Try again",
+    "nudgeDismiss": "Remind me later",
+    "skipForNow": "Skip for now — I'll do this later"
   },
   "wallet": {
     "title": "Wallet",

@@ -4,13 +4,13 @@ import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { Upload, Loader2, ShieldCheck, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from '@/i18n/routing';
+import { useRouter, Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 
 type Status = 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
 
-export function VerifyForm({ status }: { status: Status }) {
+export function VerifyForm({ status, returnTo }: { status: Status; returnTo?: string }) {
   const t = useTranslations('verification');
   const tc = useTranslations('common');
   const router = useRouter();
@@ -65,7 +65,13 @@ export function VerifyForm({ status }: { status: Status }) {
       });
       if (!res.ok) throw new Error();
       toast(t('statusPending'), 'success');
-      router.refresh();
+      // After submitting ID, send new users to their original destination
+      // (or home), so verification doesn't block them from using the app.
+      if (returnTo && returnTo !== '/') {
+        router.push(returnTo as Parameters<typeof router.push>[0]);
+      } else {
+        router.refresh();
+      }
     } catch {
       toast(tc('error'), 'error');
     } finally {
@@ -133,6 +139,16 @@ export function VerifyForm({ status }: { status: Status }) {
       </Button>
 
       <p className="text-center text-xs text-muted-foreground">{t('reducedVisibilityNote')}</p>
+
+      {/* Let users who arrived from post-registration redirect skip for now */}
+      {returnTo && returnTo !== '/' && (
+        <Link
+          href={returnTo as Parameters<typeof Link>[0]['href']}
+          className="block text-center text-xs text-muted-foreground hover:text-foreground hover:underline"
+        >
+          {t('skipForNow')}
+        </Link>
+      )}
     </div>
   );
 }

@@ -723,7 +723,17 @@
     "benefit2": "Kugaragara cyane mu bushakashatsi",
     "benefit3": "Ubushobozi bwo kwakira amafaranga",
     "reducedVisibilityNote": "Konti zitemejwe zigaragara make kandi zifite ubucuruzi bugarukije.",
-    "howVerificationWorks": "Uko kwemezwa bikorwa & ese biratekanye?"
+    "howVerificationWorks": "Uko kwemezwa bikorwa & ese biratekanye?",
+    "nudgeTitle": "Emeza ubuzimagatozi bwawe",
+    "nudgeBody": "Shyiraho ifoto y'indangamuntu yawe kugira ngo ubone ikimenyetso cy'Kwemezwa no kugera ku makuru yose y'urubuga.",
+    "nudgeCta": "Ohereza indangamuntu",
+    "nudgePendingTitle": "Kwemezwa biragenda",
+    "nudgePendingBody": "Indangamuntu yawe iragusobanurwa — tuzakumenyesha mu masaha 24.",
+    "nudgeRejectedTitle": "Ongera wohereze indangamuntu",
+    "nudgeRejectedBody": "Ntidushoboye kugenzura icyohereje ubwa nyuma. Nyamuneka ongera ugerageze ufite ifoto igaragara neza.",
+    "nudgeRejectedCta": "Ongera ugerageze",
+    "nudgeDismiss": "Mwibutse nyuma",
+    "skipForNow": "Reka ubu — nzakora ubu nyuma"
   },
   "wallet": {
     "title": "Ikofi",

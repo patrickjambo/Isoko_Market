@@ -5,7 +5,13 @@ import { getCurrentUser } from '@/lib/auth';
 import { VerifyForm } from '@/components/verification/verify-form';
 import { getFeatureFlags } from '@/lib/feature-flags';
 
-export default async function VerifyPage({ params }: { params: { locale: string } }) {
+export default async function VerifyPage({
+  params,
+  searchParams,
+}: {
+  params: { locale: string };
+  searchParams?: { returnTo?: string };
+}) {
   setRequestLocale(params.locale);
   const user = await getCurrentUser();
   if (!user) {
@@ -16,13 +22,17 @@ export default async function VerifyPage({ params }: { params: { locale: string 
   const [t, flags] = await Promise.all([getTranslations('verification'), getFeatureFlags()]);
   const jobsAny = flags.jobsEnabled || flags.hiringEnabled || flags.cvBuilderEnabled;
 
+  // Sanitize returnTo: only allow relative paths to prevent open redirects.
+  const rawReturnTo = searchParams?.returnTo ?? '';
+  const returnTo = rawReturnTo.startsWith('/') ? rawReturnTo : '/';
+
   return (
     <div className="container max-w-lg py-6">
       <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
       <p className="mb-6 text-sm text-muted-foreground">
         {jobsAny ? t('subtitle') : t('subtitleNoJobs')}
       </p>
-      <VerifyForm status={user.verificationStatus} />
+      <VerifyForm status={user.verificationStatus} returnTo={returnTo} />
       {/* Plain-language "why we ask for ID / is it safe" — Visitor spec §7 */}
       <Link
         href="/safety"

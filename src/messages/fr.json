@@ -723,7 +723,17 @@
     "benefit2": "Une meilleure visibilité dans la recherche",
     "benefit3": "La possibilité de recevoir des paiements",
     "reducedVisibilityNote": "Les comptes non vérifiés ont une visibilité réduite et des transactions limitées.",
-    "howVerificationWorks": "Comment fonctionne la vérification et est-ce sûr ?"
+    "howVerificationWorks": "Comment fonctionne la vérification et est-ce sûr ?",
+    "nudgeTitle": "Vérifiez votre identité",
+    "nudgeBody": "Téléchargez votre carte d'identité nationale pour obtenir un badge Vérifié et accéder à toutes les fonctionnalités.",
+    "nudgeCta": "Télécharger la carte d'identité",
+    "nudgePendingTitle": "Vérification en cours",
+    "nudgePendingBody": "Votre pièce d'identité est en cours d'examen — nous vous notifierons sous 24 heures.",
+    "nudgeRejectedTitle": "Re-soumettez votre pièce d'identité",
+    "nudgeRejectedBody": "Nous n'avons pas pu vérifier votre dernière soumission. Veuillez réessayer avec une photo plus claire.",
+    "nudgeRejectedCta": "Réessayer",
+    "nudgeDismiss": "Me rappeler plus tard",
+    "skipForNow": "Passer pour l'instant — je ferai cela plus tard"
   },
   "wallet": {
     "title": "Portefeuille",

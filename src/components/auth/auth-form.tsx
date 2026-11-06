@@ -147,9 +147,17 @@ export function AuthForm({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message ?? 'error');
       toast(data.isNew ? t('registerTitle') : t('loginTitle'), 'success');
-      // Restore whatever the guest was doing (§5), else use the server's
-      // role-aware landing (new → onboarding path; returning → own role home).
-      const dest = returnTo || data.redirectTo || (data.isNew ? intentHome(intent) : '/');
+      // New users are sent to the ID verification page first so they know
+      // they need to upload their ID immediately after registration.
+      // The returnTo param (or the server's role-aware landing) is preserved
+      // so after verification they continue to their intended destination.
+      let dest: string;
+      if (data.isNew) {
+        const afterVerify = returnTo || data.redirectTo || intentHome(intent) || '/';
+        dest = `/verify?returnTo=${encodeURIComponent(afterVerify)}`;
+      } else {
+        dest = returnTo || data.redirectTo || '/';
+      }
       router.push(dest);
       router.refresh();
     } catch (err) {
