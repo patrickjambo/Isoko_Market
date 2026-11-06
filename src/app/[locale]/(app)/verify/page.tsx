@@ -3,6 +3,7 @@ import { ShieldQuestion } from 'lucide-react';
 import { Link, redirect } from '@/i18n/routing';
 import { getCurrentUser } from '@/lib/auth';
 import { VerifyForm } from '@/components/verification/verify-form';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export default async function VerifyPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
@@ -12,12 +13,15 @@ export default async function VerifyPage({ params }: { params: { locale: string 
     return null;
   }
 
-  const t = await getTranslations('verification');
+  const [t, flags] = await Promise.all([getTranslations('verification'), getFeatureFlags()]);
+  const jobsAny = flags.jobsEnabled || flags.hiringEnabled || flags.cvBuilderEnabled;
 
   return (
     <div className="container max-w-lg py-6">
       <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
-      <p className="mb-6 text-sm text-muted-foreground">{t('subtitle')}</p>
+      <p className="mb-6 text-sm text-muted-foreground">
+        {jobsAny ? t('subtitle') : t('subtitleNoJobs')}
+      </p>
       <VerifyForm status={user.verificationStatus} />
       {/* Plain-language "why we ask for ID / is it safe" — Visitor spec §7 */}
       <Link

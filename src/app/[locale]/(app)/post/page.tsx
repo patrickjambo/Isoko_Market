@@ -27,7 +27,9 @@ export default async function PostPage({ params }: { params: { locale: string } 
   return (
     <div className="container max-w-lg py-10">
       <h1 className="text-2xl font-bold tracking-tight">{t('post.chooseTitle')}</h1>
-      <p className="mt-1 text-muted-foreground">{t('post.chooseSubtitle')}</p>
+      <p className="mt-1 text-muted-foreground">
+        {flags.hiringEnabled ? t('post.chooseSubtitle') : t('post.chooseSubtitleNoJobs')}
+      </p>
       <div className="mt-6 space-y-3">
         {options.map((o) => {
           const Icon = o.icon;

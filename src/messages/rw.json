@@ -14,6 +14,7 @@
     "continue": "Komeza",
     "search": "Shakisha",
     "searchPlaceholder": "Shakisha ibintu, serivisi, akazi…",
+    "searchPlaceholderNoJobs": "Shakisha ibintu, serivisi…",
     "filter": "Shungura",
     "all": "Byose",
     "seeAll": "Reba byose",
@@ -99,6 +100,7 @@
     "pillarsTitle": "Yubakiwe icyizere n'amahirwe",
     "pillarVerifiedTitle": "Zenova ryemejwe",
     "pillarVerifiedBody": "Buri mucuruzi n'ushaka akazi yerekana uko yemejwe, ku buryo umenya uwo ukorana na we.",
+    "pillarVerifiedBodyNoJobs": "Buri mucuruzi yerekana uko yemejwe, ku buryo umenya uwo ukorana na we.",
     "pillarJobsTitle": "Akazi & Kubaka CV",
     "pillarJobsBody": "Kora CV nziza mu minota mike hanyuma usabe akazi n'imirimo ku buryo bworoshye.",
     "pillarPayTitle": "Kwishyura kuri telefoni",
@@ -111,7 +113,9 @@
     "step2Title": "Wemezwe",
     "step2Body": "Ongeraho indangamuntu yawe kugira ngo wemezwe kandi ugere ku bantu benshi.",
     "step3Title": "Curuza cyangwa ushake akazi",
+    "step3TitleNoJobs": "Tangira gucuruza",
     "step3Body": "Tanga igicuruzwa, usabe akazi, kandi uvugane ako kanya.",
+    "step3BodyNoJobs": "Tanga igicuruzwa cyangwa serivisi, kandi uvugane ako kanya.",
     "featuredListings": "Ibicuruzwa byatoranyijwe",
     "latestJobs": "Akazi gashya",
     "statsReached": "urubyiruko rwagezweho",
@@ -122,6 +126,7 @@
     "ctaGetStarted": "Tangira",
     "ctaSeeWhat": "Reba ibiri kuri Zenova",
     "searchPlaceholder": "Shakisha telefone, imodoka, ibikoresho, akazi…",
+    "searchPlaceholderNoJobs": "Shakisha telefone, imodoka, ibikoresho, serivisi…",
     "live": "Bizima",
     "liveUpdating": "Bivugururwa byikora",
     "newTodaySuffix": "bishya mu masaha 24",
@@ -129,17 +134,21 @@
     "services": "Serivisi",
     "pillarsEyebrow": "Kuki Zenova",
     "pillarsSubtitle": "Uburyo bworoshye kandi bwizewe bwo kugura, kugurisha no gushaka akazi mu Rwanda.",
+    "pillarsSubtitleNoJobs": "Uburyo bworoshye kandi bwizewe bwo kugura no kugurisha mu Rwanda.",
     "howItWorksEyebrow": "Byoroshye kandi byihuse",
     "statsListings": "Ibicuruzwa bihari",
     "statsHired": "Abahawe akazi",
     "ctaBandTitle": "Witeguye kugura, kugurisha cyangwa guhabwa akazi?",
+    "ctaBandTitleNoJobs": "Witeguye kugura cyangwa kugurisha?",
     "ctaBandBody": "Ifatanye n'ibihumbi by'Abanyarwanda bacuruza kandi bakora kuri Zenova buri munsi.",
+    "ctaBandBodyNoJobs": "Fatanya n'abanyarwanda ibihumbi bacuruza kuri Zenova buri munsi.",
     "showcaseTag": "Kuri Zenova",
     "showcaseSale": "Kigurishwa",
     "showcaseService": "Serivisi",
     "heroRot1": "Gura icyo ushaka, hafi yawe.",
     "heroRot2": "Gurisha mu minota mike.",
     "heroRot3": "Shaka akazi kakubereye.",
+    "heroRot3NoJobs": "Gura ku bacuruzi bizerwa.",
     "heroRot4": "Abantu wizeye.",
     "ctgConnect": "Huza",
     "ctgTrade": "Gucuruza",
@@ -620,6 +629,7 @@
     "title": "Ubutumwa",
     "empty": "Nta kiganiro kirahaba.",
     "emptyHint": "Andikira umucuruzi cyangwa usabe akazi kugira ngo utangire ikiganiro.",
+    "emptyHintNoJobs": "Andikira umucuruzi kugira ngo utangire ikiganiro.",
     "typePlaceholder": "Andika ubutumwa…",
     "send": "Ohereza",
     "typing": "arandika…",
@@ -650,7 +660,8 @@
     "PAYMENT": "Ihinduka ku kwishyura",
     "SYSTEM": "Itangazo",
     "FAVORITE": "Igicuruzwa cyabitswe",
-    "headerSubtitle": "Amakuru ku byo waguze, akazi, n'ubutumwa"
+    "headerSubtitle": "Amakuru ku byo waguze, akazi, n'ubutumwa",
+    "headerSubtitleNoJobs": "Amakuru ku byo waguze n'ubutumwa"
   },
   "profile": {
     "title": "Umwirondoro",
@@ -697,6 +708,7 @@
   "verification": {
     "title": "Wemezwe",
     "subtitle": "Bona ikimenyetso cy'uwemejwe kandi wubake icyizere n'abaguzi n'abakoresha",
+    "subtitleNoJobs": "Bona ikimenyetso cy'uwemejwe kandi wubake icyizere n'abaguzi",
     "why": "Impamvu dusaba ibi",
     "whyBody": "Ifoto isobanutse y'indangamuntu yawe ituma itsinda ryacu risuzuma ko uri umuntu nyawe. Irabikwa mu ibanga, ntiyerekanwa ku mugaragaro, kandi isuzumwa gusa n'itsinda ryacu ry'icyizere.",
     "uploadLabel": "Shyiraho indangamuntu yawe",
@@ -985,7 +997,8 @@
   },
   "post": {
     "chooseTitle": "Ni iki ushaka gutanga?",
-    "chooseSubtitle": "Zenova rihuza ubucuruzi n'akazi ahantu hamwe."
+    "chooseSubtitle": "Zenova rihuza ubucuruzi n'akazi ahantu hamwe.",
+    "chooseSubtitleNoJobs": "Gurisha igicuruzwa cyangwa tanga serivisi kuri Zenova."
   },
   "boards": {
     "openRoles": "Imyanya ifunguye",
@@ -1348,7 +1361,8 @@
     "q4": "Kuki musaba indangamuntu, kandi irarindwa?",
     "a4": "Indangamuntu ni ku bushake kandi ikoreshwa gusa mu gutanga ikimenyetso cyo kwemezwa cyubaka icyizere. Ibikwa mu ibanga, ntiyerekanwa cyangwa igurishwa. Kwemezwa bikwongerera ukigeraho — ntabwo bisabwa mu ntangiriro.",
     "q5": "Ni gute mvuga ku buriganya?",
-    "a5": "Buri cyatanzwe, akazi n'umwirondoro bifite buto yo gutanga raporo. Raporo zigera ku itsinda ryacu rishinzwe kugenzura, rishobora guhagarika konti no gukuraho ibintu."
+    "a5": "Buri cyatanzwe, akazi n'umwirondoro bifite buto yo gutanga raporo. Raporo zigera ku itsinda ryacu rishinzwe kugenzura, rishobora guhagarika konti no gukuraho ibintu.",
+    "a5NoJobs": "Buri cyatanzwe n'umwirondoro bifite buto yo gutanga raporo. Raporo zigera ku itsinda ryacu rishinzwe kugenzura, rishobora guhagarika konti no gukuraho ibintu."
   },
   "contact": {
     "sectionLabel": "Aho bakugeraho (si itegeko)",

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
+import { useFeatureFlags } from '@/components/providers';
 
 /** Prominent hero search — routes into the marketplace with the typed query. */
 export function HeroSearch() {
@@ -11,6 +12,8 @@ export function HeroSearch() {
   const tc = useTranslations('common');
   const router = useRouter();
   const [q, setQ] = useState('');
+  const flags = useFeatureFlags();
+  const jobsAny = flags?.jobsEnabled || flags?.hiringEnabled || flags?.cvBuilderEnabled;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,7 +28,7 @@ export function HeroSearch() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder={t('searchPlaceholder')}
+          placeholder={jobsAny ? t('searchPlaceholder') : t('searchPlaceholderNoJobs')}
           aria-label={tc('search')}
           className="h-12 w-full rounded-xl border border-white/30 bg-white/95 pl-11 pr-4 text-foreground shadow-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
         />

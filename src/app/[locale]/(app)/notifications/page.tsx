@@ -19,6 +19,7 @@ import { PollRefresh } from '@/components/shared/poll-refresh';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { timeAgo, cn } from '@/lib/utils';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,12 +43,16 @@ export default async function NotificationsPage({ params }: { params: { locale: 
     return null;
   }
 
-  const t = await getTranslations('notifications');
-  const notifications = await prisma.notification.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: 'desc' },
-    take: 50,
-  });
+  const [t, flags, notifications] = await Promise.all([
+    getTranslations('notifications'),
+    getFeatureFlags(),
+    prisma.notification.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    }),
+  ]);
+  const jobsAny = flags.jobsEnabled || flags.hiringEnabled || flags.cvBuilderEnabled;
 
   return (
     <div className="container max-w-2xl py-6">
@@ -56,7 +61,7 @@ export default async function NotificationsPage({ params }: { params: { locale: 
       <PageHeader
         icon={Bell}
         title={t('title')}
-        subtitle={t('headerSubtitle')}
+        subtitle={jobsAny ? t('headerSubtitle') : t('headerSubtitleNoJobs')}
         action={notifications.some((n) => !n.readAt) ? <MarkAllReadButton /> : undefined}
       />
 

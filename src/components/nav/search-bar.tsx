@@ -5,6 +5,7 @@ import { Search, Tag, Sparkles } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { Input } from '@/components/ui/input';
+import { useFeatureFlags } from '@/components/providers';
 
 /**
  * Global search — reachable within one tap from any screen (Section 8.2), with
@@ -19,6 +20,8 @@ export function SearchBar({ className }: { className?: string }) {
   const [suggestions, setSuggestions] = useState<{ value: string; type: string }[]>([]);
   const [open, setOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flags = useFeatureFlags();
+  const jobsAny = flags?.jobsEnabled || flags?.hiringEnabled || flags?.cvBuilderEnabled;
 
   const search = useCallback(
     (query: string) => {
@@ -60,7 +63,7 @@ export function SearchBar({ className }: { className?: string }) {
           }}
           onFocus={() => suggestions.length && setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
-          placeholder={t('searchPlaceholder')}
+          placeholder={jobsAny ? t('searchPlaceholder') : t('searchPlaceholderNoJobs')}
           aria-label={t('search')}
           className="pl-9"
         />

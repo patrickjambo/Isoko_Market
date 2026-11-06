@@ -14,6 +14,7 @@
     "continue": "Continue",
     "search": "Search",
     "searchPlaceholder": "Search items, services, jobs…",
+    "searchPlaceholderNoJobs": "Search items, services…",
     "filter": "Filter",
     "all": "All",
     "seeAll": "See all",
@@ -99,6 +100,7 @@
     "pillarsTitle": "Built for trust and opportunity",
     "pillarVerifiedTitle": "Verified marketplace",
     "pillarVerifiedBody": "Every seller and job-seeker shows a verification status, so you always know who you are dealing with.",
+    "pillarVerifiedBodyNoJobs": "Every seller shows a verification status, so you always know who you are dealing with.",
     "pillarJobsTitle": "Jobs & CV builder",
     "pillarJobsBody": "Build a professional CV in minutes and apply to jobs and gigs with a single tap.",
     "pillarPayTitle": "Mobile money payments",
@@ -111,7 +113,9 @@
     "step2Title": "Get verified",
     "step2Body": "Add your ID to earn a verified badge and reach more people.",
     "step3Title": "Trade or find work",
+    "step3TitleNoJobs": "Start trading",
     "step3Body": "Post a listing, apply for a job, and chat in real time.",
+    "step3BodyNoJobs": "Post a listing or offer a service, and chat in real time.",
     "featuredListings": "Featured listings",
     "latestJobs": "Latest jobs",
     "statsReached": "youth reached",
@@ -122,6 +126,7 @@
     "ctaGetStarted": "Get Started",
     "ctaSeeWhat": "See what's on Zenova",
     "searchPlaceholder": "Search phones, cars, furniture, jobs…",
+    "searchPlaceholderNoJobs": "Search phones, cars, furniture, services…",
     "live": "Live",
     "liveUpdating": "Updates automatically",
     "newTodaySuffix": "new in the last 24h",
@@ -129,17 +134,21 @@
     "services": "Services",
     "pillarsEyebrow": "Why Zenova",
     "pillarsSubtitle": "A safer, simpler way to buy, sell, and find work in Rwanda.",
+    "pillarsSubtitleNoJobs": "A safer, simpler way to buy and sell in Rwanda.",
     "howItWorksEyebrow": "Simple and fast",
     "statsListings": "Active listings",
     "statsHired": "People hired",
     "ctaBandTitle": "Ready to buy, sell, or get hired?",
+    "ctaBandTitleNoJobs": "Ready to buy or sell?",
     "ctaBandBody": "Join thousands of Rwandans trading and working on Zenova every day.",
+    "ctaBandBodyNoJobs": "Join thousands of Rwandans trading on Zenova every day.",
     "showcaseTag": "Live on Zenova",
     "showcaseSale": "For sale",
     "showcaseService": "Service",
     "heroRot1": "Buy anything, near you.",
     "heroRot2": "Sell it in minutes.",
     "heroRot3": "Find work that fits.",
+    "heroRot3NoJobs": "Shop trusted sellers.",
     "heroRot4": "People you can trust.",
     "ctgConnect": "Connect",
     "ctgTrade": "Trade",
@@ -620,6 +629,7 @@
     "title": "Messages",
     "empty": "No conversations yet.",
     "emptyHint": "Message a seller or apply to a job to start a conversation.",
+    "emptyHintNoJobs": "Message a seller to start a conversation.",
     "typePlaceholder": "Write a message…",
     "send": "Send",
     "typing": "typing…",
@@ -650,7 +660,8 @@
     "PAYMENT": "Payment update",
     "SYSTEM": "Announcement",
     "FAVORITE": "Listing saved",
-    "headerSubtitle": "Updates on your orders, jobs, and messages"
+    "headerSubtitle": "Updates on your orders, jobs, and messages",
+    "headerSubtitleNoJobs": "Updates on your orders and messages"
   },
   "profile": {
     "title": "Profile",
@@ -697,6 +708,7 @@
   "verification": {
     "title": "Get verified",
     "subtitle": "Earn a verified badge and build trust with buyers and employers",
+    "subtitleNoJobs": "Earn a verified badge and build trust with buyers",
     "why": "Why we ask this",
     "whyBody": "A clear photo of your National ID lets our team check you're a real person. It is encrypted, never shown publicly, and only reviewed by our trust team.",
     "uploadLabel": "Upload your National ID",
@@ -985,7 +997,8 @@
   },
   "post": {
     "chooseTitle": "What would you like to post?",
-    "chooseSubtitle": "Zenova brings commerce and jobs together in one place."
+    "chooseSubtitle": "Zenova brings commerce and jobs together in one place.",
+    "chooseSubtitleNoJobs": "Sell an item or offer a service on Zenova."
   },
   "boards": {
     "openRoles": "Open roles",
@@ -1348,7 +1361,8 @@
     "q4": "Why do you ask for an ID, and is it protected?",
     "a4": "ID is optional and only used to award a Verified badge that builds trust. It's stored privately, never shown publicly or sold. Verification unlocks more reach — it's never required to start.",
     "q5": "How do I report a scam?",
-    "a5": "Every listing, job and profile has a Report button. Reports go straight to our moderation team, who can suspend accounts and remove content."
+    "a5": "Every listing, job and profile has a Report button. Reports go straight to our moderation team, who can suspend accounts and remove content.",
+    "a5NoJobs": "Every listing and profile has a Report button. Reports go straight to our moderation team, who can suspend accounts and remove content."
   },
   "contact": {
     "sectionLabel": "Contact (optional)",

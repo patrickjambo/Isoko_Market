@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ShieldCheck } from 'lucide-react';
 import { Prose } from '@/components/shared/prose';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const metadata = { title: 'Is this safe?' };
 
@@ -12,7 +13,8 @@ export const metadata = { title: 'Is this safe?' };
  */
 export default async function SafetyPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
-  const t = await getTranslations('safety');
+  const [t, flags] = await Promise.all([getTranslations('safety'), getFeatureFlags()]);
+  const jobsAny = flags.jobsEnabled || flags.hiringEnabled || flags.cvBuilderEnabled;
   const items = [1, 2, 3, 4, 5];
 
   return (
@@ -24,7 +26,7 @@ export default async function SafetyPage({ params }: { params: { locale: string 
         {items.map((n) => (
           <div key={n}>
             <dt className="font-semibold text-foreground">{t(`q${n}`)}</dt>
-            <dd className="mt-1">{t(`a${n}`)}</dd>
+            <dd className="mt-1">{n === 5 && !jobsAny ? t('a5NoJobs') : t(`a${n}`)}</dd>
           </div>
         ))}
       </dl>

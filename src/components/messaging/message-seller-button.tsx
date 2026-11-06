@@ -85,7 +85,7 @@ export function MessageSellerButton({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{label}</DialogTitle>
-          <DialogDescription>{t('messages.emptyHint')}</DialogDescription>
+          <DialogDescription>{t('messages.emptyHintNoJobs')}</DialogDescription>
         </DialogHeader>
         <Textarea
           value={body}

@@ -8,6 +8,7 @@ import { PollRefresh } from '@/components/shared/poll-refresh';
 import { getCurrentUser } from '@/lib/auth';
 import { getConversationsForUser } from '@/lib/messaging';
 import { initials, timeAgo, cn } from '@/lib/utils';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,9 +20,14 @@ export default async function MessagesPage({ params }: { params: { locale: strin
     return null;
   }
 
-  const t = await getTranslations('messages');
-  const tt = await getTranslations('trust');
-  const conversations = await getConversationsForUser(user.id);
+  const [t, tt, flags, conversations] = await Promise.all([
+    getTranslations('messages'),
+    getTranslations('trust'),
+    getFeatureFlags(),
+    getConversationsForUser(user.id),
+  ]);
+  const jobsAny = flags.jobsEnabled || flags.hiringEnabled || flags.cvBuilderEnabled;
+  const emptyHint = jobsAny ? t('emptyHint') : t('emptyHintNoJobs');
 
   return (
     <div className="container max-w-2xl py-6">
@@ -29,7 +35,7 @@ export default async function MessagesPage({ params }: { params: { locale: strin
       <h1 className="mb-4 text-2xl font-bold tracking-tight">{t('title')}</h1>
 
       {conversations.length === 0 ? (
-        <EmptyState icon={MessageCircle} title={t('empty')} description={t('emptyHint')} />
+        <EmptyState icon={MessageCircle} title={t('empty')} description={emptyHint} />
       ) : (
         <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
           {conversations.map((c) => (
@@ -69,7 +75,7 @@ export default async function MessagesPage({ params }: { params: { locale: strin
                   >
                     {c.lastMessage
                       ? `${c.lastMessage.fromMe ? `${t('you')}: ` : ''}${c.lastMessage.body}`
-                      : t('emptyHint')}
+                      : emptyHint}
                   </p>
                 </div>
                 {c.unread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-accent" />}

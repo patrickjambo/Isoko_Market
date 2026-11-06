@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
 import { intentHome, type Intent } from '@/lib/onboarding';
+import { useFeatureFlags } from '@/components/providers';
 import { GoogleButton } from './google-button';
 
 type Mode = 'login' | 'register';
@@ -31,6 +32,7 @@ export function AuthForm({
   const locale = useLocale();
   const router = useRouter();
   const { toast } = useToast();
+  const flags = useFeatureFlags();
 
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
@@ -238,7 +240,7 @@ export function AuthForm({
               >
                 <option value="BUYER">{t('roleBuyer')}</option>
                 <option value="SELLER">{t('roleSeller')}</option>
-                <option value="EMPLOYER">{t('roleEmployer')}</option>
+                {flags?.hiringEnabled && <option value="EMPLOYER">{t('roleEmployer')}</option>}
               </Select>
             </div>
           )}

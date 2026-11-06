@@ -56,9 +56,14 @@ export default async function HomePage({ params }: { params: { locale: string } 
   // Filter out jobs if the feature is disabled — the fetch already returned
   // cached data with negligible overhead, so we just ignore the result here.
   const visibleJobs = flags.jobsEnabled ? jobs : [];
+  const jobsAny = flags.jobsEnabled || flags.hiringEnabled || flags.cvBuilderEnabled;
 
   const pillars = [
-    { icon: ShieldCheck, title: t('pillarVerifiedTitle'), body: t('pillarVerifiedBody') },
+    {
+      icon: ShieldCheck,
+      title: t('pillarVerifiedTitle'),
+      body: jobsAny ? t('pillarVerifiedBody') : t('pillarVerifiedBodyNoJobs'),
+    },
     ...(flags.jobsEnabled
       ? [{ icon: Briefcase, title: t('pillarJobsTitle'), body: t('pillarJobsBody') }]
       : []),
@@ -131,7 +136,12 @@ export default async function HomePage({ params }: { params: { locale: string } 
 
             <h1 className="min-h-[2.2em] text-3xl font-extrabold leading-tight tracking-tight drop-shadow-sm sm:text-4xl md:text-5xl">
               <RotatingText
-                phrases={[t('heroRot1'), t('heroRot2'), t('heroRot3'), t('heroRot4')]}
+                phrases={[
+                  t('heroRot1'),
+                  t('heroRot2'),
+                  jobsAny ? t('heroRot3') : t('heroRot3NoJobs'),
+                  t('heroRot4'),
+                ]}
               />
             </h1>
 
@@ -221,7 +231,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <Eyebrow>{t('pillarsEyebrow')}</Eyebrow>
           <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('pillarsTitle')}</h2>
-          <p className="mt-2 text-muted-foreground">{t('pillarsSubtitle')}</p>
+          <p className="mt-2 text-muted-foreground">
+            {jobsAny ? t('pillarsSubtitle') : t('pillarsSubtitleNoJobs')}
+          </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {pillars.map((p) => {
@@ -290,15 +302,19 @@ export default async function HomePage({ params }: { params: { locale: string } 
             <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('howItWorksTitle')}</h2>
           </div>
           <ol className="grid gap-6 sm:grid-cols-3">
-            {[1, 2, 3].map((n) => (
-              <li key={n} className="relative rounded-xl border border-border bg-card p-6 pt-7">
-                <span className="absolute -top-4 left-6 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-base font-bold text-accent-foreground shadow-sm">
-                  {n}
-                </span>
-                <h3 className="mb-1 mt-2 font-semibold">{t(`step${n}Title`)}</h3>
-                <p className="text-sm text-muted-foreground">{t(`step${n}Body`)}</p>
-              </li>
-            ))}
+            {[1, 2, 3].map((n) => {
+              const title = n === 3 && !jobsAny ? t('step3TitleNoJobs') : t(`step${n}Title`);
+              const body = n === 3 && !jobsAny ? t('step3BodyNoJobs') : t(`step${n}Body`);
+              return (
+                <li key={n} className="relative rounded-xl border border-border bg-card p-6 pt-7">
+                  <span className="absolute -top-4 left-6 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-base font-bold text-accent-foreground shadow-sm">
+                    {n}
+                  </span>
+                  <h3 className="mb-1 mt-2 font-semibold">{title}</h3>
+                  <p className="text-sm text-muted-foreground">{body}</p>
+                </li>
+              );
+            })}
           </ol>
         </div>
       </section>
@@ -309,9 +325,11 @@ export default async function HomePage({ params }: { params: { locale: string } 
         <div className="pointer-events-none absolute -bottom-28 -left-10 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
         <div className="container relative flex flex-col items-center gap-5 py-16 text-center">
           <h2 className="max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl">
-            {t('ctaBandTitle')}
+            {jobsAny ? t('ctaBandTitle') : t('ctaBandTitleNoJobs')}
           </h2>
-          <p className="max-w-xl text-white/90">{t('ctaBandBody')}</p>
+          <p className="max-w-xl text-white/90">
+            {jobsAny ? t('ctaBandBody') : t('ctaBandBodyNoJobs')}
+          </p>
           <div className="mt-2 flex flex-wrap justify-center gap-3">
             <Button size="lg" variant="accent" asChild>
               <Link href={user ? '/marketplace' : '/get-started'}>

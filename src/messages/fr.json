@@ -14,6 +14,7 @@
     "continue": "Continuer",
     "search": "Rechercher",
     "searchPlaceholder": "Rechercher articles, services, emplois…",
+    "searchPlaceholderNoJobs": "Rechercher articles, services…",
     "filter": "Filtrer",
     "all": "Tout",
     "seeAll": "Voir tout",
@@ -99,6 +100,7 @@
     "pillarsTitle": "Conçu pour la confiance et l'opportunité",
     "pillarVerifiedTitle": "Marché vérifié",
     "pillarVerifiedBody": "Chaque vendeur et chercheur d'emploi affiche un statut de vérification, pour toujours savoir avec qui vous traitez.",
+    "pillarVerifiedBodyNoJobs": "Chaque vendeur affiche un statut de vérification, pour toujours savoir avec qui vous traitez.",
     "pillarJobsTitle": "Emplois & créateur de CV",
     "pillarJobsBody": "Créez un CV professionnel en quelques minutes et postulez à des emplois et missions en un seul clic.",
     "pillarPayTitle": "Paiements mobile money",
@@ -111,7 +113,9 @@
     "step2Title": "Faites-vous vérifier",
     "step2Body": "Ajoutez votre pièce d'identité pour obtenir un badge vérifié et toucher plus de monde.",
     "step3Title": "Échangez ou trouvez du travail",
+    "step3TitleNoJobs": "Commencez à commercer",
     "step3Body": "Publiez une annonce, postulez à un emploi et discutez en temps réel.",
+    "step3BodyNoJobs": "Publiez une annonce ou offrez un service, et discutez en temps réel.",
     "featuredListings": "Annonces à la une",
     "latestJobs": "Derniers emplois",
     "statsReached": "jeunes touchés",
@@ -122,6 +126,7 @@
     "ctaGetStarted": "Commencer",
     "ctaSeeWhat": "Voir ce qui est sur Zenova",
     "searchPlaceholder": "Rechercher téléphones, voitures, meubles, emplois…",
+    "searchPlaceholderNoJobs": "Rechercher téléphones, voitures, meubles, services…",
     "live": "En direct",
     "liveUpdating": "Mise à jour automatique",
     "newTodaySuffix": "nouveautés en 24h",
@@ -129,17 +134,21 @@
     "services": "Services",
     "pillarsEyebrow": "Pourquoi Zenova",
     "pillarsSubtitle": "Une façon plus sûre et plus simple d'acheter, vendre et trouver du travail au Rwanda.",
+    "pillarsSubtitleNoJobs": "Une façon plus sûre et plus simple d'acheter et de vendre au Rwanda.",
     "howItWorksEyebrow": "Simple et rapide",
     "statsListings": "Annonces actives",
     "statsHired": "Personnes recrutées",
     "ctaBandTitle": "Prêt à acheter, vendre ou être recruté ?",
+    "ctaBandTitleNoJobs": "Prêt à acheter ou vendre ?",
     "ctaBandBody": "Rejoignez des milliers de Rwandais qui échangent et travaillent sur Zenova chaque jour.",
+    "ctaBandBodyNoJobs": "Rejoignez des milliers de Rwandais qui commercent sur Zenova chaque jour.",
     "showcaseTag": "En direct sur Zenova",
     "showcaseSale": "À vendre",
     "showcaseService": "Service",
     "heroRot1": "Achetez tout, près de chez vous.",
     "heroRot2": "Vendez en quelques minutes.",
     "heroRot3": "Trouvez un travail adapté.",
+    "heroRot3NoJobs": "Achetez auprès de vendeurs de confiance.",
     "heroRot4": "Des gens de confiance.",
     "ctgConnect": "Connecter",
     "ctgTrade": "Échanger",
@@ -620,6 +629,7 @@
     "title": "Messages",
     "empty": "Aucune conversation pour l'instant.",
     "emptyHint": "Contactez un vendeur ou postulez à un emploi pour démarrer une conversation.",
+    "emptyHintNoJobs": "Contactez un vendeur pour démarrer une conversation.",
     "typePlaceholder": "Écrivez un message…",
     "send": "Envoyer",
     "typing": "écrit…",
@@ -650,7 +660,8 @@
     "PAYMENT": "Mise à jour de paiement",
     "SYSTEM": "Annonce",
     "FAVORITE": "Annonce enregistrée",
-    "headerSubtitle": "Nouvelles sur vos commandes, emplois et messages"
+    "headerSubtitle": "Nouvelles sur vos commandes, emplois et messages",
+    "headerSubtitleNoJobs": "Nouvelles sur vos commandes et messages"
   },
   "profile": {
     "title": "Profil",
@@ -697,6 +708,7 @@
   "verification": {
     "title": "Se faire vérifier",
     "subtitle": "Obtenez un badge vérifié et gagnez la confiance des acheteurs et employeurs",
+    "subtitleNoJobs": "Obtenez un badge vérifié et gagnez la confiance des acheteurs",
     "why": "Pourquoi nous le demandons",
     "whyBody": "Une photo nette de votre carte d'identité nationale permet à notre équipe de vérifier que vous êtes une personne réelle. Elle est chiffrée, jamais affichée publiquement, et examinée uniquement par notre équipe de confiance.",
     "uploadLabel": "Téléversez votre carte d'identité nationale",
@@ -985,7 +997,8 @@
   },
   "post": {
     "chooseTitle": "Que souhaitez-vous publier ?",
-    "chooseSubtitle": "Zenova réunit le commerce et l'emploi au même endroit."
+    "chooseSubtitle": "Zenova réunit le commerce et l'emploi au même endroit.",
+    "chooseSubtitleNoJobs": "Vendez un article ou proposez un service sur Zenova."
   },
   "boards": {
     "openRoles": "Postes ouverts",
@@ -1348,7 +1361,8 @@
     "q4": "Pourquoi demandez-vous une pièce d'identité, et est-elle protégée ?",
     "a4": "La pièce d'identité est facultative et sert uniquement à attribuer un badge Vérifié qui renforce la confiance. Elle est stockée en privé, jamais affichée ni vendue. La vérification élargit votre portée — elle n'est jamais requise au départ.",
     "q5": "Comment signaler une arnaque ?",
-    "a5": "Chaque annonce, offre et profil dispose d'un bouton Signaler. Les signalements vont directement à notre équipe de modération, qui peut suspendre des comptes et retirer du contenu."
+    "a5": "Chaque annonce, offre et profil dispose d'un bouton Signaler. Les signalements vont directement à notre équipe de modération, qui peut suspendre des comptes et retirer du contenu.",
+    "a5NoJobs": "Chaque annonce et profil dispose d'un bouton Signaler. Les signalements vont directement à notre équipe de modération, qui peut suspendre des comptes et retirer du contenu."
   },
   "contact": {
     "sectionLabel": "Contact (facultatif)",
