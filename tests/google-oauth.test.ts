@@ -15,10 +15,13 @@ describe('Google OAuth Helper', () => {
     expect(s1).not.toBe(s2);
   });
 
-  it('builds callback URL targeting /api/auth/google/callback', async () => {
+  it('builds callback URL targeting /api/auth/google/callback with default or custom origin', async () => {
     const { callbackUrl } = await import('@/lib/google-oauth');
     const cb = callbackUrl();
     expect(cb).toContain('/api/auth/google/callback');
+
+    const customCb = callbackUrl('https://mycustomdomain.com');
+    expect(customCb).toBe('https://mycustomdomain.com/api/auth/google/callback');
   });
 
   it('detects OAuth enabled status', async () => {

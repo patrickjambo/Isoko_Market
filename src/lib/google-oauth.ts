@@ -42,13 +42,15 @@ export function generateState(): string {
   return randomBytes(24).toString('hex');
 }
 
-/** Build the redirect URI for the current deployment. */
-export function callbackUrl(): string {
-  return `${env.NEXT_PUBLIC_APP_URL}/api/auth/google/callback`;
+/** Build the redirect URI for the current deployment or specific origin. */
+export function callbackUrl(origin?: string): string {
+  const base = (origin || env.NEXT_PUBLIC_APP_URL).replace(/\/+$/, '');
+  return `${base}/api/auth/google/callback`;
 }
 
 /** Build the Google authorization URL to send the user to. */
-export function buildAuthUrl(state: string, returnTo?: string): string {
+export function buildAuthUrl(state: string, returnTo?: string, origin?: string): string {
+  const cb = callbackUrl(origin);
   if (!isRealGoogleConfigured() && isDevFallbackAllowed()) {
     // In local dev/staging without credentials, route directly to callback with dev mock
     const params = new URLSearchParams({
@@ -56,12 +58,12 @@ export function buildAuthUrl(state: string, returnTo?: string): string {
       state,
       ...(returnTo ? { returnTo } : {}),
     });
-    return `${callbackUrl()}?${params}`;
+    return `${cb}?${params}`;
   }
 
   const params = new URLSearchParams({
     client_id: env.GOOGLE_CLIENT_ID,
-    redirect_uri: callbackUrl(),
+    redirect_uri: cb,
     response_type: 'code',
     scope: SCOPES,
     state,
@@ -81,7 +83,7 @@ export type GoogleUserInfo = {
 };
 
 /** Exchange the authorization code for tokens and return the user profile. */
-export async function fetchGoogleUser(code: string): Promise<GoogleUserInfo> {
+export async function fetchGoogleUser(code: string, origin?: string): Promise<GoogleUserInfo> {
   if (code === 'dev_google_mock' && isDevFallbackAllowed() && !isRealGoogleConfigured()) {
     return {
       id: 'google_dev_mock_id_9901',
@@ -100,7 +102,7 @@ export async function fetchGoogleUser(code: string): Promise<GoogleUserInfo> {
       code,
       client_id: env.GOOGLE_CLIENT_ID,
       client_secret: env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: callbackUrl(),
+      redirect_uri: callbackUrl(origin),
       grant_type: 'authorization_code',
     }),
     cache: 'no-store',

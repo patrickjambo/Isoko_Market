@@ -23,16 +23,38 @@ export const dynamic = 'force-dynamic';
  * 5. Redirects to the app (returnTo or role-aware landing).
  */
 export async function GET(req: NextRequest) {
-  const appUrl = req.nextUrl?.origin || env.NEXT_PUBLIC_APP_URL;
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+  const proto = req.headers.get('x-forwarded-proto') || req.nextUrl?.protocol?.replace(':', '') || 'https';
+  const detectedOrigin = host ? `${proto}://${host}` : req.nextUrl?.origin;
+  const initialAppUrl = detectedOrigin || env.NEXT_PUBLIC_APP_URL;
 
   if (!isGoogleOAuthEnabled()) {
-    return NextResponse.redirect(new URL('/login?error=google_disabled', appUrl).toString());
+    return NextResponse.redirect(new URL('/login?error=google_disabled', initialAppUrl).toString());
   }
 
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
   const state = searchParams.get('state');
   const errorParam = searchParams.get('error');
+
+  // Decode returnTo and origin from the state payload
+  let returnTo = '/';
+  let stateOrigin: string | undefined;
+  if (state) {
+    try {
+      const decoded = JSON.parse(Buffer.from(state, 'base64url').toString('utf8')) as {
+        nonce: string;
+        returnTo?: string;
+        origin?: string;
+      };
+      returnTo = decoded.returnTo || '/';
+      stateOrigin = decoded.origin;
+    } catch {
+      // fall through
+    }
+  }
+
+  const appUrl = stateOrigin || initialAppUrl;
 
   // User denied access on the consent screen
   if (errorParam === 'access_denied' || !code) {
@@ -45,22 +67,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=google_state', appUrl).toString());
   }
 
-  // Decode returnTo from the state payload
-  let returnTo = '/';
-  try {
-    const decoded = JSON.parse(Buffer.from(state, 'base64url').toString('utf8')) as {
-      nonce: string;
-      returnTo: string;
-    };
-    returnTo = decoded.returnTo || '/';
-  } catch {
-    // fall through — returnTo stays '/'
-  }
-
   // Exchange code for user profile
   let googleUser;
   try {
-    googleUser = await fetchGoogleUser(code);
+    googleUser = await fetchGoogleUser(code, appUrl);
   } catch {
     return NextResponse.redirect(new URL('/login?error=google_failed', appUrl).toString());
   }

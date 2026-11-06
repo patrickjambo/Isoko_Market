@@ -16,7 +16,9 @@ export const dynamic = 'force-dynamic';
  * round-trip on the callback and prevent CSRF.
  */
 export async function GET(req: NextRequest) {
-  const appUrl = req.nextUrl?.origin || env.NEXT_PUBLIC_APP_URL;
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+  const proto = req.headers.get('x-forwarded-proto') || req.nextUrl?.protocol?.replace(':', '') || 'https';
+  const appUrl = host ? `${proto}://${host}` : req.nextUrl?.origin || env.NEXT_PUBLIC_APP_URL;
 
   if (!isGoogleOAuthEnabled()) {
     return NextResponse.redirect(new URL('/login?error=google_disabled', appUrl));
@@ -27,12 +29,12 @@ export async function GET(req: NextRequest) {
 
   const state = generateState();
 
-  // Pack returnTo into state so the callback can restore it without an extra
-  // cookie — keeps the flow stateless and simpler.
-  const statePayload = JSON.stringify({ nonce: state, returnTo });
+  // Pack returnTo and origin into state so the callback can restore the exact
+  // destination and match the redirect_uri in token exchange.
+  const statePayload = JSON.stringify({ nonce: state, returnTo, origin: appUrl });
   const encodedState = Buffer.from(statePayload).toString('base64url');
 
-  const url = buildAuthUrl(encodedState);
+  const url = buildAuthUrl(encodedState, undefined, appUrl);
   const redirectTarget = new URL(url, req.url).toString();
 
   const res = NextResponse.redirect(redirectTarget);
