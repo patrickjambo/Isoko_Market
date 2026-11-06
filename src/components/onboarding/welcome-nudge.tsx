@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { Sparkles, X, ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import type { FeatureFlags } from '@/lib/feature-flags';
 
 const KEY = 'isoko_welcome_dismissed';
 
-const PATH: Record<string, { href: string }> = {
+const PATH: Record<string, { href: string; requiresFlag?: keyof Pick<FeatureFlags, 'hiringEnabled' | 'cvBuilderEnabled'> }> = {
   buy_sell: { href: '/dashboard/sell' },
-  find_work: { href: '/cv' },
-  hire: { href: '/jobs/new' },
+  find_work: { href: '/cv', requiresFlag: 'cvBuilderEnabled' },
+  hire: { href: '/jobs/new', requiresFlag: 'hiringEnabled' },
   browse: { href: '/marketplace' },
 };
 
@@ -18,14 +19,30 @@ const PATH: Record<string, { href: string }> = {
  * One-time, dismissible welcome nudge (Visitor spec §6) — highlights the single
  * primary action for the path the user chose at sign-up, never a forced multi-
  * screen tour. Remembers dismissal in localStorage so it shows only once.
+ * Hidden automatically when the feature the intent requires is disabled.
  */
-export function WelcomeNudge({ preferredRole, name }: { preferredRole: string | null; name: string }) {
+export function WelcomeNudge({
+  preferredRole,
+  name,
+  flags,
+}: {
+  preferredRole: string | null;
+  name: string;
+  flags?: Pick<FeatureFlags, 'hiringEnabled' | 'cvBuilderEnabled'>;
+}) {
   const t = useTranslations('onboarding');
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (preferredRole && PATH[preferredRole] && localStorage.getItem(KEY) !== '1') setShow(true);
-  }, [preferredRole]);
+    if (!preferredRole || !PATH[preferredRole]) return;
+    if (localStorage.getItem(KEY) === '1') return;
+
+    // Suppress nudge if the feature it requires is currently disabled.
+    const path = PATH[preferredRole];
+    if (path.requiresFlag && flags && !flags[path.requiresFlag]) return;
+
+    setShow(true);
+  }, [preferredRole, flags]);
 
   if (!show || !preferredRole || !PATH[preferredRole]) return null;
 

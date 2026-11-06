@@ -87,7 +87,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
 
       {/* One-time welcome nudge toward the chosen onboarding path (Visitor §6) */}
       {user && (
-        <WelcomeNudge preferredRole={user.preferredRole} name={user.fullName.split(' ')[0]!} />
+        <WelcomeNudge preferredRole={user.preferredRole} name={user.fullName.split(' ')[0]!} flags={flags} />
       )}
 
       {/* Resume/discard an unfinished "Add Product" draft (self-hides if none). */}

@@ -1,10 +1,14 @@
 import { setRequestLocale } from 'next-intl/server';
 import { Prose } from '@/components/shared/prose';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const metadata = { title: 'Privacy Policy' };
 
-export default function PrivacyPage({ params }: { params: { locale: string } }) {
+export default async function PrivacyPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
+  const flags = await getFeatureFlags();
+  const jobsAny = flags.jobsEnabled || flags.hiringEnabled || flags.cvBuilderEnabled;
+
   return (
     <Prose title="Privacy Policy">
       <p>
@@ -13,13 +17,13 @@ export default function PrivacyPage({ params }: { params: { locale: string } }) 
       </p>
       <h2>What we collect</h2>
       <p>
-        Your phone number (used as your login), your name and profile details, listings and jobs
-        you post, messages you send, and — only if you choose to get verified — a copy of your
-        National ID.
+        Your phone number (used as your login), your name and profile details,
+        listings{jobsAny ? ' and jobs' : ''} you post, messages you send, and — only if you choose to get
+        verified — a copy of your National ID.
       </p>
       <h2>How we use it</h2>
       <p>
-        To operate the marketplace and job board, verify identities to keep the platform
+        To operate the marketplace{jobsAny ? ' and job board' : ''}, verify identities to keep the platform
         trustworthy, deliver notifications, and process mobile-money payments for optional premium
         features.
       </p>

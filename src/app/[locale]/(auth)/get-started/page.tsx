@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ShoppingBag, Briefcase, Users, Compass, ArrowRight } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,16 +23,17 @@ export default function GetStartedPage({
 }
 
 async function Content({ locale, returnTo }: { locale: string; returnTo?: string }) {
-  const t = await getTranslations('onboarding');
+  const [t, flags] = await Promise.all([getTranslations('onboarding'), getFeatureFlags()]);
   const ret = returnTo ? `&returnTo=${encodeURIComponent(returnTo)}` : '';
 
-  const cards: { intent: string; href: string; icon: LucideIcon; accent: string }[] = [
-    { intent: 'buy_sell', href: `/register?intent=buy_sell${ret}`, icon: ShoppingBag, accent: 'text-primary bg-primary/10' },
-    { intent: 'find_work', href: `/register?intent=find_work${ret}`, icon: Briefcase, accent: 'text-accent bg-accent/10' },
-    { intent: 'hire', href: `/register?intent=hire${ret}`, icon: Users, accent: 'text-primary bg-primary/10' },
+  const allCards: { intent: string; href: string; icon: LucideIcon; accent: string; enabled: boolean }[] = [
+    { intent: 'buy_sell', href: `/register?intent=buy_sell${ret}`, icon: ShoppingBag, accent: 'text-primary bg-primary/10', enabled: true },
+    { intent: 'find_work', href: `/register?intent=find_work${ret}`, icon: Briefcase, accent: 'text-accent bg-accent/10', enabled: flags.jobsEnabled || flags.cvBuilderEnabled },
+    { intent: 'hire', href: `/register?intent=hire${ret}`, icon: Users, accent: 'text-primary bg-primary/10', enabled: flags.hiringEnabled },
     // "Just looking" drops straight into browse — intent inferred later (§3).
-    { intent: 'browse', href: returnTo || '/marketplace', icon: Compass, accent: 'text-muted-foreground bg-secondary' },
+    { intent: 'browse', href: returnTo || '/marketplace', icon: Compass, accent: 'text-muted-foreground bg-secondary', enabled: true },
   ];
+  const cards = allCards.filter((c) => c.enabled);
 
   return (
     <div className="space-y-6">

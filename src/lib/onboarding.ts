@@ -17,14 +17,25 @@ export function intentToRole(intent?: Intent): 'BUYER' | 'SELLER' | 'EMPLOYER' {
   return intent === 'hire' ? 'EMPLOYER' : 'BUYER';
 }
 
-/** The first screen to land on after registering with this intent (§4 Step 4). */
-export function intentHome(intent?: Intent | null): string {
+/** The first screen to land on after registering with this intent (§4 Step 4).
+ *  When optional `flags` are supplied, falls back to `/` if the feature is off. */
+export function intentHome(
+  intent?: Intent | null,
+  flags?: { jobsEnabled?: boolean; hiringEnabled?: boolean; cvBuilderEnabled?: boolean }
+): string {
   switch (intent) {
     case 'buy_sell':
       return '/marketplace';
     case 'find_work':
+      // Fall back to home if CV builder is off; jobs page if only jobs is on.
+      if (flags) {
+        if (flags.cvBuilderEnabled) return '/cv';
+        if (flags.jobsEnabled) return '/jobs';
+        return '/';
+      }
       return '/cv';
     case 'hire':
+      if (flags && !flags.hiringEnabled) return '/';
       return '/jobs/new';
     default:
       return '/';
@@ -42,11 +53,15 @@ export function intentHome(intent?: Intent | null): string {
  * locked in"). Distinct from {@link intentHome}, which is the first-run
  * onboarding screen (e.g. CV builder / Post-a-Job).
  */
-export function landingFor(user: { role: string; preferredRole?: string | null }): string {
+export function landingFor(
+  user: { role: string; preferredRole?: string | null },
+  flags?: { hiringEnabled?: boolean; jobsEnabled?: boolean }
+): string {
   if (user.role === 'ADMIN') return '/admin';
-  if (user.role === 'EMPLOYER' || user.preferredRole === 'hire') return '/employer';
+  // If hiring is disabled, don't send EMPLOYER-role users to /employer (which 404s).
+  if ((user.role === 'EMPLOYER' || user.preferredRole === 'hire') && (!flags || flags.hiringEnabled)) return '/employer';
   if (user.role === 'SELLER') return '/dashboard';
-  if (user.preferredRole === 'find_work') return '/jobs';
+  if (user.preferredRole === 'find_work' && (!flags || flags.jobsEnabled)) return '/jobs';
   return '/'; // buyers / browsers → personalized buyer home
 }
 

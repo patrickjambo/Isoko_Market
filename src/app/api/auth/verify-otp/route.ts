@@ -9,6 +9,7 @@ import { uniqueReferralCode, applyReferral } from '@/lib/referral';
 import { emitAdmin } from '@/lib/admin-realtime';
 import { ensureStaffRole } from '@/lib/staff';
 import { intentToRole, intentHome, landingFor } from '@/lib/onboarding';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const POST = route(async (req: NextRequest) => {
   const body = await req.json().catch(() => ({}));
@@ -69,10 +70,13 @@ export const POST = route(async (req: NextRequest) => {
 
   await createSession({ userId: user.id, role: user.role, v: user.sessionVersion });
 
+  // Fetch flags to gate redirect destinations for disabled features.
+  const flags = await getFeatureFlags();
+
   // Role-aware landing: a NEW user goes to their onboarding first-screen (intent
   // based); a RETURNING user opens on their own role home (bug fix — login used
   // to always route to '/'). The client still honours an explicit returnTo.
-  const redirectTo = existing ? landingFor(user) : intentHome(input.intent);
+  const redirectTo = existing ? landingFor(user, flags) : intentHome(input.intent, flags);
 
   return jsonOk({ user: toSessionUser(user), isNew: !existing, intent: input.intent ?? null, redirectTo });
 });

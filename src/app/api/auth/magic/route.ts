@@ -7,6 +7,7 @@ import { landingFor } from '@/lib/onboarding';
 import { rateLimit } from '@/lib/rate-limit';
 import { routing } from '@/i18n/routing';
 import { env } from '@/lib/env';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 function safeLocale(raw: string | null): string {
   return raw && (routing.locales as readonly string[]).includes(raw) ? raw : routing.defaultLocale;
@@ -52,9 +53,12 @@ export async function POST(req: NextRequest) {
   // Bootstrap platform staff (ADMIN_EMAILS / MODERATOR_EMAILS) on login too.
   const user = await ensureStaffRole(found);
 
+  // Fetch flags to gate redirect destinations for disabled features.
+  const flags = await getFeatureFlags();
+
   // Attach the session cookie to THIS redirect — a cookie set via next/headers
   // would be dropped on a response we build ourselves.
-  const res = to(landingFor(user));
+  const res = to(landingFor(user, flags));
   await writeSessionCookie(res, { userId: user.id, role: user.role, v: user.sessionVersion });
   return res;
 }
