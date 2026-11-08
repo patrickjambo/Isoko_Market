@@ -733,7 +733,14 @@
     "nudgeRejectedBody": "Ntidushoboye kugenzura icyohereje ubwa nyuma. Nyamuneka ongera ugerageze ufite ifoto igaragara neza.",
     "nudgeRejectedCta": "Ongera ugerageze",
     "nudgeDismiss": "Mwibutse nyuma",
-    "skipForNow": "Reka ubu — nzakora ubu nyuma"
+    "skipForNow": "Reka ubu — nzakora ubu nyuma",
+    "statusPendingTitle": "Kwemezwa birasuzumwa",
+    "pendingNotice": "Indangamuntu yawe yamaze koherezwa kandi irasuzumwa n'itsinda ryacu. Urashobora gukomeza kureba, kugura no gucuruza ibicuruzwa cyangwa serivisi mu gihe dutegereje kwemeza konti yawe.",
+    "verifiedNotice": "Ubuzimagatozi bwawe bwemejwe! Ufite uburenganzira bwose ku mikorere yose y'urubuga.",
+    "autoRedirectCountdown": "Kukujyana ku rupapuro rw'itangiriro mu masegonda {seconds}…",
+    "goToHome": "Komeza ku Itangiriro",
+    "continueSelling": "Tangira gucuruza / Shyiraho",
+    "backToHome": "Gusubira ku Itangiriro"
   },
   "wallet": {
     "title": "Ikofi",

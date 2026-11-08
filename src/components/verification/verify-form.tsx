@@ -1,8 +1,17 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Upload, Loader2, ShieldCheck, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import {
+  Upload,
+  Loader2,
+  ShieldCheck,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
+  ArrowRight,
+  ShoppingBag,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter, Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
@@ -16,22 +25,23 @@ export function VerifyForm({ status, returnTo }: { status: Status; returnTo?: st
   const router = useRouter();
   const { toast } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [localStatus, setLocalStatus] = useState<Status>(status);
   const [preview, setPreview] = useState<string | null>(null);
   const [docUrl, setDocUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  if (status === 'VERIFIED') {
-    return (
-      <StatusPanel
-        icon={CheckCircle2}
-        tone="success"
-        title={t('statusVerified')}
-      />
-    );
+  // Sync if status prop changes from server
+  useEffect(() => {
+    setLocalStatus(status);
+  }, [status]);
+
+  if (localStatus === 'VERIFIED') {
+    return <VerifiedRedirectCard returnTo={returnTo} />;
   }
-  if (status === 'PENDING') {
-    return <StatusPanel icon={Clock} tone="muted" title={t('statusPending')} />;
+
+  if (localStatus === 'PENDING') {
+    return <PendingRedirectCard returnTo={returnTo} />;
   }
 
   async function onFile(file: File | undefined) {
@@ -65,13 +75,11 @@ export function VerifyForm({ status, returnTo }: { status: Status; returnTo?: st
       });
       if (!res.ok) throw new Error();
       toast(t('statusPending'), 'success');
-      // After submitting ID, send new users to their original destination
-      // (or home), so verification doesn't block them from using the app.
-      if (returnTo && returnTo !== '/') {
-        router.push(returnTo as Parameters<typeof router.push>[0]);
-      } else {
-        router.refresh();
-      }
+      setDocUrl(null);
+      // Immediately switch to the pending redirect card so they see confirmation
+      // and are auto-redirected to home / return destination without getting stuck.
+      setLocalStatus('PENDING');
+      router.refresh();
     } catch {
       toast(tc('error'), 'error');
     } finally {
@@ -81,7 +89,7 @@ export function VerifyForm({ status, returnTo }: { status: Status; returnTo?: st
 
   return (
     <div className="space-y-6">
-      {status === 'REJECTED' && (
+      {localStatus === 'REJECTED' && (
         <StatusPanel icon={AlertTriangle} tone="destructive" title={t('statusRejected')} />
       )}
 
@@ -140,15 +148,127 @@ export function VerifyForm({ status, returnTo }: { status: Status; returnTo?: st
 
       <p className="text-center text-xs text-muted-foreground">{t('reducedVisibilityNote')}</p>
 
-      {/* Let users who arrived from post-registration redirect skip for now */}
-      {returnTo && returnTo !== '/' && (
-        <Link
-          href={returnTo as Parameters<typeof Link>[0]['href']}
-          className="block text-center text-xs text-muted-foreground hover:text-foreground hover:underline"
-        >
-          {t('skipForNow')}
-        </Link>
-      )}
+      {/* Let users skip ID upload for now and continue using the app */}
+      <Link
+        href={(returnTo && returnTo !== '/verify' ? returnTo : '/') as Parameters<typeof Link>[0]['href']}
+        className="block text-center text-xs text-muted-foreground hover:text-foreground hover:underline"
+      >
+        {t('skipForNow')}
+      </Link>
+    </div>
+  );
+}
+
+function PendingRedirectCard({ returnTo }: { returnTo?: string }) {
+  const t = useTranslations('verification');
+  const router = useRouter();
+  const [countdown, setCountdown] = useState(4);
+  const target = (returnTo && returnTo !== '/verify' ? returnTo : '/') as Parameters<typeof router.push>[0];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          router.push(target);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [router, target]);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-blue-500/30 bg-blue-500/5 p-8 text-center">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400">
+          <Clock className="h-8 w-8 animate-pulse" />
+        </div>
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
+          {t('statusPendingTitle')}
+        </h2>
+        <p className="mt-2 max-w-md text-sm text-muted-foreground">
+          {t('pendingNotice')}
+        </p>
+
+        <div className="mt-4 flex items-center gap-2 rounded-full border border-blue-200 bg-blue-100/60 px-3.5 py-1 text-xs font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          <span>{t('autoRedirectCountdown', { seconds: countdown })}</span>
+        </div>
+
+        <div className="mt-6 flex flex-col sm:flex-row w-full max-w-sm gap-3">
+          <Button
+            className="flex-1"
+            size="lg"
+            onClick={() => router.push(target)}
+          >
+            {t('goToHome')} <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="flex-1"
+            onClick={() => router.push('/dashboard/sell')}
+          >
+            <ShoppingBag className="mr-2 h-4 w-4" />
+            {t('continueSelling')}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VerifiedRedirectCard({ returnTo }: { returnTo?: string }) {
+  const t = useTranslations('verification');
+  const router = useRouter();
+  const [countdown, setCountdown] = useState(3);
+  const target = (returnTo && returnTo !== '/verify' ? returnTo : '/') as Parameters<typeof router.push>[0];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          router.push(target);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [router, target]);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-success/30 bg-success/5 p-8 text-center">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success/15 text-success">
+          <CheckCircle2 className="h-8 w-8" />
+        </div>
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
+          {t('statusVerified')}
+        </h2>
+        <p className="mt-2 max-w-md text-sm text-muted-foreground">
+          {t('verifiedNotice')}
+        </p>
+
+        <div className="mt-4 flex items-center gap-2 rounded-full border border-success/30 bg-success/10 px-3.5 py-1 text-xs font-medium text-success">
+          <span>{t('autoRedirectCountdown', { seconds: countdown })}</span>
+        </div>
+
+        <div className="mt-6 w-full max-w-xs">
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={() => router.push(target)}
+          >
+            {t('goToHome')} <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

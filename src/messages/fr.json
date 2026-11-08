@@ -733,7 +733,14 @@
     "nudgeRejectedBody": "Nous n'avons pas pu vérifier votre dernière soumission. Veuillez réessayer avec une photo plus claire.",
     "nudgeRejectedCta": "Réessayer",
     "nudgeDismiss": "Me rappeler plus tard",
-    "skipForNow": "Passer pour l'instant — je ferai cela plus tard"
+    "skipForNow": "Passer pour l'instant — je ferai cela plus tard",
+    "statusPendingTitle": "Vérification en cours d'examen",
+    "pendingNotice": "Votre pièce d'identité a été soumise et est en cours d'examen par notre équipe. Vous pouvez continuer à parcourir, acheter et vendre des articles ou des services pendant que nous vérifions votre compte.",
+    "verifiedNotice": "Votre identité est vérifiée ! Vous avez un accès complet à toutes les fonctionnalités de la plateforme.",
+    "autoRedirectCountdown": "Redirection vers l'accueil dans {seconds}s…",
+    "goToHome": "Continuer vers l'accueil",
+    "continueSelling": "Commencer à vendre / Publier",
+    "backToHome": "Retour à l'accueil"
   },
   "wallet": {
     "title": "Portefeuille",

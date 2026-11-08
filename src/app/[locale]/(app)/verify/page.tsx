@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { ShieldQuestion } from 'lucide-react';
+import { ShieldQuestion, ChevronLeft } from 'lucide-react';
 import { Link, redirect } from '@/i18n/routing';
 import { getCurrentUser } from '@/lib/auth';
 import { VerifyForm } from '@/components/verification/verify-form';
@@ -28,6 +28,15 @@ export default async function VerifyPage({
 
   return (
     <div className="container max-w-lg py-6">
+      <div className="mb-4">
+        <Link
+          href={(returnTo && returnTo !== '/verify' ? returnTo : '/') as Parameters<typeof Link>[0]['href']}
+          className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4" /> {t('backToHome')}
+        </Link>
+      </div>
+
       <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
       <p className="mb-6 text-sm text-muted-foreground">
         {jobsAny ? t('subtitle') : t('subtitleNoJobs')}

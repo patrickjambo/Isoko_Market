@@ -733,7 +733,14 @@
     "nudgeRejectedBody": "We couldn't verify your last submission. Please try again with a clearer photo.",
     "nudgeRejectedCta": "Try again",
     "nudgeDismiss": "Remind me later",
-    "skipForNow": "Skip for now — I'll do this later"
+    "skipForNow": "Skip for now — I'll do this later",
+    "statusPendingTitle": "Verification under review",
+    "pendingNotice": "Your National ID has been submitted and is currently being verified by our team. You can continue to browse, buy, and sell items or services while we verify your account.",
+    "verifiedNotice": "Your identity has been verified! You have full access to all features across the marketplace.",
+    "autoRedirectCountdown": "Redirecting to home in {seconds}s…",
+    "goToHome": "Continue to Home",
+    "continueSelling": "Start selling / Post",
+    "backToHome": "Back to Home"
   },
   "wallet": {
     "title": "Wallet",
