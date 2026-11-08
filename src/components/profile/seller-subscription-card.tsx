@@ -198,7 +198,6 @@ export function SellerSubscriptionCard({ initialStatus, initialPlan, initialExpi
           selectedPrice={selectedPrice}
           submitting={submitting}
           onSubmit={handleSubscribe}
-          t={t}
         />
       </>
     );
@@ -243,7 +242,6 @@ export function SellerSubscriptionCard({ initialStatus, initialPlan, initialExpi
           selectedPrice={selectedPrice}
           submitting={submitting}
           onSubmit={handleSubscribe}
-          t={t}
         />
       </>
     );
@@ -280,7 +278,6 @@ export function SellerSubscriptionCard({ initialStatus, initialPlan, initialExpi
         selectedPrice={selectedPrice}
         submitting={submitting}
         onSubmit={handleSubscribe}
-        t={t}
       />
     </>
   );
@@ -300,8 +297,6 @@ interface SubscribeDialogProps {
   selectedPrice: number;
   submitting: boolean;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  t: any;
 }
 
 function SubscribeDialog({
@@ -316,8 +311,8 @@ function SubscribeDialog({
   selectedPrice,
   submitting,
   onSubmit,
-  t,
 }: SubscribeDialogProps) {
+  const t = useTranslations('subscription');
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
