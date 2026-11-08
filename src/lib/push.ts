@@ -1,15 +1,32 @@
 import 'server-only';
-import webpush from 'web-push';
+import {
+  setVapidDetails,
+  sendNotification,
+  type PushSubscription as WebPushSubscription,
+} from 'web-push';
 import type { NotificationType } from '@prisma/client';
 import { prisma } from './prisma';
 import { env } from './env';
 
-// Configure Web Push with VAPID details (RFC 8292)
-webpush.setVapidDetails(
-  env.VAPID_SUBJECT,
-  env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-  env.VAPID_PRIVATE_KEY
-);
+let vapidConfigured = false;
+
+/**
+ * Configure Web Push with VAPID details (RFC 8292).
+ * Initialized lazily to prevent module evaluation errors during Next.js route builds.
+ */
+function ensureVapidConfigured() {
+  if (vapidConfigured) return;
+  try {
+    setVapidDetails(
+      env.VAPID_SUBJECT,
+      env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      env.VAPID_PRIVATE_KEY
+    );
+    vapidConfigured = true;
+  } catch (err) {
+    console.warn('Failed to configure VAPID details:', err);
+  }
+}
 
 export type PushPayload = {
   title: string;
@@ -116,9 +133,11 @@ export async function sendPushNotification(params: {
   let failed = 0;
   let pruned = 0;
 
+  ensureVapidConfigured();
+
   // 4. Send to all devices with retry mechanism and cleanup
   const pushPromises = subscriptions.map(async (sub) => {
-    const pushSub: webpush.PushSubscription = {
+    const pushSub: WebPushSubscription = {
       endpoint: sub.endpoint,
       keys: {
         p256dh: sub.p256dh,
@@ -132,7 +151,7 @@ export async function sendPushNotification(params: {
     while (attempt < maxAttempts) {
       attempt++;
       try {
-        await webpush.sendNotification(pushSub, payloadString, {
+        await sendNotification(pushSub, payloadString, {
           TTL: 86400, // 24 hours delivery window for offline phones
           urgency: 'high',
         });
