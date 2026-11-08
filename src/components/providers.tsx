@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { ToastProvider } from '@/components/ui/toast';
+import { PushPromptModal } from '@/components/notifications/push-prompt-modal';
 import type { SessionUser } from '@/lib/serialize';
 import type { FeatureFlags } from '@/lib/feature-flags';
 import { FeatureFlagsProvider, useFeatureFlags } from './providers/feature-flags-provider';
@@ -35,7 +36,10 @@ export function Providers({
     <SessionContext.Provider value={user}>
       <FeatureFlagsProvider initialFlags={initialFlags}>
         <SubscriptionProvider initialSettings={initialSubscriptionSettings}>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            {children}
+            <PushPromptModal />
+          </ToastProvider>
         </SubscriptionProvider>
       </FeatureFlagsProvider>
     </SessionContext.Provider>

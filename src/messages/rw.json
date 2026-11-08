@@ -661,7 +661,20 @@
     "SYSTEM": "Itangazo",
     "FAVORITE": "Igicuruzwa cyabitswe",
     "headerSubtitle": "Amakuru ku byo waguze, akazi, n'ubutumwa",
-    "headerSubtitleNoJobs": "Amakuru ku byo waguze n'ubutumwa"
+    "headerSubtitleNoJobs": "Amakuru ku byo waguze n'ubutumwa",
+    "promptTitle": "Komeza Kumenyeshwa Ako Kanya",
+    "promptSubtitle": "Fungura imenyesha kugira ngo ubone ubutumwa bw'ako kanya kuri telefoni cyangwa mudasobwa yawe.",
+    "promptBenefitChatTitle": "Ubutumwa bw'ako kanya",
+    "promptBenefitChatDesc": "Menyeshwa ako kanya igihe umuguzi cyangwa umugurisha akwandikiye.",
+    "promptBenefitItemsTitle": "Ibintu bishya n'ibiciro byagabanutse",
+    "promptBenefitItemsDesc": "Ba uwa mbere mu kumenya igihe ibintu bishya byashyizweho cyangwa ibyo wakunze byagabanuriwe igiciro.",
+    "promptBenefitOrdersTitle": "Ibyatumijwe n'Ubwishyu",
+    "promptBenefitOrdersDesc": "Amakuru y'ako kanya ku byo watumije, ubwishyu burinzwe, n'amafaranga yawe.",
+    "promptAllowBtn": "Emeza Imenyesha",
+    "promptLaterBtn": "Wenda nyuma",
+    "promptEnabling": "Birafungurwa...",
+    "promptSuccess": "Imenyesha ryafunguwe! Ubu uzajya ubona amakuru y'ako kanya.",
+    "promptFooterNote": "Ushobora guhindura ibyo wifuza kumenyeshwaho igihe cyose mu Igenamiterere."
   },
   "profile": {
     "title": "Umwirondoro",

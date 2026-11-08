@@ -661,7 +661,20 @@
     "SYSTEM": "Announcement",
     "FAVORITE": "Listing saved",
     "headerSubtitle": "Updates on your orders, jobs, and messages",
-    "headerSubtitleNoJobs": "Updates on your orders and messages"
+    "headerSubtitleNoJobs": "Updates on your orders and messages",
+    "promptTitle": "Stay Updated in Real Time",
+    "promptSubtitle": "Turn on notifications to get instant alerts on your phone or computer even when Zenova is closed.",
+    "promptBenefitChatTitle": "Instant Chat Messages",
+    "promptBenefitChatDesc": "Immediate alerts when buyers or sellers send you messages.",
+    "promptBenefitItemsTitle": "New Items & Price Drops",
+    "promptBenefitItemsDesc": "Be first to know when new items are posted or your favorites get discounted.",
+    "promptBenefitOrdersTitle": "Orders & Payments",
+    "promptBenefitOrdersDesc": "Real-time updates on your orders, escrow milestones, and payouts.",
+    "promptAllowBtn": "Allow Notifications",
+    "promptLaterBtn": "Maybe Later",
+    "promptEnabling": "Enabling...",
+    "promptSuccess": "Notifications enabled! You will now receive real-time alerts.",
+    "promptFooterNote": "You can change or mute notification preferences anytime in Settings."
   },
   "profile": {
     "title": "Profile",

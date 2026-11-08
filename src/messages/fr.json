@@ -661,7 +661,20 @@
     "SYSTEM": "Annonce",
     "FAVORITE": "Annonce enregistrée",
     "headerSubtitle": "Nouvelles sur vos commandes, emplois et messages",
-    "headerSubtitleNoJobs": "Nouvelles sur vos commandes et messages"
+    "headerSubtitleNoJobs": "Nouvelles sur vos commandes et messages",
+    "promptTitle": "Restez informé en temps réel",
+    "promptSubtitle": "Activez les notifications pour recevoir des alertes instantanées sur votre téléphone ou ordinateur.",
+    "promptBenefitChatTitle": "Messages instantanés",
+    "promptBenefitChatDesc": "Alertes immédiates lorsque des acheteurs ou vendeurs vous envoient un message.",
+    "promptBenefitItemsTitle": "Nouveaux articles et baisses de prix",
+    "promptBenefitItemsDesc": "Soyez le premier informé des nouveaux articles publiés ou de vos favoris en réduction.",
+    "promptBenefitOrdersTitle": "Commandes et paiements",
+    "promptBenefitOrdersDesc": "Mises à jour en direct sur vos commandes, étapes de séquestre et retraits.",
+    "promptAllowBtn": "Autoriser les notifications",
+    "promptLaterBtn": "Plus tard",
+    "promptEnabling": "Activation...",
+    "promptSuccess": "Notifications activées ! Vous recevrez des alertes en direct.",
+    "promptFooterNote": "Vous pouvez modifier ou désactiver les notifications à tout moment dans Paramètres."
   },
   "profile": {
     "title": "Profil",
