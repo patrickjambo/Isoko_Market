@@ -32,7 +32,7 @@ interface Props {
   initialPlan: SubscriptionPlan | null;
   initialExpiresAt: string | null;
   phone: string | null;
-  isSeller: boolean;
+  isSeller?: boolean;
 }
 
 function useCountdown(expiresAt: string | null) {
@@ -65,7 +65,13 @@ function useCountdown(expiresAt: string | null) {
   return remaining;
 }
 
-export function SellerSubscriptionCard({ initialStatus, initialPlan, initialExpiresAt, phone, isSeller }: Props) {
+export function SellerSubscriptionCard({
+  initialStatus,
+  initialPlan,
+  initialExpiresAt,
+  phone,
+  isSeller = true,
+}: Props) {
   const t = useTranslations('subscription');
   const { toast } = useToast();
   const settings = useSubscriptionSettings();
@@ -74,6 +80,28 @@ export function SellerSubscriptionCard({ initialStatus, initialPlan, initialExpi
   const [status, setStatus] = useState<SubscriptionStatus>(initialStatus);
   const [plan, setPlan] = useState<SubscriptionPlan | null>(initialPlan);
   const [expiresAt, setExpiresAt] = useState<string | null>(initialExpiresAt);
+
+  // Sync latest subscription status on mount and focus (e.g. admin grant/revoke)
+  useEffect(() => {
+    async function syncUserSub() {
+      try {
+        const res = await fetch('/api/seller/subscription');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.subscriptionStatus) {
+            setStatus(data.subscriptionStatus);
+            setPlan(data.subscriptionPlan ?? null);
+            setExpiresAt(data.subscriptionExpiresAt ?? null);
+          }
+        }
+      } catch {
+        /* ignore offline/error */
+      }
+    }
+    syncUserSub();
+    window.addEventListener('focus', syncUserSub);
+    return () => window.removeEventListener('focus', syncUserSub);
+  }, []);
 
   // Subscribe dialog state
   const [open, setOpen] = useState(false);
@@ -113,8 +141,8 @@ export function SellerSubscriptionCard({ initialStatus, initialPlan, initialExpi
     [selectedPlan, phoneValue, t, toast]
   );
 
-  // Guard: hide when disabled or not a seller
-  if (!settings.subscriptionEnabled || !isSeller) return null;
+  // Guard: hide when disabled by admin, or if explicitly not a seller
+  if (!settings.subscriptionEnabled || isSeller === false) return null;
 
   const selectedPrice =
     selectedPlan === 'MONTHLY'

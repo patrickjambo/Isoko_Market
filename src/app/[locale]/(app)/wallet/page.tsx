@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Wallet, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
-import type { TransactionType, TransactionStatus } from '@prisma/client';
+import type { TransactionType, TransactionStatus, PaymentProviderName } from '@prisma/client';
 import { redirect } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -17,6 +17,14 @@ const statusVariant: Record<TransactionStatus, 'success' | 'muted' | 'destructiv
   PENDING: 'muted',
   FAILED: 'destructive',
   REFUNDED: 'muted',
+};
+
+/** Human-readable provider labels — never expose the raw DB enum to users. */
+const providerLabel: Record<PaymentProviderName, string> = {
+  MTN_MOMO: 'MTN MoMo',
+  AIRTEL_MONEY: 'Airtel Money',
+  CENTRIPAY: 'CentriPay',
+  MOCK: 'Mobile Money',
 };
 
 export default async function WalletPage({ params }: { params: { locale: string } }) {
@@ -71,7 +79,7 @@ export default async function WalletPage({ params }: { params: { locale: string 
                     {t(`type.${tx.type as TransactionType}`)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {timeAgo(tx.createdAt, params.locale)} · {tx.provider}
+                    {timeAgo(tx.createdAt, params.locale)} · {providerLabel[tx.provider]}
                   </p>
                 </div>
                 <div className="text-right">

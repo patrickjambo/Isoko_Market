@@ -96,7 +96,7 @@ export default async function ProfilePage({ params }: { params: { locale: string
         initialPlan={user.subscriptionPlan as 'MONTHLY' | 'ANNUAL' | null}
         initialExpiresAt={user.subscriptionExpiresAt?.toISOString() ?? null}
         phone={user.phone}
-        isSeller={user.role === 'SELLER'}
+        isSeller={user.role !== 'EMPLOYER' || user.subscriptionStatus !== 'NONE' || listings.length > 0}
       />
 
       <section>
