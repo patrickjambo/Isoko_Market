@@ -89,3 +89,99 @@ self.addEventListener('fetch', (event) => {
     );
   }
 });
+
+/* ==========================================================================
+ * Real-time Native Push Notifications (WhatsApp / YouTube / Social standard)
+ * Delivers instantly to phone lock screens, watches, and notification centers
+ * even when the browser or PWA is completely closed.
+ * ========================================================================== */
+
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  let payload;
+  try {
+    payload = event.data.json();
+  } catch {
+    payload = {
+      title: 'Zenova',
+      body: event.data.text(),
+    };
+  }
+
+  const title = payload.title || 'Zenova';
+  const options = {
+    body: payload.body || '',
+    icon: payload.icon || '/icon-192.png',
+    badge: payload.badge || '/icon-192.png',
+    image: payload.image,
+    tag: payload.tag || 'zenova-alert',
+    renotify: true,
+    vibrate: [120, 60, 120, 60, 200],
+    data: {
+      url: payload.url || (payload.data && payload.data.url) || '/',
+      timestamp: Date.now(),
+    },
+    actions: [
+      {
+        action: 'open',
+        title: 'View',
+      },
+      {
+        action: 'dismiss',
+        title: 'Dismiss',
+      },
+    ],
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'dismiss') {
+    return;
+  }
+
+  const targetUrl = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // If an existing Zenova window is open, focus it and navigate
+        for (const client of clientList) {
+          if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+            if ('navigate' in client) {
+              client.navigate(targetUrl);
+            }
+            return client.focus();
+          }
+        }
+        // Otherwise, open a fresh window
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(targetUrl);
+        }
+      })
+  );
+});
+
+// Automatic token resync if browser rotates push subscription credentials
+self.addEventListener('pushsubscriptionchange', (event) => {
+  event.waitUntil(
+    self.registration.pushManager
+      .subscribe(event.oldSubscription ? event.oldSubscription.options : { userVisibleOnly: true })
+      .then((subscription) => {
+        return fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(subscription.toJSON()),
+        });
+      })
+      .catch(() => {
+        /* best-effort resync */
+      })
+  );
+});
+

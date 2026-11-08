@@ -322,6 +322,8 @@ model User {
   reviewsWritten      Review[]                  @relation("ReviewAuthor")
   reviewsReceived     Review[]                  @relation("ReviewSubject")
   notifications       Notification[]
+  pushSubscriptions   PushSubscription[]
+  notificationPreferences NotificationPreference?
   reportsFiled        Report[]                  @relation("Reporter")
   verificationReviews VerificationRequest[]     @relation("VerificationReviewer")
   verificationRequest VerificationRequest?
@@ -811,6 +813,34 @@ model Notification {
 
   @@index([userId, readAt])
   @@index([userId, createdAt])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model NotificationPreference {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pushEnabled    Boolean  @default(true) // master switch
+  notifyMessages Boolean  @default(true) // chat / messages
+  notifyOrders   Boolean  @default(true) // purchases, sales, escrow, payments
+  notifyListings Boolean  @default(true) // favorites, alerts, listing updates
+  notifyJobs     Boolean  @default(true) // job applications, updates
+  notifySystem   Boolean  @default(true) // verification, subscription, platform notices
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 // ─────────────────────── Support / Help desk ────────────────

@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link, redirect } from '@/i18n/routing';
 import { getCurrentUser } from '@/lib/auth';
 import { SettingsForm } from '@/components/profile/settings-form';
+import { PushNotificationCard } from '@/components/notifications/push-notification-card';
 
 export default async function SettingsPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
@@ -30,6 +31,10 @@ export default async function SettingsPage({ params }: { params: { locale: strin
           payoutKind: user.payoutKind,
         }}
       />
+
+      <div className="mt-8">
+        <PushNotificationCard />
+      </div>
     </div>
   );
 }

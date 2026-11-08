@@ -22,6 +22,12 @@ const schema = z.object({
   PAYMENTS_WEBHOOK_SECRET: z.string().optional(),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 
+  // Web Push Notifications (VAPID RFC 8292) — completely free, cross-platform push
+  // for all modern browsers & devices (Android Chrome, iOS Safari 16.4+, PWA, Desktop).
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().default('BNGZY0XmsE2FdHVmBKDOIqzr-I6Hb0BkgILMqAOCtNg2-VOSltKEZGB_vWv5UfCF-stofE56ctoYNaxYgC4pkqY'),
+  VAPID_PRIVATE_KEY: z.string().default('pHIMv5iAR0SV9AcnF1AZoTy069qofABfey7YP5PeUXo'),
+  VAPID_SUBJECT: z.string().default('mailto:support@zenova.rw'),
+
   // Email is the auth/OTP + notification channel (replaces SMS). `console` prints
   // to the server log for local dev; `resend`/`brevo` send real email once the
   // matching key is set. Brevo delivers to any recipient after a single verified

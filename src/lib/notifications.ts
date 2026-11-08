@@ -4,6 +4,7 @@ import { prisma } from './prisma';
 import { publish, isOnline } from './realtime';
 import { sendNotificationEmail } from './email';
 import { background } from './background';
+import { sendPushNotification } from './push';
 
 // High-signal notifications worth an email when the user is offline.
 const EMAIL_FALLBACK_TYPES: NotificationType[] = [
@@ -52,6 +53,28 @@ export async function notify(params: {
       createdAt: notification.createdAt.toISOString(),
     },
   });
+
+  // Native Web Push delivery to phone lock screens and notification panels.
+  // Dispatched in the background so it never blocks the request or DB commit.
+  const payloadRecord =
+    params.payload && typeof params.payload === 'object' && !Array.isArray(params.payload)
+      ? (params.payload as Record<string, unknown>)
+      : null;
+  const conversationId = payloadRecord?.conversationId;
+  const tag = conversationId
+    ? `conv-${conversationId}`
+    : `notif-${params.type.toLowerCase()}-${notification.id}`;
+
+  background(() =>
+    sendPushNotification({
+      userId: params.userId,
+      title: params.title,
+      body: params.body,
+      url: params.href,
+      tag,
+      type: params.type,
+    })
+  );
 
   // Email fallback for offline users — runs AFTER the response so it never blocks
   // the caller, but via waitUntil so it actually completes on serverless (a bare

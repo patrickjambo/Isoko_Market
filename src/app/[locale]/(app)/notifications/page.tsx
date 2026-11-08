@@ -15,6 +15,7 @@ import { Link, redirect } from '@/i18n/routing';
 import { EmptyState } from '@/components/shared/empty-state';
 import { PageHeader } from '@/components/shared/page-header';
 import { MarkAllReadButton } from '@/components/notifications/mark-all-read';
+import { PushBanner } from '@/components/notifications/push-banner';
 import { PollRefresh } from '@/components/shared/poll-refresh';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -64,6 +65,8 @@ export default async function NotificationsPage({ params }: { params: { locale: 
         subtitle={jobsAny ? t('headerSubtitle') : t('headerSubtitleNoJobs')}
         action={notifications.some((n) => !n.readAt) ? <MarkAllReadButton /> : undefined}
       />
+
+      <PushBanner />
 
       {notifications.length === 0 ? (
         <EmptyState icon={Bell} title={t('empty')} />
