@@ -1,13 +1,12 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Package, Briefcase, FileText, Wallet, ChevronRight, Crown } from 'lucide-react';
+import { Package, Briefcase, FileText, Wallet, ChevronRight } from 'lucide-react';
 import { Link, redirect } from '@/i18n/routing';
 import { ProfileHeader } from '@/components/profile/profile-header';
 import { ListingCard } from '@/components/marketplace/listing-card';
 import { EmptyState } from '@/components/shared/empty-state';
-import { PaymentButton } from '@/components/payments/payment-button';
+import { SellerSubscriptionCard } from '@/components/profile/seller-subscription-card';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { PRICING, SUBSCRIPTION_DURATION_DAYS } from '@/lib/pricing';
 import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +20,6 @@ export default async function ProfilePage({ params }: { params: { locale: string
   }
 
   const t = await getTranslations('profile');
-  const tp = await getTranslations('premium');
 
   const [flags, listings, ratingAgg, reviewCount, counts] = await Promise.all([
     getFeatureFlags(),
@@ -92,35 +90,14 @@ export default async function ProfilePage({ params }: { params: { locale: string
         })}
       </div>
 
-      {/* Premium — verified-seller subscription (Section 6.2) */}
-      <section className="rounded-2xl border border-accent/30 bg-accent/5 p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent">
-              <Crown className="h-6 w-6" />
-            </div>
-            <div>
-              <h2 className="flex items-center gap-2 font-semibold">
-                {tp('subscriptionTitle')}
-                <span className="text-sm font-normal text-muted-foreground">
-                  RWF {PRICING.VERIFIED_SUBSCRIPTION.toLocaleString()} {tp('perMonth')}
-                </span>
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {tp('subscriptionBody', { days: SUBSCRIPTION_DURATION_DAYS })}
-              </p>
-            </div>
-          </div>
-          <PaymentButton
-            type="SUBSCRIPTION"
-            amount={PRICING.VERIFIED_SUBSCRIPTION}
-            label={tp('subscribeCta')}
-            title={tp('subscriptionTitle')}
-            description={tp('subscriptionBody', { days: SUBSCRIPTION_DURATION_DAYS })}
-            icon="badge"
-          />
-        </div>
-      </section>
+      {/* Seller subscription card — realtime, admin-controlled */}
+      <SellerSubscriptionCard
+        initialStatus={user.subscriptionStatus as 'NONE' | 'ACTIVE' | 'EXPIRED' | 'GRACE'}
+        initialPlan={user.subscriptionPlan as 'MONTHLY' | 'ANNUAL' | null}
+        initialExpiresAt={user.subscriptionExpiresAt?.toISOString() ?? null}
+        phone={user.phone}
+        isSeller={user.role === 'SELLER'}
+      />
 
       <section>
         <h2 className="mb-3 text-lg font-semibold">{t('myListings')}</h2>

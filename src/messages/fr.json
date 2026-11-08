@@ -1530,6 +1530,26 @@
     "totalRevenue": "Revenus totaux",
     "expiringSoon": "Expire bientôt",
     "grantSub": "Accorder un abonnement",
-    "revokeSub": "Révoquer"
+    "revokeSub": "Révoquer",
+    "cardTitle": "Abonnement vendeur",
+    "cardSubtitle": "Abonnez-vous pour débloquer une visibilité premium et le badge abonné.",
+    "statusActiveTitle": "Abonnement actif",
+    "statusGraceTitle": "Période de grâce",
+    "statusExpiredTitle": "Abonnement expiré",
+    "statusNoneTitle": "Aucun abonnement actif",
+    "daysRemaining": "{days}j {hours}h restants",
+    "expiresOn": "Expire le {date}",
+    "expiredOn": "Expiré le {date}",
+    "renewNow": "Renouveler maintenant",
+    "subscribeCta": "S'abonner",
+    "choosePlan": "Choisir un plan",
+    "planMonthlyDesc": "Mensuel — RWF {price}",
+    "planAnnualDesc": "Annuel — RWF {price}",
+    "phoneLabel": "Numéro MoMo",
+    "phonePlaceholder": "+250 7XX XXX XXX",
+    "payNow": "Payer RWF {amount}",
+    "graceDesc": "Votre abonnement a expiré. Vous bénéficiez d'une période de grâce — renouvelez maintenant pour rester actif.",
+    "expiredDesc": "Votre abonnement est terminé. Abonnez-vous à nouveau pour retrouver vos avantages vendeur.",
+    "noneDesc": "Obtenez le badge vendeur vérifié, une priorité dans les résultats de recherche, et bien plus encore."
   }
 }

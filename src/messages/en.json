@@ -1530,6 +1530,26 @@
     "totalRevenue": "Total revenue",
     "expiringSoon": "Expiring soon",
     "grantSub": "Grant subscription",
-    "revokeSub": "Revoke"
+    "revokeSub": "Revoke",
+    "cardTitle": "Seller Subscription",
+    "cardSubtitle": "Subscribe to unlock premium visibility and the subscriber badge.",
+    "statusActiveTitle": "Subscription Active",
+    "statusGraceTitle": "Grace Period",
+    "statusExpiredTitle": "Subscription Expired",
+    "statusNoneTitle": "No Active Subscription",
+    "daysRemaining": "{days}d {hours}h remaining",
+    "expiresOn": "Expires {date}",
+    "expiredOn": "Expired {date}",
+    "renewNow": "Renew Now",
+    "subscribeCta": "Subscribe",
+    "choosePlan": "Choose a Plan",
+    "planMonthlyDesc": "Monthly — RWF {price}",
+    "planAnnualDesc": "Annual — RWF {price}",
+    "phoneLabel": "MoMo phone number",
+    "phonePlaceholder": "+250 7XX XXX XXX",
+    "payNow": "Pay RWF {amount}",
+    "graceDesc": "Your subscription has expired. You have a grace period — renew now to stay active.",
+    "expiredDesc": "Your subscription has ended. Subscribe again to restore your seller benefits.",
+    "noneDesc": "Get verified seller badge, priority in search results, and more."
   }
 }

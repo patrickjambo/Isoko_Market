@@ -73,7 +73,15 @@ export const POST = route(async (req: NextRequest) => {
     );
   }
 
-  return jsonOk({ transaction: { id: transaction.id, status: result.status }, result });
+  const subscriptionExpiresAt =
+    result.status === 'SUCCESS'
+      ? new Date(
+          Date.now() +
+            (input.plan === 'MONTHLY' ? DAYS_MONTHLY : DAYS_ANNUAL) * 24 * 60 * 60 * 1000
+        ).toISOString()
+      : null;
+
+  return jsonOk({ transaction: { id: transaction.id, status: result.status }, result, subscriptionExpiresAt });
 });
 
 /**

@@ -35,6 +35,19 @@ export const POST = route(async (req: NextRequest) => {
         data: { walletBalance: { increment: amount } },
       });
     }
+    if (input.type === 'SUBSCRIPTION') {
+      const plan = (input.metadata?.plan as 'MONTHLY' | 'ANNUAL') ?? 'MONTHLY';
+      const days = plan === 'ANNUAL' ? 365 : 30;
+      const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          subscriptionStatus: 'ACTIVE',
+          subscriptionPlan: plan,
+          subscriptionExpiresAt: expiresAt,
+        },
+      });
+    }
     if (input.type === 'FEATURED_LISTING' && input.metadata?.listingId) {
       const listingId = input.metadata.listingId;
       const owned = await prisma.listing.findFirst({

@@ -1530,6 +1530,26 @@
     "totalRevenue": "Amafaranga yose",
     "expiringSoon": "Bizarangira vuba",
     "grantSub": "Ha kwiyandikisha",
-    "revokeSub": "Hagarika"
+    "revokeSub": "Hagarika",
+    "cardTitle": "Kwiyandikisha kw'Umucuruzi",
+    "cardSubtitle": "Iyandikishe kugira ngo ubone imbonerahamwe nziza n'ikimenyetso cy'uyiyandikishije.",
+    "statusActiveTitle": "Kwiyandikisha Bikorwa",
+    "statusGraceTitle": "Igihe cy'Ineza",
+    "statusExpiredTitle": "Kwiyandikisha Byarangiye",
+    "statusNoneTitle": "Nta Kwiyandikisha Bikorwa",
+    "daysRemaining": "{days}d {hours}h bisigaye",
+    "expiresOn": "Bizarangira ku wa {date}",
+    "expiredOn": "Byarangiye ku wa {date}",
+    "renewNow": "Ongera usubire",
+    "subscribeCta": "Iyandikishe",
+    "choosePlan": "Hitamo Gahunda",
+    "planMonthlyDesc": "Buri kwezi — RWF {price}",
+    "planAnnualDesc": "Buri mwaka — RWF {price}",
+    "phoneLabel": "Nomero ya MoMo",
+    "phonePlaceholder": "+250 7XX XXX XXX",
+    "payNow": "Ishyura RWF {amount}",
+    "graceDesc": "Kwiyandikisha kwawe byarangiye. Ufite igihe cy'ineza — subiramo ngo ukomeze kuba muri sisitemu.",
+    "expiredDesc": "Kwiyandikisha kwawe byarangiye burundu. Iyandikishe nanone kugira ngo ugarure inzira z'umucuruzi.",
+    "noneDesc": "Bona ikimenyetso cy'umucuruzi wemejwe, utuwe neza mu bisubizo bya gushaka, n'ibindi byinshi."
   }
 }
