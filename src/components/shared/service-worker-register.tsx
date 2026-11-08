@@ -12,6 +12,24 @@ export function ServiceWorkerRegister() {
   useEffect(() => {
     if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
 
+    // In local development, unregister any service worker so it never intercepts
+    // localhost requests or serves the offline fallback page.
+    if (
+      process.env.NODE_ENV !== 'production' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+    ) {
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((registrations) => {
+          for (const reg of registrations) {
+            reg.unregister();
+          }
+        })
+        .catch(() => {});
+      return;
+    }
+
     const register = async () => {
       try {
         const reg = await navigator.serviceWorker.register('/sw.js');

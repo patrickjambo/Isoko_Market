@@ -18,7 +18,7 @@
  *
  * Bump VERSION on each deploy that changes precached assets to drop old caches.
  */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const STATIC_CACHE = `zenova-static-${VERSION}`;
 const PRECACHE = [
   '/offline.html',
@@ -61,6 +61,11 @@ function isStaticAsset(url) {
 }
 
 self.addEventListener('fetch', (event) => {
+  // In local development, bypass caching and offline shell completely
+  if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+    return;
+  }
+
   const { request } = event;
   if (request.method !== 'GET') return; // never touch mutations
   const url = new URL(request.url);
