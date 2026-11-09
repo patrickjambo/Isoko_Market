@@ -1579,5 +1579,13 @@
     "graceDesc": "Your subscription has expired. You have a grace period — renew now to stay active.",
     "expiredDesc": "Your subscription has ended. Subscribe again to restore your seller benefits.",
     "noneDesc": "Get verified seller badge, priority in search results, and more."
+  },
+  "community": {
+    "title": "Our Community Speaks",
+    "subtitle": "Trusted by thousands of Rwandans for a better and more connected community.",
+    "basedOn": "Based on 2,500+ reviews",
+    "feedbackTitle": "Share Your Feedback",
+    "feedbackSubtitle": "Have a suggestion or experience to share with us?",
+    "feedbackCta": "Leave a Comment"
   }
 }

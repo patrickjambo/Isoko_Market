@@ -1579,5 +1579,13 @@
     "graceDesc": "Votre abonnement a expiré. Vous bénéficiez d'une période de grâce — renouvelez maintenant pour rester actif.",
     "expiredDesc": "Votre abonnement est terminé. Abonnez-vous à nouveau pour retrouver vos avantages vendeur.",
     "noneDesc": "Obtenez le badge vendeur vérifié, une priorité dans les résultats de recherche, et bien plus encore."
+  },
+  "community": {
+    "title": "Notre Communauté Parle",
+    "subtitle": "Approuvé par des milliers de Rwandais pour une communauté meilleure et plus connectée.",
+    "basedOn": "Basé sur 2 500+ avis",
+    "feedbackTitle": "Partagez Votre Avis",
+    "feedbackSubtitle": "Une suggestion ou une expérience à partager avec nous ?",
+    "feedbackCta": "Laisser un Commentaire"
   }
 }

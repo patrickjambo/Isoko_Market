@@ -33,6 +33,7 @@ import {
 } from '@/lib/queries';
 import { getCurrentUser } from '@/lib/auth';
 import { getFeatureFlags } from '@/lib/feature-flags';
+import { CommunitySection } from '@/components/landing/community-section';
 
 export default async function HomePage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
@@ -290,6 +291,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
           </div>
         </section>
       )}
+
+      {/* Community testimonials + WhatsApp feedback — visible to all visitors */}
+      <CommunitySection />
 
       {/* How it works + closing CTA — conversion sections for guests only. */}
       {!user && (

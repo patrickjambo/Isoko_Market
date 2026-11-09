@@ -1579,5 +1579,13 @@
     "graceDesc": "Kwiyandikisha kwawe byarangiye. Ufite igihe cy'ineza — subiramo ngo ukomeze kuba muri sisitemu.",
     "expiredDesc": "Kwiyandikisha kwawe byarangiye burundu. Iyandikishe nanone kugira ngo ugarure inzira z'umucuruzi.",
     "noneDesc": "Bona ikimenyetso cy'umucuruzi wemejwe, utuwe neza mu bisubizo bya gushaka, n'ibindi byinshi."
+  },
+  "community": {
+    "title": "Umuryango Wacu Uvuga",
+    "subtitle": "Byizirwa n'ibihumbi by'Abanyarwanda kuri sosiyete nziza kandi ifite itumanaho ryiza.",
+    "basedOn": "Hashingiwe ku bisubizo 2,500+",
+    "feedbackTitle": "Sangira Ibitekerezo Byawe",
+    "feedbackSubtitle": "Ufite inama cyangwa inzira yo gusangira natwe?",
+    "feedbackCta": "Siga Igitekerezo"
   }
 }
