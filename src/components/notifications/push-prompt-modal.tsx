@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import {
-  BellRing,
+  Bell,
   MessageSquare,
   Sparkles,
   ShieldCheck,
@@ -62,7 +62,7 @@ export function PushPromptModal() {
       if (!isMounted) return;
       if (sub) return;
 
-      // Natural delay of 3 seconds so the user is engaged with the page first
+      // Natural delay of 3 seconds so user is engaged first
       const timer = setTimeout(() => {
         if (isMounted) setOpen(true);
       }, 3000);
@@ -85,18 +85,26 @@ export function PushPromptModal() {
   }
 
   async function handleAllow() {
+    if (loading) return;
     setLoading(true);
+
     try {
-      const res = await subscribeToPushNotifications();
-      if (res.success) {
-        setOpen(false);
+      // 1. Immediately request browser notification permission
+      const permission = await Notification.requestPermission();
+
+      // 2. Automatically and instantly close the modal the moment the user responds
+      setOpen(false);
+
+      if (permission === 'granted') {
         toast(t('promptSuccess'), 'success');
+
+        // Complete the service worker and server push registration in the background
+        subscribeToPushNotifications().catch(() => {});
       } else {
         snooze();
-        if (res.error && !res.error.includes('dismissed')) {
-          toast(res.error, 'error');
-        }
       }
+    } catch {
+      snooze();
     } finally {
       setLoading(false);
     }
@@ -104,116 +112,86 @@ export function PushPromptModal() {
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => (!isOpen ? snooze() : setOpen(true))}>
-      <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl border border-border shadow-2xl sm:max-w-md">
-        {/* Header with Zenova Brand Gradient */}
-        <div className="relative bg-gradient-to-br from-primary via-primary/95 to-accent p-6 text-white text-center">
-          <button
-            type="button"
-            onClick={snooze}
-            className="absolute right-4 top-4 rounded-full p-1 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[360px] p-5 rounded-2xl border border-border bg-card shadow-xl sm:max-w-[360px]">
+        {/* Close Button */}
+        <button
+          type="button"
+          onClick={snooze}
+          className="absolute right-3.5 top-3.5 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label="Close"
+        >
+          <X className="h-4 w-4" />
+        </button>
 
-          {/* Animated Bell Tile */}
-          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-md ring-8 ring-white/10 shadow-inner">
-            <BellRing className="h-8 w-8 text-white animate-bounce" style={{ animationDuration: '2s' }} />
+        {/* Compact Header with Icon Tile */}
+        <div className="flex items-start gap-3 pt-0.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Bell className="h-5 w-5" />
           </div>
-
-          <DialogHeader className="space-y-1 text-center">
-            <DialogTitle className="text-xl font-bold text-white tracking-tight">
+          <DialogHeader className="space-y-0.5 text-left pr-4">
+            <DialogTitle className="text-base font-semibold leading-tight text-foreground">
               {t('promptTitle')}
             </DialogTitle>
-            <DialogDescription className="text-xs text-white/85 max-w-xs mx-auto leading-relaxed">
+            <DialogDescription className="text-xs text-muted-foreground leading-snug">
               {t('promptSubtitle')}
             </DialogDescription>
           </DialogHeader>
         </div>
 
-        {/* Real-time Benefits List */}
-        <div className="p-5 space-y-3.5 bg-card">
-          {/* Chat Messages */}
-          <div className="flex items-start gap-3 rounded-xl bg-muted/40 p-2.5 transition-colors">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary mt-0.5">
-              <MessageSquare className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-foreground">
-                {t('promptBenefitChatTitle')}
-              </p>
-              <p className="text-xs text-muted-foreground leading-snug">
-                {t('promptBenefitChatDesc')}
-              </p>
-            </div>
+        {/* Compact Benefit Highlights (Clean single-line rows) */}
+        <div className="space-y-2 py-2">
+          <div className="flex items-center gap-2.5 rounded-lg bg-muted/40 px-3 py-2 text-xs">
+            <MessageSquare className="h-3.5 w-3.5 shrink-0 text-primary" />
+            <span className="text-foreground font-medium truncate">
+              {t('promptBenefitChatTitle')}
+            </span>
           </div>
 
-          {/* New Items & Deals */}
-          <div className="flex items-start gap-3 rounded-xl bg-muted/40 p-2.5 transition-colors">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent mt-0.5">
-              <Sparkles className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-foreground">
-                {t('promptBenefitItemsTitle')}
-              </p>
-              <p className="text-xs text-muted-foreground leading-snug">
-                {t('promptBenefitItemsDesc')}
-              </p>
-            </div>
+          <div className="flex items-center gap-2.5 rounded-lg bg-muted/40 px-3 py-2 text-xs">
+            <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-500" />
+            <span className="text-foreground font-medium truncate">
+              {t('promptBenefitItemsTitle')}
+            </span>
           </div>
 
-          {/* Orders & Payments */}
-          <div className="flex items-start gap-3 rounded-xl bg-muted/40 p-2.5 transition-colors">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 mt-0.5">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-foreground">
-                {t('promptBenefitOrdersTitle')}
-              </p>
-              <p className="text-xs text-muted-foreground leading-snug">
-                {t('promptBenefitOrdersDesc')}
-              </p>
-            </div>
+          <div className="flex items-center gap-2.5 rounded-lg bg-muted/40 px-3 py-2 text-xs">
+            <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+            <span className="text-foreground font-medium truncate">
+              {t('promptBenefitOrdersTitle')}
+            </span>
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="pt-2 flex flex-col gap-2">
-            <Button
-              type="button"
-              onClick={handleAllow}
-              disabled={loading}
-              className="w-full h-11 text-sm font-semibold gap-2 shadow-md"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  {t('promptEnabling')}
-                </>
-              ) : (
-                <>
-                  <BellRing className="h-4 w-4" />
-                  {t('promptAllowBtn')}
-                </>
-              )}
-            </Button>
+        {/* Compact Action Buttons */}
+        <div className="flex flex-col gap-1.5 pt-1">
+          <Button
+            type="button"
+            onClick={handleAllow}
+            disabled={loading}
+            className="w-full h-10 text-xs font-semibold gap-1.5 rounded-xl shadow-sm"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                {t('promptEnabling')}
+              </>
+            ) : (
+              <>
+                <Bell className="h-3.5 w-3.5" />
+                {t('promptAllowBtn')}
+              </>
+            )}
+          </Button>
 
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={snooze}
-              disabled={loading}
-              className="w-full h-9 text-xs text-muted-foreground hover:text-foreground"
-            >
-              {t('promptLaterBtn')}
-            </Button>
-          </div>
-
-          {/* Footer reassurance note */}
-          <p className="text-center text-[11px] text-muted-foreground/80 px-2">
-            {t('promptFooterNote')}
-          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={snooze}
+            disabled={loading}
+            className="w-full h-8 text-xs text-muted-foreground hover:text-foreground"
+          >
+            {t('promptLaterBtn')}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
