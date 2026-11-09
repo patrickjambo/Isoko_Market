@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { Logo } from '@/components/brand/logo';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, MessageCircle } from 'lucide-react';
 
 export async function Footer() {
   const t = await getTranslations('footer');
@@ -30,6 +30,15 @@ export async function Footer() {
           <Link href="/terms" className="text-muted-foreground hover:text-foreground">
             {t('terms')}
           </Link>
+          <a
+            href="https://wa.me/79365299465?text=Hello%20Zenova%20Support%2C%20I%20need%20help%20or%20more%20information."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="col-span-2 mt-1 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <MessageCircle className="h-3.5 w-3.5 text-[#25D366]" />
+            <span>WhatsApp: +7 936 529-94-65</span>
+          </a>
         </nav>
       </div>
       <div className="border-t border-border py-4">

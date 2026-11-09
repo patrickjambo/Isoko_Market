@@ -1586,6 +1586,24 @@
     "basedOn": "Hashingiwe ku bisubizo 2,500+",
     "feedbackTitle": "Sangira Ibitekerezo Byawe",
     "feedbackSubtitle": "Ufite inama cyangwa inzira yo gusangira natwe?",
-    "feedbackCta": "Siga Igitekerezo"
+    "feedbackCta": "Siga Igitekerezo",
+    "modalTitle": "Siga Igitekerezo & Ubuhamya",
+    "modalSubtitle": "Sangiza uko ubona Zenova. Ubuhamya bwawe buzagaragara ku rubuga rwa Zenova!",
+    "nameLabel": "Amazina yawe",
+    "namePlaceholder": "urug. Uwase Aline",
+    "ratingLabel": "Amanota",
+    "commentLabel": "Igitekerezo cyangwa ubuhamya bwawe",
+    "commentPlaceholder": "Tubwire uko byagenze uguze, ucuruza cyangwa ukoresha Zenova...",
+    "submitBtn": "Ohereza Igitekerezo",
+    "submitting": "Kiri koherezwa...",
+    "cancelBtn": "Hagarika",
+    "successToast": "Urakoze! Igitekerezo cyawe cyakiriwe kandi kiri kugaragara.",
+    "errorToast": "Kiri koherezwa byanze. Ongera ugerageze.",
+    "justNow": "Ubu ngubu",
+    "helpSectionTitle": "Ukeneye Ubufasha cyangwa Amakuru Arambuye?",
+    "helpSectionSubtitle": "Ufite ikibazo, ukeneye ubufasha cyangwa ibisobanuro? Vugana natwe ako kanya kuri WhatsApp.",
+    "whatsappCta": "Vugana natwe kuri WhatsApp",
+    "whatsappSupportNumber": "+7 936 529-94-65",
+    "whatsappFloatingTooltip": "Ukeneye ubufasha? Tuvugishe kuri WhatsApp"
   }
 }

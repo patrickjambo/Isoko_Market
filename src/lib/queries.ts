@@ -634,3 +634,26 @@ export const getCategories = unstable_cache(
   ['categories'],
   { tags: ['categories'], revalidate: 3600 }
 );
+
+/**
+ * Public testimonials for the community section on the landing page.
+ */
+export async function getLandingFeedbacks() {
+  try {
+    return await prisma.landingFeedback.findMany({
+      where: { status: 'APPROVED' },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      select: {
+        id: true,
+        name: true,
+        comment: true,
+        rating: true,
+        createdAt: true,
+      },
+    });
+  } catch {
+    return [];
+  }
+}
+

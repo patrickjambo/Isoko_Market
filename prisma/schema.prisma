@@ -341,6 +341,7 @@ model User {
   serviceRequestsReceived ServiceRequest[]      @relation("ServiceProvider")
   listingViews        ListingView[]
   savedSearches       SavedSearch[]
+  landingFeedbacks    LandingFeedback[]
 
   @@index([role])
   @@index([location])
@@ -940,6 +941,29 @@ model Review {
   @@unique([reviewerId, revieweeId, transactionId])
   @@index([revieweeId])
   @@index([listingId])
+}
+
+// Public testimonials submitted via the "Leave a Comment" form on the landing
+// page. Approved ones appear in the community carousel.
+model LandingFeedback {
+  id        String               @id @default(cuid())
+  name      String               // display name (required)
+  comment   String               // the testimonial text
+  rating    Int                  @default(5) // 1..5
+  status    LandingFeedbackStatus @default(APPROVED)
+  userId    String?              // optional — if the submitter is signed in
+  user      User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum LandingFeedbackStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model Report {

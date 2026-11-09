@@ -1586,6 +1586,24 @@
     "basedOn": "Based on 2,500+ reviews",
     "feedbackTitle": "Share Your Feedback",
     "feedbackSubtitle": "Have a suggestion or experience to share with us?",
-    "feedbackCta": "Leave a Comment"
+    "feedbackCta": "Leave a Comment",
+    "modalTitle": "Leave a Comment & Review",
+    "modalSubtitle": "Share your experience with Zenova. Your review will appear on our community page!",
+    "nameLabel": "Your Name",
+    "namePlaceholder": "e.g. Uwase Aline",
+    "ratingLabel": "Rating",
+    "commentLabel": "Your Review / Feedback",
+    "commentPlaceholder": "Tell us about your experience buying, selling, or using Zenova...",
+    "submitBtn": "Post Review",
+    "submitting": "Posting...",
+    "cancelBtn": "Cancel",
+    "successToast": "Thank you! Your review has been posted and is now live.",
+    "errorToast": "Failed to submit review. Please try again.",
+    "justNow": "Just now",
+    "helpSectionTitle": "Need Help or More Information?",
+    "helpSectionSubtitle": "Have questions, need assistance, or facing any issue? Chat directly with our support on WhatsApp.",
+    "whatsappCta": "Chat on WhatsApp",
+    "whatsappSupportNumber": "+7 936 529-94-65",
+    "whatsappFloatingTooltip": "Need help? Chat with us"
   }
 }

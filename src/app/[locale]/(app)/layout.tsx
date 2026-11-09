@@ -7,6 +7,7 @@ import { InstallBanner } from '@/components/shared/install-banner';
 import { getFeatureFlags } from '@/lib/feature-flags';
 import { getCurrentUser } from '@/lib/auth';
 import { VerificationNudge } from '@/components/onboarding/verification-nudge';
+import { WhatsAppFloatingButton } from '@/components/support/whatsapp-support';
 
 /**
  * Authenticated/app chrome: persistent top nav (desktop) + bottom tab bar
@@ -41,6 +42,7 @@ export default async function AppLayout({
       <BackButton />
       <main className="flex-1 pb-24 md:pb-0 min-w-0 max-w-full">{children}</main>
       <Footer />
+      <WhatsAppFloatingButton />
       <BottomNav jobsEnabled={flags.jobsEnabled} />
     </div>
   );

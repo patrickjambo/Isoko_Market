@@ -30,10 +30,12 @@ import {
   getLatestJobs,
   getLatestServices,
   getPlatformStats,
+  getLandingFeedbacks,
 } from '@/lib/queries';
 import { getCurrentUser } from '@/lib/auth';
 import { getFeatureFlags } from '@/lib/feature-flags';
 import { CommunitySection } from '@/components/landing/community-section';
+import { WhatsAppHelpBanner } from '@/components/support/whatsapp-support';
 
 export default async function HomePage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
@@ -45,13 +47,14 @@ export default async function HomePage({ params }: { params: { locale: string } 
   // `getPlatformSettings` is wrapped with React `cache()` so all these calls
   // that go through `getFeatureFlags()` → `getPlatformSettings()` share a
   // single DB round-trip with the root layout and app-shell layout fetches.
-  const [flags, listings, services, stats, user, jobs] = await Promise.all([
+  const [flags, listings, services, stats, user, jobs, feedbacks] = await Promise.all([
     getFeatureFlags(),
     getFeaturedListings(8),
     getLatestServices(4),
     getPlatformStats(),
     getCurrentUser(),
     getLatestJobs(6),
+    getLandingFeedbacks(),
   ]);
 
   // Filter out jobs if the feature is disabled — the fetch already returned
@@ -292,9 +295,6 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </section>
       )}
 
-      {/* Community testimonials + WhatsApp feedback — visible to all visitors */}
-      <CommunitySection />
-
       {/* How it works + closing CTA — conversion sections for guests only. */}
       {!user && (
       <>
@@ -357,6 +357,12 @@ export default async function HomePage({ params }: { params: { locale: string } 
       </section>
       </>
       )}
+
+      {/* Community testimonials & real reviews left by users */}
+      <CommunitySection initialFeedbacks={feedbacks} />
+
+      {/* WhatsApp Help & Support — directs questions and issues to WhatsApp */}
+      <WhatsAppHelpBanner />
     </div>
   );
 }

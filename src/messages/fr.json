@@ -1586,6 +1586,24 @@
     "basedOn": "Basé sur 2 500+ avis",
     "feedbackTitle": "Partagez Votre Avis",
     "feedbackSubtitle": "Une suggestion ou une expérience à partager avec nous ?",
-    "feedbackCta": "Laisser un Commentaire"
+    "feedbackCta": "Laisser un Commentaire",
+    "modalTitle": "Laisser un Commentaire & Avis",
+    "modalSubtitle": "Partagez votre expérience avec Zenova. Votre avis apparaîtra sur notre page d'accueil !",
+    "nameLabel": "Votre Nom",
+    "namePlaceholder": "ex. Uwase Aline",
+    "ratingLabel": "Note",
+    "commentLabel": "Votre Avis / Commentaire",
+    "commentPlaceholder": "Racontez-nous votre expérience d'achat, de vente ou d'utilisation de Zenova...",
+    "submitBtn": "Publier l'Avis",
+    "submitting": "Publication...",
+    "cancelBtn": "Annuler",
+    "successToast": "Merci ! Votre avis a été publié et est maintenant en ligne.",
+    "errorToast": "Échec de l'envoi de l'avis. Veuillez réessayer.",
+    "justNow": "À l'instant",
+    "helpSectionTitle": "Besoin d'Aide ou de Renseignements ?",
+    "helpSectionSubtitle": "Vous avez des questions, besoin d'aide ou un problème ? Discutez directement avec nous sur WhatsApp.",
+    "whatsappCta": "Discuter sur WhatsApp",
+    "whatsappSupportNumber": "+7 936 529-94-65",
+    "whatsappFloatingTooltip": "Besoin d'aide ? Écrivez-nous"
   }
 }
