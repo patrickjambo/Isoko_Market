@@ -25,6 +25,7 @@ import {
   Menu,
   X,
   Crown,
+  Database,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -118,6 +119,7 @@ export function AdminShell({
       { href: '/admin/subscriptions', label: t('subscriptionsTitle'), icon: Crown, perm: 'users.view' },
       { href: '/admin/partners', label: t('partners'), icon: Handshake, perm: 'partners.view' },
       { href: '/admin/settings', label: t('settingsTitle'), icon: Settings, perm: 'settings.view' },
+      { href: '/admin/backups', label: t('backupsTitle'), icon: Database, perm: 'backup.view' },
       { href: '/admin/content', label: t('content'), icon: Languages, perm: 'content.view' },
       { href: '/admin/roles', label: t('rolesPanel'), icon: KeyRound, perm: 'roles.view' },
       { href: '/admin/audit', label: t('auditLog'), icon: ScrollText, perm: 'audit.view' },

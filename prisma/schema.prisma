@@ -308,6 +308,9 @@ model User {
   statusReason       String? // reason for suspend/ban (audit trail)
   sessionVersion     Int                @default(0) // bump to revoke all existing sessions
   lastActiveAt       DateTime?
+  nationalId         String?            // Verified national identification number (e.g. Rwandan 16-digit ID)
+  country            String?            @default("Rwanda")
+  verifiedAt         DateTime?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -342,6 +345,9 @@ model User {
   listingViews        ListingView[]
   savedSearches       SavedSearch[]
   landingFeedbacks    LandingFeedback[]
+  backupsCreated      BackupRecord[]            @relation("BackupCreator")
+  restorationsRun     RestorationRecord[]       @relation("RestorationPerformer")
+  integrityScansRun   DataIntegrityScan[]       @relation("IntegrityScanner")
 
   @@index([role])
   @@index([location])
@@ -375,10 +381,16 @@ model VerificationRequest {
   idDocumentUrl String
   status        VerificationStatus @default(PENDING)
   reviewNote    String?
-  reviewedById  String?
-  reviewedBy    User?              @relation("VerificationReviewer", fields: [reviewedById], references: [id])
-  reviewedAt    DateTime?
-  createdAt     DateTime           @default(now())
+  reviewedById       String?
+  reviewedBy         User?              @relation("VerificationReviewer", fields: [reviewedById], references: [id])
+  reviewedAt         DateTime?
+  extractedFullName  String?            // OCR extracted full name
+  extractedIdNumber  String?            // OCR extracted 16-digit Rwandan ID number
+  extractedCountry   String?            // OCR extracted country (e.g. "Rwanda")
+  ocrConfidence      Float?             // OCR confidence score (0.0 to 1.0)
+  ocrRawText         String?            // Full raw text extracted for review & auditing
+  needsManualReview  Boolean            @default(false) // Flagged if confidence is low or fields ambiguous
+  createdAt          DateTime           @default(now())
 
   @@index([status])
 }
@@ -1058,4 +1070,103 @@ model LocaleString {
 
   @@unique([locale, key])
   @@index([locale])
+}
+
+// ─────────────────── Automated Backup & Disaster Recovery ───────────────────
+
+enum BackupType {
+  FULL
+  INCREMENTAL
+  SAFETY_SNAPSHOT
+}
+
+enum BackupStatus {
+  IN_PROGRESS
+  SUCCESS
+  FAILED
+  CORRUPTED
+}
+
+enum RestorationType {
+  FULL
+  SELECTIVE
+}
+
+enum RestorationStatus {
+  IN_PROGRESS
+  SUCCESS
+  FAILED
+  ROLLED_BACK
+}
+
+enum ScanStatus {
+  COMPLETED
+  FAILED
+  ISSUES_FOUND
+}
+
+model BackupRecord {
+  id              String        @id @default(cuid())
+  filename        String        // filename of archive on disk/storage
+  type            BackupType    @default(FULL)
+  status          BackupStatus  @default(IN_PROGRESS)
+  scope           String[]      // ['users', 'listings', 'transactions', 'messages', 'files', 'settings']
+  recordCount     Int           @default(0)
+  fileCount       Int           @default(0)
+  sizeBytes       Int           @default(0)
+  checksumSha256  String        // SHA-256 integrity hash
+  encrypted       Boolean       @default(true)
+  encryptionAlg   String        @default("aes-256-gcm")
+  storageLocation String        // file path or cloud bucket URI
+  createdById     String?
+  createdBy       User?         @relation("BackupCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  metadata        Json?         // Table counts, manifest details, parent backup ID for incremental
+  notes           String?
+  expiresAt       DateTime?     // Retention policy expiry
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  restorations    RestorationRecord[]
+
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model RestorationRecord {
+  id                   String             @id @default(cuid())
+  backupId             String
+  backup               BackupRecord       @relation(fields: [backupId], references: [id], onDelete: Cascade)
+  type                 RestorationType    @default(FULL)
+  status               RestorationStatus  @default(IN_PROGRESS)
+  targetScope          String[]           // Specific scopes restored
+  preRestoreSnapshotId String?            // ID of safety snapshot taken before restoration
+  recordsRestored      Int                @default(0)
+  filesRestored        Int                @default(0)
+  performedById        String
+  performedBy          User               @relation("RestorationPerformer", fields: [performedById], references: [id])
+  report               Json?              // Detailed restoration report & verification summary
+  notes                String?
+  createdAt            DateTime           @default(now())
+  completedAt          DateTime?
+
+  @@index([status])
+  @@index([backupId])
+  @@index([createdAt])
+}
+
+model DataIntegrityScan {
+  id             String      @id @default(cuid())
+  status         ScanStatus  @default(COMPLETED)
+  issuesCount    Int         @default(0)
+  issues         Json?       // Array of detected issues: orphan records, missing files, corrupted fields
+  recordsScanned Int         @default(0)
+  filesScanned   Int         @default(0)
+  scannedById    String?
+  scannedBy      User?       @relation("IntegrityScanner", fields: [scannedById], references: [id], onDelete: SetNull)
+  durationMs     Int         @default(0)
+  createdAt      DateTime    @default(now())
+
+  @@index([status])
+  @@index([createdAt])
 }

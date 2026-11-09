@@ -1018,7 +1018,9 @@
     "favourSeller": "Trancher pour le vendeur",
     "disputeResolved": "Litige résolu",
     "settingsTitle": "Paramètres",
-    "subscriptionsTitle": "Abonnements"
+    "subscriptionsTitle": "Abonnements",
+    "backupsTitle": "Sauvegardes & Restauration",
+    "backupSubtitle": "Plan de reprise d'activité automatisé, surveillance de perte de données et restauration sécurisée."
   },
   "trust": {
     "verifiedSeller": "Vendeur vérifié",

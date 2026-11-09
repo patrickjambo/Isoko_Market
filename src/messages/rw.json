@@ -1018,7 +1018,9 @@
     "favourSeller": "Kemurira umugurisha",
     "disputeResolved": "Impaka yakemuwe",
     "settingsTitle": "Igenamiterere",
-    "subscriptionsTitle": "Kwiyandikisha"
+    "subscriptionsTitle": "Kwiyandikisha",
+    "backupsTitle": "Kubika & Kugarura Amakuru",
+    "backupSubtitle": "Sisitemu yo kubika amakuru no kuyagarura mu buryo bwizewe kandi butunganye."
   },
   "trust": {
     "verifiedSeller": "Umucuruzi wemejwe",

@@ -1,52 +1,78 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, X, Loader2 } from 'lucide-react';
+import { Eye, ShieldCheck, Check, X, RotateCcw, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
+import {
+  VerificationReviewModal,
+  type VerificationReviewItem,
+} from './verification-review-modal';
 
-export function VerificationActions({ requestId }: { requestId: string }) {
+export function VerificationActions({
+  requestId,
+  request,
+}: {
+  requestId: string;
+  request?: VerificationReviewItem;
+}) {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const router = useRouter();
   const { toast } = useToast();
-  const [loading, setLoading] = useState<'approve' | 'reject' | null>(null);
 
-  async function decide(decision: 'approve' | 'reject') {
-    setLoading(decision);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [activeRequest, setActiveRequest] = useState<VerificationReviewItem | null>(
+    request ?? null
+  );
+  const [fetching, setFetching] = useState(false);
+
+  async function openReviewModal() {
+    if (activeRequest) {
+      setModalOpen(true);
+      return;
+    }
+
+    setFetching(true);
     try {
-      const res = await fetch(`/api/admin/verifications/${requestId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ decision }),
-      });
-      if (!res.ok) throw new Error();
-      toast(decision === 'approve' ? t('approve') : t('reject'), 'success');
-      router.refresh();
-    } catch {
-      toast(tc('error'), 'error');
+      const res = await fetch(`/api/admin/verifications/${requestId}`);
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error?.message || 'Could not load verification details');
+      setActiveRequest(json.data);
+      setModalOpen(true);
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Error loading details', 'error');
     } finally {
-      setLoading(null);
+      setFetching(false);
     }
   }
 
   return (
-    <div className="flex gap-2">
-      <Button size="sm" onClick={() => decide('approve')} disabled={loading !== null}>
-        {loading === 'approve' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-        {t('approve')}
-      </Button>
+    <div className="flex items-center gap-2">
       <Button
         size="sm"
-        variant="outline"
-        onClick={() => decide('reject')}
-        disabled={loading !== null}
+        className="bg-primary hover:bg-primary/90 text-white font-medium text-xs gap-1.5 shadow-sm"
+        onClick={openReviewModal}
+        disabled={fetching}
       >
-        {loading === 'reject' ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
-        {t('reject')}
+        {fetching ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        ) : (
+          <Eye className="h-3.5 w-3.5" />
+        )}
+        Review & Verify
       </Button>
+
+      <VerificationReviewModal
+        request={activeRequest}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        onDecisionSuccess={() => {
+          router.refresh();
+        }}
+      />
     </div>
   );
 }

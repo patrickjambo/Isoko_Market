@@ -8,10 +8,20 @@ import { prisma } from './prisma';
  * Keys are grouped by module for the permission-matrix UI.
  */
 export const PERMISSION_MODULES: { module: string; keys: string[] }[] = [
-  { module: 'users', keys: ['users.view', 'users.suspend', 'users.ban', 'users.reactivate'] },
+  {
+    module: 'users',
+    keys: [
+      'users.view',
+      'users.suspend',
+      'users.ban',
+      'users.reactivate',
+      'users.export',
+      'users.export_sensitive',
+    ],
+  },
   {
     module: 'verification',
-    keys: ['verification.view', 'verification.approve', 'verification.reject'],
+    keys: ['verification.view', 'verification.approve', 'verification.reject', 'verification.resubmit'],
   },
   { module: 'listings', keys: ['listings.view', 'listings.remove', 'listings.feature'] },
   { module: 'jobs', keys: ['jobs.view', 'jobs.close'] },
@@ -25,6 +35,10 @@ export const PERMISSION_MODULES: { module: string; keys: string[] }[] = [
   { module: 'roles', keys: ['roles.view', 'roles.manage'] },
   { module: 'settings', keys: ['settings.view', 'settings.manage'] },
   { module: 'audit', keys: ['audit.view'] },
+  {
+    module: 'backup',
+    keys: ['backup.view', 'backup.create', 'backup.restore', 'backup.download'],
+  },
 ];
 
 export const ALL_PERMISSIONS: string[] = PERMISSION_MODULES.flatMap((m) => m.keys);
@@ -43,9 +57,11 @@ export const ROLE_DEFAULTS: Record<AdminRoleName, string[] | '*'> = {
   SUPER_ADMIN: '*',
   MODERATOR: [
     'users.view',
+    'users.export',
     'verification.view',
     'verification.approve',
     'verification.reject',
+    'verification.resubmit',
     'listings.view',
     'listings.remove',
     'jobs.view',
@@ -56,6 +72,7 @@ export const ROLE_DEFAULTS: Record<AdminRoleName, string[] | '*'> = {
     'support.view',
     'support.reply',
     'audit.view',
+    'backup.view',
   ],
   SUPPORT: [
     'users.view',
@@ -75,6 +92,7 @@ export const ROLE_DEFAULTS: Record<AdminRoleName, string[] | '*'> = {
     'settings.view',
     'settings.manage',
     'audit.view',
+    'backup.view',
   ],
   READONLY_ANALYST: [...VIEW_ONLY, 'analytics.export'],
 };

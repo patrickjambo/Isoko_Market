@@ -1018,7 +1018,9 @@
     "favourSeller": "Resolve for seller",
     "disputeResolved": "Dispute resolved",
     "settingsTitle": "Settings",
-    "subscriptionsTitle": "Subscriptions"
+    "subscriptionsTitle": "Subscriptions",
+    "backupsTitle": "Backups & Recovery",
+    "backupSubtitle": "Automated disaster recovery, data loss monitoring, and safe point-in-time restoration."
   },
   "trust": {
     "verifiedSeller": "Verified seller",
