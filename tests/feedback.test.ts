@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 
 const feedbackSchema = z.object({
-  name: z.string().trim().min(2, 'Name must be at least 2 characters').max(60),
-  comment: z.string().trim().min(5, 'Comment must be at least 5 characters').max(500),
+  name: z.string().trim().max(60).optional().nullable(),
+  comment: z.string().trim().min(2, 'Comment must be at least 2 characters').max(500),
   rating: z.number().int().min(1).max(5).default(5),
 });
 
@@ -18,17 +18,29 @@ describe('Landing feedback validation', () => {
     expect(parsed.success).toBe(true);
   });
 
+  it('allows omitting name for logged-in users', () => {
+    const withoutName = {
+      comment: 'Excellent buying and selling experience!',
+      rating: 5,
+    };
+    const parsed = feedbackSchema.safeParse(withoutName);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.name).toBeUndefined();
+    }
+  });
+
   it('defaults rating to 5 if omitted', () => {
     const input = {
       name: 'Jean Claude',
-      comment: 'Very reliable and safe marketplace.',
+      comment: 'Very reliable and safe marketplace for buying goods.',
     };
     const parsed = feedbackSchema.parse(input);
     expect(parsed.rating).toBe(5);
   });
 
-  it('rejects too short name or comment', () => {
-    expect(feedbackSchema.safeParse({ name: 'A', comment: 'Good' }).success).toBe(false);
+  it('rejects too short comment', () => {
+    expect(feedbackSchema.safeParse({ name: 'User', comment: 'A' }).success).toBe(false);
   });
 
   it('rejects invalid star rating outside 1..5', () => {

@@ -34,7 +34,7 @@ const DEFAULT_TESTIMONIALS: TestimonialData[] = [
     avatar: 'NJ',
     color: 'bg-blue-600',
     timeAgo: '1 week ago',
-    quote: 'Easy to post and get quick response.',
+    quote: 'Easy to post items and get quick responses from verified buyers.',
     rating: 5,
   },
   {
@@ -43,7 +43,7 @@ const DEFAULT_TESTIMONIALS: TestimonialData[] = [
     avatar: 'MC',
     color: 'bg-purple-600',
     timeAgo: '2 weeks ago',
-    quote: 'A great platform for buying and selling.',
+    quote: 'A great platform for buying and selling securely across Rwanda.',
     rating: 5,
   },
   {
@@ -52,7 +52,7 @@ const DEFAULT_TESTIMONIALS: TestimonialData[] = [
     avatar: 'HE',
     color: 'bg-amber-600',
     timeAgo: '3 weeks ago',
-    quote: 'I sold my phone within 24 hours. Incredible!',
+    quote: 'I sold my phone within 24 hours. Incredible speed and buyer reach!',
     rating: 5,
   },
   {
@@ -61,7 +61,7 @@ const DEFAULT_TESTIMONIALS: TestimonialData[] = [
     avatar: 'KG',
     color: 'bg-rose-600',
     timeAgo: '1 month ago',
-    quote: 'Best marketplace in Rwanda. Very trustworthy.',
+    quote: 'Best marketplace in Rwanda. Very trustworthy for finding great deals.',
     rating: 5,
   },
   {
@@ -70,7 +70,7 @@ const DEFAULT_TESTIMONIALS: TestimonialData[] = [
     avatar: 'MD',
     color: 'bg-teal-600',
     timeAgo: '1 month ago',
-    quote: 'I found a job through Zenova. Life-changing platform!',
+    quote: 'Smooth transaction! I bought quality electronics at a great price and safe delivery.',
     rating: 5,
   },
 ];
