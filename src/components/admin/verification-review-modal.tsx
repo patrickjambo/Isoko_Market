@@ -37,7 +37,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
-import { validateRwandanIdNumber } from '@/lib/verification/ocr';
+import { validateRwandanIdNumber } from '@/lib/verification/id-validator';
 
 export interface VerificationReviewItem {
   id: string;
