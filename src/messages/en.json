@@ -753,7 +753,15 @@
     "autoRedirectCountdown": "Redirecting to home in {seconds}s…",
     "goToHome": "Continue to Home",
     "continueSelling": "Start selling / Post",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "remindMeLater": "Remind me later",
+    "remindLaterToast": "We'll remind you to verify your ID later.",
+    "modalTitle": "Verify Your Identity",
+    "modalSubtitle": "Verify your National ID to build trust and unlock full access on Zenova.",
+    "verifyNow": "Verify ID Now",
+    "modalBenefit1": "Verified trust badge on your profile & listings",
+    "modalBenefit2": "Higher reach and faster buyer connections",
+    "modalBenefit3": "Safe, private & encrypted ID storage"
   },
   "wallet": {
     "title": "Wallet",

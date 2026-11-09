@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ShieldCheck, Clock, AlertTriangle, X, ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import { useRealtime } from '@/hooks/use-realtime';
 
 type VerificationStatus = 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
 
@@ -23,24 +24,41 @@ export function VerificationNudge({
   verificationStatus: VerificationStatus;
 }) {
   const t = useTranslations('verification');
+  const [localStatus, setLocalStatus] = useState<VerificationStatus>(verificationStatus);
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    setLocalStatus(verificationStatus);
+  }, [verificationStatus]);
+
+  useRealtime((event) => {
+    if (event.type === 'verification_updated') {
+      setLocalStatus(event.status);
+    }
+    if (event.type === 'notification' && event.notification.type === 'VERIFICATION_APPROVED') {
+      setLocalStatus('VERIFIED');
+    }
+  });
+
+  useEffect(() => {
     // Never show for verified users.
-    if (verificationStatus === 'VERIFIED') return;
+    if (localStatus === 'VERIFIED') {
+      setShow(false);
+      return;
+    }
     // Session-based dismissal: re-appears next session.
     if (sessionStorage.getItem(SESSION_KEY) === '1') return;
     setShow(true);
-  }, [verificationStatus]);
+  }, [localStatus]);
 
-  if (!show || verificationStatus === 'VERIFIED') return null;
+  if (!show || localStatus === 'VERIFIED') return null;
 
   function dismiss() {
     sessionStorage.setItem(SESSION_KEY, '1');
     setShow(false);
   }
 
-  if (verificationStatus === 'PENDING') {
+  if (localStatus === 'PENDING') {
     return (
       <div className="container pt-3">
         <div className="flex items-start gap-3 rounded-xl border border-blue-500/30 bg-blue-500/5 p-4">
@@ -64,7 +82,7 @@ export function VerificationNudge({
     );
   }
 
-  if (verificationStatus === 'REJECTED') {
+  if (localStatus === 'REJECTED') {
     return (
       <div className="container pt-3">
         <div className="flex items-start gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4">

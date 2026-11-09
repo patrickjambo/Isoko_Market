@@ -753,7 +753,15 @@
     "autoRedirectCountdown": "Redirection vers l'accueil dans {seconds}s…",
     "goToHome": "Continuer vers l'accueil",
     "continueSelling": "Commencer à vendre / Publier",
-    "backToHome": "Retour à l'accueil"
+    "backToHome": "Retour à l'accueil",
+    "remindMeLater": "Me rappeler plus tard",
+    "remindLaterToast": "Nous vous rappellerons de vérifier votre identité plus tard.",
+    "modalTitle": "Vérifiez votre identité",
+    "modalSubtitle": "Vérifiez votre pièce d'identité pour inspirer confiance et débloquer toutes les fonctionnalités sur Zenova.",
+    "verifyNow": "Vérifier mon identité maintenant",
+    "modalBenefit1": "Badge vérifié sur votre profil et vos annonces",
+    "modalBenefit2": "Meilleure visibilité et contacts plus rapides",
+    "modalBenefit3": "Stockage sécurisé, privé et chiffré de votre pièce d'identité"
   },
   "wallet": {
     "title": "Portefeuille",

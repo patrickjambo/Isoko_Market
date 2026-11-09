@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { ToastProvider } from '@/components/ui/toast';
 import { PushPromptModal } from '@/components/notifications/push-prompt-modal';
+import { VerificationPromptModal } from '@/components/verification/verification-prompt-modal';
 import type { SessionUser } from '@/lib/serialize';
 import type { FeatureFlags } from '@/lib/feature-flags';
 import { FeatureFlagsProvider, useFeatureFlags } from './providers/feature-flags-provider';
@@ -39,6 +40,7 @@ export function Providers({
           <ToastProvider>
             {children}
             <PushPromptModal />
+            <VerificationPromptModal />
           </ToastProvider>
         </SubscriptionProvider>
       </FeatureFlagsProvider>

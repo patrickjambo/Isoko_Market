@@ -4,6 +4,7 @@ import { adminRoute } from '@/lib/admin-route';
 import { prisma } from '@/lib/prisma';
 import { notify } from '@/lib/notifications';
 import { emitAdmin } from '@/lib/admin-realtime';
+import { publish } from '@/lib/realtime';
 import { audit } from '@/lib/audit';
 
 const schema = z.object({
@@ -56,6 +57,9 @@ export const PATCH = adminRoute(
       body: reason,
       href: '/verify',
     });
+
+    // Real-time update to the user's active browser session
+    publish(request.userId, { type: 'verification_updated', status });
 
     // Broadcast the decision to other admins' consoles (rule 6 gap: previously
     // only the "pending" submission was broadcast, not the approve/reject).

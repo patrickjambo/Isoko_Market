@@ -16,6 +16,8 @@ import { useTranslations } from 'next-intl';
 import { useRouter, Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
+import { useRealtime } from '@/hooks/use-realtime';
+import { VERIFY_SNOOZE_KEY, VERIFY_SNOOZE_DURATION_MS } from '@/lib/verification-prompt';
 
 type Status = 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
 
@@ -35,6 +37,27 @@ export function VerifyForm({ status, returnTo }: { status: Status; returnTo?: st
   useEffect(() => {
     setLocalStatus(status);
   }, [status]);
+
+  // Real-time listener: instantly update status if verified while on the page
+  useRealtime((event) => {
+    if (event.type === 'verification_updated') {
+      setLocalStatus(event.status);
+    }
+    if (event.type === 'notification' && event.notification.type === 'VERIFICATION_APPROVED') {
+      setLocalStatus('VERIFIED');
+    }
+  });
+
+  function handleRemindLater() {
+    try {
+      localStorage.setItem(VERIFY_SNOOZE_KEY, String(Date.now() + VERIFY_SNOOZE_DURATION_MS));
+    } catch {
+      /* ignore storage error */
+    }
+    toast(t('remindLaterToast'), 'info');
+    const target = (returnTo && returnTo !== '/verify' ? returnTo : '/') as Parameters<typeof router.push>[0];
+    router.push(target);
+  }
 
   if (localStatus === 'VERIFIED') {
     return <VerifiedRedirectCard returnTo={returnTo} />;
@@ -136,25 +159,30 @@ export function VerifyForm({ status, returnTo }: { status: Status; returnTo?: st
         />
       </div>
 
-      <Button
-        onClick={submit}
-        disabled={!docUrl || submitting || uploading}
-        size="lg"
-        className="w-full"
-      >
-        {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-        {submitting ? t('submitting') : t('submit')}
-      </Button>
+      <div className="space-y-2.5">
+        <Button
+          onClick={submit}
+          disabled={!docUrl || submitting || uploading}
+          size="lg"
+          className="w-full"
+        >
+          {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+          {submitting ? t('submitting') : t('submit')}
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className="w-full flex items-center justify-center gap-2"
+          onClick={handleRemindLater}
+        >
+          <Clock className="h-4 w-4 text-muted-foreground" />
+          {t('remindMeLater')}
+        </Button>
+      </div>
 
       <p className="text-center text-xs text-muted-foreground">{t('reducedVisibilityNote')}</p>
-
-      {/* Let users skip ID upload for now and continue using the app */}
-      <Link
-        href={(returnTo && returnTo !== '/verify' ? returnTo : '/') as Parameters<typeof Link>[0]['href']}
-        className="block text-center text-xs text-muted-foreground hover:text-foreground hover:underline"
-      >
-        {t('skipForNow')}
-      </Link>
     </div>
   );
 }

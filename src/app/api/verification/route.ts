@@ -4,6 +4,19 @@ import { requireUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { verificationSubmitSchema } from '@/lib/validators/misc';
 import { emitAdmin } from '@/lib/admin-realtime';
+import { publish } from '@/lib/realtime';
+
+/**
+ * GET /api/verification — get the current user's verification status.
+ */
+export const GET = route(async () => {
+  const user = await requireUser();
+  return jsonOk({
+    status: user.verificationStatus,
+    isVerified: user.isVerified,
+    hasIdDocument: Boolean(user.idDocumentUrl),
+  });
+});
 
 /**
  * POST /api/verification — submit a National ID for review (Section 6.1).
@@ -28,6 +41,9 @@ export const POST = route(async (req: NextRequest) => {
 
   // Live-notify the trust team that a new ID is awaiting review.
   await emitAdmin('verification.pending', `${user.fullName} submitted an ID for verification`);
+
+  // Live-notify the submitting user so client UI updates in realtime.
+  publish(user.id, { type: 'verification_updated', status: 'PENDING' });
 
   return jsonOk({ ok: true, status: 'PENDING' });
 });

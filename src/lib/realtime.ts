@@ -49,7 +49,11 @@ export type RealtimeEvent =
         cvBuilderEnabled: boolean;
       };
     }
-  | { type: 'subscription_settings_updated'; settings: SubscriptionSettings };
+  | { type: 'subscription_settings_updated'; settings: SubscriptionSettings }
+  | {
+      type: 'verification_updated';
+      status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
+    };
 
 export type SerializedMessage = {
   id: string;

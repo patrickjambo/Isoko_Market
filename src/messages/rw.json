@@ -753,7 +753,15 @@
     "autoRedirectCountdown": "Kukujyana ku rupapuro rw'itangiriro mu masegonda {seconds}…",
     "goToHome": "Komeza ku Itangiriro",
     "continueSelling": "Tangira gucuruza / Shyiraho",
-    "backToHome": "Gusubira ku Itangiriro"
+    "backToHome": "Gusubira ku Itangiriro",
+    "remindMeLater": "Nyibutsa nyuma",
+    "remindLaterToast": "Tuzakwibutsa kwemeza indangamuntu yawe nyuma.",
+    "modalTitle": "Emeza Umwirondoro Wawe",
+    "modalSubtitle": "Emeza indangamuntu yawe kugira ngo wubake icyizere kandi ufungure byose kuri Zenova.",
+    "verifyNow": "Emeza Indangamuntu Ubu",
+    "modalBenefit1": "Ikiranga cy'icyizere cyemejwe ku mwirondoro wawe",
+    "modalBenefit2": "Kugerwaho n'abantu benshi no guhuzwa n'abaguzi byihuse",
+    "modalBenefit3": "Indangamuntu ibikwa mu mutekano n'ibanga rikomeye"
   },
   "wallet": {
     "title": "Ikofi",

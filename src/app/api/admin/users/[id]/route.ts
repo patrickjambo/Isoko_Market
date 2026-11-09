@@ -7,6 +7,7 @@ import { audit } from '@/lib/audit';
 import { setUserStatus } from '@/lib/admin-users';
 import { notify } from '@/lib/notifications';
 import { emitAdmin } from '@/lib/admin-realtime';
+import { publish } from '@/lib/realtime';
 
 const schema = z.object({
   action: z.enum(['suspend', 'ban', 'reactivate', 'verify', 'unverify']),
@@ -63,6 +64,11 @@ export const PATCH = adminRoute(
         type: verified ? 'VERIFICATION_APPROVED' : 'VERIFICATION_REJECTED',
         title: verified ? 'Verification approved' : 'Verification updated',
         href: '/verify',
+      });
+      // Real-time update to the user's active browser session
+      publish(ctx.params.id, {
+        type: 'verification_updated',
+        status: verified ? 'VERIFIED' : 'UNVERIFIED',
       });
       // Same admin-console broadcast as the verification queue (rule 6 parity).
       await emitAdmin(
