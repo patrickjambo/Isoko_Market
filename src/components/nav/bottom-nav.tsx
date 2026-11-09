@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { Home, Store, Briefcase, MessageCircle, User, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
@@ -27,13 +28,36 @@ export function BottomNav({ jobsEnabled: initialJobsEnabled }: { jobsEnabled?: b
   const liveFlags = useFeatureFlags();
 
   const effectiveJobsEnabled = liveFlags?.jobsEnabled ?? initialJobsEnabled ?? false;
-  const featureOn: Record<string, boolean> = { jobs: effectiveJobsEnabled };
 
-  const tabs = TABS.filter((tab) => {
-    if ('auth' in tab && tab.auth && !user) return false;
-    if ('feature' in tab && tab.feature && !featureOn[tab.feature]) return false;
-    return true;
-  });
+  const tabs = React.useMemo(() => {
+    // When guest is not logged in:
+    // Symmetrical layout: Home (left), (+) Post (center), Marketplace (right)
+    // Ensures equal spacing and a balanced, prominent center action before login.
+    if (!user) {
+      if (effectiveJobsEnabled) {
+        return [
+          { href: '/', key: 'home' as const, icon: Home, exact: true },
+          { href: '/post', key: 'post' as const, icon: Plus, center: true },
+          { href: '/marketplace', key: 'marketplace' as const, icon: Store },
+          { href: '/jobs', key: 'jobs' as const, icon: Briefcase },
+        ];
+      }
+      return [
+        { href: '/', key: 'home' as const, icon: Home, exact: true },
+        { href: '/post', key: 'post' as const, icon: Plus, center: true },
+        { href: '/marketplace', key: 'marketplace' as const, icon: Store },
+      ];
+    }
+
+    // Logged-in user:
+    // Symmetrical 5-tab layout: Home, Marketplace, (+) Post in center, Messages, Profile
+    const featureOn: Record<string, boolean> = { jobs: effectiveJobsEnabled };
+    return TABS.filter((tab) => {
+      if ('auth' in tab && tab.auth && !user) return false;
+      if ('feature' in tab && tab.feature && !featureOn[tab.feature]) return false;
+      return true;
+    });
+  }, [user, effectiveJobsEnabled]);
 
   return (
     <nav
@@ -49,7 +73,7 @@ export function BottomNav({ jobsEnabled: initialJobsEnabled }: { jobsEnabled?: b
           const Icon = tab.icon;
           if ('center' in tab && tab.center) {
             return (
-              <li key={tab.href} className="flex items-center">
+              <li key={tab.href} className="flex items-center justify-center shrink-0">
                 <Link
                   href={tab.href}
                   aria-label={t('post')}
