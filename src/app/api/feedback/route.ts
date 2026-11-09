@@ -70,14 +70,20 @@ export async function POST(req: NextRequest) {
       console.warn('Prisma create failed, ensuring table exists...', dbErr);
 
       try {
-        // Auto-create table if not exists (Postgres)
+        // Auto-create enum and table if not exists (Postgres)
         await prisma.$executeRawUnsafe(`
+          DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'LandingFeedbackStatus') THEN
+              CREATE TYPE "LandingFeedbackStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+            END IF;
+          END $$;
+
           CREATE TABLE IF NOT EXISTS "LandingFeedback" (
             "id" TEXT NOT NULL PRIMARY KEY,
             "name" TEXT NOT NULL,
             "comment" TEXT NOT NULL,
             "rating" INTEGER NOT NULL DEFAULT 5,
-            "status" TEXT NOT NULL DEFAULT 'APPROVED',
+            "status" "LandingFeedbackStatus" NOT NULL DEFAULT 'APPROVED',
             "userId" TEXT,
             "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
             "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
