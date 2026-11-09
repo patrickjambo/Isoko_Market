@@ -1601,9 +1601,9 @@
     "errorToast": "Failed to submit review. Please try again.",
     "justNow": "Just now",
     "helpSectionTitle": "Need Help or More Information?",
-    "helpSectionSubtitle": "Have questions, need assistance, or facing any issue? Chat directly with our support on WhatsApp.",
+    "helpSectionSubtitle": "Have questions, need assistance, or facing any issue? Chat directly with our support team on WhatsApp.",
+    "helpBadge": "Direct WhatsApp Support",
     "whatsappCta": "Chat on WhatsApp",
-    "whatsappSupportNumber": "+7 936 529-94-65",
-    "whatsappFloatingTooltip": "Need help? Chat with us"
+    "whatsappFloatingTooltip": "Need help? Chat with us on WhatsApp"
   }
 }

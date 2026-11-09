@@ -59,7 +59,7 @@ const DEFAULT_TESTIMONIALS: TestimonialData[] = [
     id: 'base-5',
     name: 'Kayitesi Grace',
     avatar: 'KG',
-    color: 'bg-pink-600',
+    color: 'bg-rose-600',
     timeAgo: '1 month ago',
     quote: 'Best marketplace in Rwanda. Very trustworthy.',
     rating: 5,
@@ -80,10 +80,9 @@ const AVATAR_COLORS = [
   'bg-blue-600',
   'bg-purple-600',
   'bg-amber-600',
-  'bg-pink-600',
+  'bg-rose-600',
   'bg-teal-600',
   'bg-indigo-600',
-  'bg-rose-600',
 ];
 
 function getInitials(name: string): string {
@@ -117,17 +116,16 @@ const AUTO_ADVANCE_MS = 4500;
 /* ------------------------------------------------------------------ */
 /*  Star rating row                                                   */
 /* ------------------------------------------------------------------ */
-function StarRow({ count = 5, size = 'sm' }: { count?: number; size?: 'sm' | 'md' }) {
-  const cls = size === 'md' ? 'h-5 w-5' : 'h-4 w-4';
+function StarRow({ count = 5 }: { count?: number }) {
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-1">
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
-          className={`${cls} ${
+          className={`h-4 w-4 ${
             i < count
-              ? 'fill-yellow-400 text-yellow-400'
-              : 'fill-transparent text-muted-foreground/30'
+              ? 'fill-amber-400 text-amber-400'
+              : 'fill-slate-100 text-slate-300'
           }`}
         />
       ))}
@@ -140,28 +138,34 @@ function StarRow({ count = 5, size = 'sm' }: { count?: number; size?: 'sm' | 'md
 /* ------------------------------------------------------------------ */
 function TestimonialCard({ testimonial }: { testimonial: TestimonialData }) {
   return (
-    <div className="flex flex-col justify-between gap-3 rounded-2xl border border-border bg-card/90 p-4 shadow-sm backdrop-blur-sm transition-all hover:shadow-md h-full">
+    <div className="flex flex-col justify-between gap-3.5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_16px_rgba(0,0,0,0.04)] transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 h-full">
+      {/* Header with avatar, name, verified checkmark and time */}
       <div className="flex items-center gap-3">
-        {/* Avatar */}
         <span
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${testimonial.color}`}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm ring-2 ring-white ${testimonial.color}`}
         >
           {testimonial.avatar}
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <p className="truncate text-sm font-semibold leading-tight text-foreground">
+            <p className="truncate text-[15px] font-bold text-slate-900 leading-tight">
               {testimonial.name}
             </p>
-            <CheckCircle className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+            <CheckCircle className="h-4 w-4 shrink-0 text-emerald-600" />
           </div>
-          <p className="text-xs text-muted-foreground">{testimonial.timeAgo}</p>
+          <p className="text-xs font-medium text-slate-400 mt-0.5">{testimonial.timeAgo}</p>
         </div>
       </div>
-      <p className="flex-1 text-sm italic text-foreground/80 leading-snug">
+
+      {/* Quote text */}
+      <p className="flex-1 text-[14px] italic text-slate-700 leading-relaxed font-normal">
         &ldquo;{testimonial.quote}&rdquo;
       </p>
-      <StarRow count={testimonial.rating} />
+
+      {/* 5-star rating */}
+      <div className="pt-1 border-t border-slate-100">
+        <StarRow count={testimonial.rating} />
+      </div>
     </div>
   );
 }
@@ -243,40 +247,37 @@ export function CommunitySection({ initialFeedbacks = [] }: CommunitySectionProp
 
   return (
     <>
-      <section className="relative overflow-hidden border-t border-border bg-gradient-to-br from-emerald-500/5 via-background to-teal-500/10">
-        {/* Decorative background glows */}
+      <section className="relative overflow-hidden border-t border-slate-200/80 bg-gradient-to-b from-[#eef9f5]/70 via-[#f8fcfb] to-white py-14 sm:py-18">
+        {/* Subtle decorative Kigali landscape skyline silhouette */}
         <div
-          aria-hidden
-          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -bottom-20 -left-16 h-64 w-64 rounded-full bg-primary/10 blur-3xl"
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-40 opacity-[0.06] bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-emerald-900 via-transparent to-transparent"
         />
 
-        <div className="container relative py-12 sm:py-16">
+        <div className="container relative">
           {/* 3-column layout matching design: Left info | Center carousel | Right feedback */}
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[250px_1fr_240px] lg:gap-6 lg:items-center">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr_260px] lg:gap-6 lg:items-center">
 
             {/* ── Left: community info ─────────────────────────── */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2 text-emerald-600">
+            <div className="flex flex-col gap-3.5">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-sm">
                 <Users className="h-6 w-6" />
               </div>
-              <h2 className="text-2xl font-extrabold tracking-tight leading-tight text-foreground sm:text-3xl">
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
                 {t('title')}
               </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm sm:text-base font-normal text-slate-600 leading-relaxed">
                 {t('subtitle')}
               </p>
 
               {/* Rating and review count */}
-              <div className="mt-1 flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <StarRow count={5} size="md" />
-                  <span className="text-lg font-bold text-foreground">4.8/5</span>
+              <div className="mt-1 flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <StarRow count={5} />
+                  <span className="text-base sm:text-lg font-bold text-slate-900">4.8/5</span>
                 </div>
-                <p className="text-xs text-muted-foreground">{t('basedOn')}</p>
+                <span className="text-slate-300">|</span>
+                <p className="text-xs sm:text-sm font-medium text-slate-500">{t('basedOn')}</p>
               </div>
             </div>
 
@@ -287,9 +288,9 @@ export function CommunitySection({ initialFeedbacks = [] }: CommunitySectionProp
               onMouseLeave={() => setPaused(false)}
             >
               {/* Carousel slides */}
-              <div className="relative overflow-hidden min-h-[160px]">
+              <div className="relative overflow-hidden min-h-[175px]">
                 {/* Desktop view: 3 cards */}
-                <div className="hidden sm:grid sm:grid-cols-3 sm:gap-3">
+                <div className="hidden sm:grid sm:grid-cols-3 sm:gap-3.5">
                   {visibleCardsDesktop.map((item) => (
                     <TestimonialCard key={String(item.id)} testimonial={item} />
                   ))}
@@ -307,9 +308,9 @@ export function CommunitySection({ initialFeedbacks = [] }: CommunitySectionProp
                   type="button"
                   onClick={prev}
                   aria-label="Previous testimonials"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow-sm transition hover:bg-muted active:scale-95"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-300 active:scale-95"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-5 w-5" />
                 </button>
 
                 {/* Dot indicators */}
@@ -320,8 +321,8 @@ export function CommunitySection({ initialFeedbacks = [] }: CommunitySectionProp
                       type="button"
                       onClick={() => setActiveIndex(i)}
                       aria-label={`Slide ${i + 1}`}
-                      className={`h-2 rounded-full transition-all ${
-                        i === activeIndex ? 'w-6 bg-emerald-600' : 'w-2 bg-muted-foreground/30'
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        i === activeIndex ? 'w-6 bg-emerald-600' : 'w-2 bg-slate-300'
                       }`}
                     />
                   ))}
@@ -331,30 +332,30 @@ export function CommunitySection({ initialFeedbacks = [] }: CommunitySectionProp
                   type="button"
                   onClick={next}
                   aria-label="Next testimonials"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow-sm transition hover:bg-muted active:scale-95"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-300 active:scale-95"
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-5 w-5" />
                 </button>
               </div>
             </div>
 
             {/* ── Right: feedback & comment CTA ─────────────────── */}
-            <div className="flex flex-col items-start gap-4 rounded-2xl border border-emerald-500/20 bg-card/80 p-5 shadow-sm backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-emerald-600">
+            <div className="flex flex-col items-start gap-4 rounded-3xl border border-emerald-500/20 bg-white p-6 shadow-[0_4px_16px_rgba(0,0,0,0.04)]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-sm">
                 <MessageSquarePlus className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-foreground sm:text-lg">
+                <h3 className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">
                   {t('feedbackTitle')}
                 </h3>
-                <p className="mt-1 text-xs text-muted-foreground leading-relaxed sm:text-sm">
+                <p className="mt-1 text-sm font-normal text-slate-600 leading-relaxed">
                   {t('feedbackSubtitle')}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setModalOpen(true)}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-emerald-700 hover:shadow-md active:scale-95 sm:w-auto"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#056349] px-6 py-3.5 text-sm sm:text-base font-bold text-white shadow-md shadow-emerald-950/15 transition hover:bg-[#04523c] hover:shadow-lg active:scale-95 sm:w-auto"
               >
                 <MessageSquarePlus className="h-4 w-4" />
                 <span>{t('feedbackCta')}</span>

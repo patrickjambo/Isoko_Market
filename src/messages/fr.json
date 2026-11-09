@@ -1601,9 +1601,9 @@
     "errorToast": "Échec de l'envoi de l'avis. Veuillez réessayer.",
     "justNow": "À l'instant",
     "helpSectionTitle": "Besoin d'Aide ou de Renseignements ?",
-    "helpSectionSubtitle": "Vous avez des questions, besoin d'aide ou un problème ? Discutez directement avec nous sur WhatsApp.",
+    "helpSectionSubtitle": "Vous avez des questions, besoin d'aide ou un problème ? Discutez directement avec notre équipe sur WhatsApp.",
+    "helpBadge": "Support Direct WhatsApp",
     "whatsappCta": "Discuter sur WhatsApp",
-    "whatsappSupportNumber": "+7 936 529-94-65",
-    "whatsappFloatingTooltip": "Besoin d'aide ? Écrivez-nous"
+    "whatsappFloatingTooltip": "Besoin d'aide ? Écrivez-nous sur WhatsApp"
   }
 }

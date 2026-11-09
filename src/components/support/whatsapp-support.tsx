@@ -1,66 +1,61 @@
 'use client';
 
-import { MessageCircle, HelpCircle, PhoneCall, ShieldCheck } from 'lucide-react';
+import { ShieldCheck, HelpCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { WhatsAppIcon } from '@/components/icons/whatsapp-icon';
 
-// WhatsApp number for support: +7 936 529-94-65 (Russian number)
-const WHATSAPP_INTL_NUMBER = '79365299465';
-const WHATSAPP_DISPLAY_NUMBER = '+7 936 529-94-65';
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_INTL_NUMBER}?text=${encodeURIComponent(
+// Direct WhatsApp link to support — Russian WhatsApp number: +7 936 529-94-65
+const WHATSAPP_URL = `https://wa.me/79365299465?text=${encodeURIComponent(
   'Hello Zenova Support, I need help or more information.'
 )}`;
 
 /**
- * Dedicated Help & Support section for the landing page.
- * Directs users with questions, issues, or needing more information to WhatsApp.
+ * Dedicated Help & Support section placed between main content and footer.
+ * Directs users with questions, issues, or needing more information directly to WhatsApp.
+ * Number is hidden from UI per specification — clicking automatically opens the chat.
  */
 export function WhatsAppHelpBanner() {
   const t = useTranslations('community');
 
   return (
-    <section className="border-t border-border bg-emerald-500/5 py-10 transition-colors">
+    <section className="border-t border-border bg-gradient-to-r from-emerald-50/70 via-background to-teal-50/70 py-10 transition-colors">
       <div className="container">
-        <div className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-r from-emerald-500/10 via-background to-teal-500/10 p-6 sm:p-10 shadow-sm">
+        <div className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-white/95 p-6 shadow-sm sm:p-9 backdrop-blur-sm">
           {/* Subtle decorative glow */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-emerald-500/10 blur-2xl"
+            className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-emerald-500/10 blur-2xl"
           />
 
           <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-            {/* Left side: Icon + Headings */}
-            <div className="flex items-start gap-4 max-w-2xl">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#25D366] text-white shadow-md shadow-emerald-500/20">
-                <MessageCircle className="h-7 w-7" />
+            {/* Left side: Official WhatsApp Logo + Clear readable text */}
+            <div className="flex items-start gap-4 sm:gap-5 max-w-2xl">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#25D366] text-white shadow-md shadow-emerald-500/20 transition-transform hover:scale-105">
+                <WhatsAppIcon className="h-8 w-8" />
               </div>
               <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  <span>Direct WhatsApp Support</span>
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100/70 px-3 py-1 text-xs font-semibold text-emerald-800">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>{t('helpBadge')}</span>
                 </div>
-                <h3 className="text-xl font-bold tracking-tight sm:text-2xl text-foreground">
+                <h3 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
                   {t('helpSectionTitle')}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm font-normal text-slate-600 sm:text-base leading-relaxed">
                   {t('helpSectionSubtitle')}
                 </p>
-                <div className="flex items-center gap-2 pt-1 text-xs text-muted-foreground">
-                  <PhoneCall className="h-3.5 w-3.5 text-emerald-600" />
-                  <span className="font-medium text-foreground">{WHATSAPP_DISPLAY_NUMBER}</span>
-                  <span>• Available for any inquiries & support</span>
-                </div>
               </div>
             </div>
 
-            {/* Right side: Action button */}
+            {/* Right side: Action button with official logo — NO number displayed */}
             <div className="w-full shrink-0 sm:w-auto">
               <a
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-[#25D366] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition-all hover:bg-[#1ebe5d] hover:shadow-xl hover:shadow-emerald-500/30 active:scale-95 sm:w-auto"
+                className="inline-flex w-full items-center justify-center gap-2.5 rounded-2xl bg-[#25D366] px-6 py-3.5 text-base font-bold text-white shadow-md shadow-emerald-600/20 transition-all hover:bg-[#1ebe5d] hover:shadow-lg hover:shadow-emerald-600/30 active:scale-95 sm:w-auto"
               >
-                <MessageCircle className="h-5 w-5" />
+                <WhatsAppIcon className="h-5 w-5" />
                 <span>{t('whatsappCta')}</span>
               </a>
             </div>
@@ -72,8 +67,8 @@ export function WhatsAppHelpBanner() {
 }
 
 /**
- * Floating WhatsApp button accessible across mobile and desktop.
- * Placed safely above the mobile bottom tab bar (bottom-20 on mobile, bottom-6 on desktop).
+ * Floating WhatsApp button with official logo.
+ * Offset from bottom to clear mobile bottom tab bar (`bottom-20 md:bottom-6`).
  */
 export function WhatsAppFloatingButton() {
   const t = useTranslations('community');
@@ -88,18 +83,18 @@ export function WhatsAppFloatingButton() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label={t('whatsappFloatingTooltip')}
-        className="group relative flex h-13 w-13 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:scale-110 hover:bg-[#1ebe5d] hover:shadow-xl active:scale-95"
+        className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl shadow-emerald-950/20 transition-all duration-300 hover:scale-110 hover:bg-[#1ebe5d] active:scale-95"
       >
-        <MessageCircle className="h-7 w-7" />
+        <WhatsAppIcon className="h-8 w-8" />
 
-        {/* Pulse effect */}
+        {/* Pulse halo animation */}
         <span
           aria-hidden
-          className="absolute inset-0 -z-10 animate-ping rounded-full bg-[#25D366] opacity-30 duration-1000"
+          className="absolute inset-0 -z-10 animate-ping rounded-full bg-[#25D366] opacity-35 duration-1000"
         />
 
         {/* Desktop hover tooltip */}
-        <span className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs font-medium text-background opacity-0 shadow-md transition-opacity duration-200 group-hover:opacity-100 md:inline-block">
+        <span className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 md:inline-block">
           {t('whatsappFloatingTooltip')}
         </span>
       </a>

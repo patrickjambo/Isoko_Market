@@ -1601,9 +1601,9 @@
     "errorToast": "Kiri koherezwa byanze. Ongera ugerageze.",
     "justNow": "Ubu ngubu",
     "helpSectionTitle": "Ukeneye Ubufasha cyangwa Amakuru Arambuye?",
-    "helpSectionSubtitle": "Ufite ikibazo, ukeneye ubufasha cyangwa ibisobanuro? Vugana natwe ako kanya kuri WhatsApp.",
+    "helpSectionSubtitle": "Ufite ikibazo, ukeneye ubufasha cyangwa ibisobanuro? Vugana n'itsinda ryacu ako kanya kuri WhatsApp.",
+    "helpBadge": "Ubufasha bwa WhatsApp",
     "whatsappCta": "Vugana natwe kuri WhatsApp",
-    "whatsappSupportNumber": "+7 936 529-94-65",
     "whatsappFloatingTooltip": "Ukeneye ubufasha? Tuvugishe kuri WhatsApp"
   }
 }

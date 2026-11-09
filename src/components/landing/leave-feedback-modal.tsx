@@ -196,7 +196,11 @@ export function LeaveFeedbackModal({
             >
               {t('cancelBtn')}
             </Button>
-            <Button type="submit" disabled={submitting} className="min-w-[120px]">
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="min-w-[130px] rounded-full bg-[#056349] hover:bg-[#04523c] text-white font-bold"
+            >
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

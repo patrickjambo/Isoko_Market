@@ -1,4 +1,5 @@
-import { Phone, MessageCircle, Mail, Instagram } from 'lucide-react';
+import { Phone, Mail, Instagram } from 'lucide-react';
+import { WhatsAppIcon } from '@/components/icons/whatsapp-icon';
 import { telLink, whatsappLink, instagramLink, type ContactChannels } from '@/lib/contact';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +13,7 @@ export function ContactLinks({ contact }: { contact: ContactChannels | null }) {
 
   const items = [
     contact.phone && { href: telLink(contact.phone), Icon: Phone, label: contact.phone, cls: 'text-primary' },
-    contact.whatsapp && { href: whatsappLink(contact.whatsapp), Icon: MessageCircle, label: 'WhatsApp', cls: 'text-emerald-600', external: true },
+    contact.whatsapp && { href: whatsappLink(contact.whatsapp), Icon: WhatsAppIcon, label: 'WhatsApp', cls: 'text-[#25D366]', external: true },
     contact.email && { href: `mailto:${contact.email}`, Icon: Mail, label: contact.email, cls: 'text-primary' },
     contact.instagram && { href: instagramLink(contact.instagram), Icon: Instagram, label: `@${contact.instagram}`, cls: 'text-pink-600', external: true },
   ].filter(Boolean) as { href: string; Icon: typeof Phone; label: string; cls: string; external?: boolean }[];
