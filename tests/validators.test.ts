@@ -16,6 +16,31 @@ describe('createListingSchema', () => {
     expect(parsed.images).toEqual([]);
   });
 
+  it('accepts optional price defaulting to 0 when empty or omitted', () => {
+    const withoutPrice = createListingSchema.parse({
+      title: 'Nice phone',
+      description: 'A good phone in great condition.',
+      location: 'Kigali',
+    });
+    expect(withoutPrice.price).toBe(0);
+
+    const withEmptyPrice = createListingSchema.parse({
+      title: 'Nice phone',
+      description: 'A good phone in great condition.',
+      price: '',
+      location: 'Kigali',
+    });
+    expect(withEmptyPrice.price).toBe(0);
+
+    const withNullPrice = createListingSchema.parse({
+      title: 'Nice phone',
+      description: 'A good phone in great condition.',
+      price: null,
+      location: 'Kigali',
+    });
+    expect(withNullPrice.price).toBe(0);
+  });
+
   it('rejects short titles and too many images', () => {
     expect(() =>
       createListingSchema.parse({ title: 'a', description: 'short', price: 1, location: 'K' })

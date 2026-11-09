@@ -47,6 +47,8 @@ export function BuyNowButton({
   const [delivery, setDelivery] = useState('pickup');
   const [busy, setBusy] = useState(false);
 
+  if (price <= 0) return null;
+
   if (!user) {
     // Preserve the listing they were about to buy through sign-up (§5).
     return (

@@ -44,7 +44,7 @@ export default async function EditListingPage({
           .map((c) => ({ id: c.id, name: categoryName(c, params.locale), slug: c.slug }))}
         initial={{
           title: listing.title,
-          price: String(Math.round(listing.price / 100)),
+          price: listing.price > 0 ? String(Math.round(listing.price / 100)) : '',
           categoryId: listing.categoryId ?? '',
           kind: listing.kind,
           condition: listing.condition,

@@ -102,7 +102,7 @@ export default async function ListingDetailPage({
 
   // Price context vs. similar items nearby (Section 4).
   let priceContext: 'below' | 'fair' | 'above' | null = null;
-  if (priceCtx.median != null) {
+  if (listing.price > 0 && priceCtx.median != null) {
     const priceFrancs = listing.price / 100;
     if (priceFrancs < priceCtx.median * 0.9) priceContext = 'below';
     else if (priceFrancs > priceCtx.median * 1.15) priceContext = 'above';
@@ -137,7 +137,7 @@ export default async function ListingDetailPage({
               )}
             </div>
             <p className="text-3xl font-extrabold text-primary">
-              {formatRWF(listing.price, params.locale)}
+              {listing.price > 0 ? formatRWF(listing.price, params.locale) : '—'}
             </p>
             {priceContext && (
               <p
@@ -200,7 +200,8 @@ export default async function ListingDetailPage({
                   />
                 ) : (
                   listing.status === 'ACTIVE' &&
-                  listing.kind !== 'SERVICE' && (
+                  listing.kind !== 'SERVICE' &&
+                  listing.price > 0 && (
                     <BuyNowButton
                       listingId={listing.id}
                       price={listing.price}

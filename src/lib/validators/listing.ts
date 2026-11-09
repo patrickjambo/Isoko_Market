@@ -21,8 +21,11 @@ export type ListingSpec = z.infer<typeof listingSpecSchema>;
 export const createListingSchema = z.object({
   title: z.string().trim().min(3, 'Add a short, clear title.').max(120),
   description: z.string().trim().min(10, 'Describe the item.').max(4000),
-  // Price entered in whole RWF by the user; converted to minor units server-side.
-  price: z.coerce.number().int('Enter a valid price.').min(0).max(1_000_000_000),
+  // Price entered in whole RWF by the user (optional — 0 indicates open/negotiable/contact); converted to minor units server-side.
+  price: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? 0 : val),
+    z.coerce.number().int('Enter a valid price.').min(0).max(1_000_000_000).default(0)
+  ),
   categoryId: z.string().cuid().optional().nullable(),
   // Optional (no default) so PUT edits that omit it leave the stored kind intact;
   // create routes fall back to PRODUCT.

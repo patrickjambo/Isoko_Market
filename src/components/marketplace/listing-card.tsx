@@ -61,7 +61,9 @@ export function ListingCard({
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1 py-1">
           <div className="flex items-center gap-2">
-            <p className="text-base font-bold text-primary">{formatRWF(listing.price, locale)}</p>
+            <p className="text-base font-bold text-primary">
+              {listing.price > 0 ? formatRWF(listing.price, locale) : '—'}
+            </p>
             {listing.kind === 'SERVICE' && <Badge variant="outline">{t('serviceBadge')}</Badge>}
             {listing.isFeatured && listing.status === 'ACTIVE' && (
               <Badge variant="accent">{t('featured')}</Badge>
@@ -128,7 +130,9 @@ export function ListingCard({
         )}
       </div>
       <div className="flex flex-1 flex-col gap-1.5 p-3">
-        <p className="text-base font-bold text-primary">{formatRWF(listing.price, locale)}</p>
+        <p className="text-base font-bold text-primary">
+          {listing.price > 0 ? formatRWF(listing.price, locale) : '—'}
+        </p>
         <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground">
           {listing.title}
         </h3>

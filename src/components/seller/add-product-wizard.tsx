@@ -194,7 +194,7 @@ export function AddProductWizard({
   const canNext =
     (step === 1 && data.images.length > 0) ||
     (step === 2 && data.title.trim().length >= 3) ||
-    (step === 3 && !!data.categoryId && data.price !== '') ||
+    (step === 3 && !!data.categoryId) ||
     step === 4 ||
     (step === 5 && data.location.trim().length >= 2) ||
     step === 6;
@@ -656,7 +656,9 @@ function Review({
       )}
       <div>
         <p className="text-lg font-bold text-primary">
-          {data.price !== '' ? formatRWF(Number(data.price) * 100, locale) : '—'}
+          {data.price !== '' && Number(data.price) > 0
+            ? formatRWF(Number(data.price) * 100, locale)
+            : '—'}
         </p>
         <p className="font-semibold">{data.title || '—'}</p>
         <p className="text-sm text-muted-foreground">
