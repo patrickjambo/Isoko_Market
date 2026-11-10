@@ -207,12 +207,14 @@ export async function extractIdDocumentData(options: {
   if (geminiKey && imageBuffer && imageBuffer.length > 0) {
     try {
       const b64 = imageBuffer.toString('base64');
+      // Gemini 2.0 Flash — v1 stable API, correct request format
       const body = {
-        system_instruction: { parts: [{ text: OCR_SYSTEM_PROMPT }] },
+        systemInstruction: { parts: [{ text: OCR_SYSTEM_PROMPT }] },
         contents: [
           {
+            role: 'user',
             parts: [
-              { inline_data: { mime_type: mimeType, data: b64 } },
+              { inlineData: { mimeType: mimeType, data: b64 } },
               {
                 text: `Extract the identity information from this ID card. The registered account name is "${userFullName || 'Unknown'}". Return ONLY JSON.`,
               },
@@ -223,7 +225,7 @@ export async function extractIdDocumentData(options: {
       };
 
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
+        `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -246,7 +248,7 @@ export async function extractIdDocumentData(options: {
         }
       } else {
         const errText = await res.text();
-        console.error('[ocr] Gemini Vision HTTP error:', res.status, errText.slice(0, 200));
+        console.error('[ocr] Gemini Vision HTTP error:', res.status, errText.slice(0, 300));
       }
     } catch (err) {
       console.error('[ocr] Gemini Vision error:', err);

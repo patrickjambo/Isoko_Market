@@ -10,6 +10,9 @@ import {
 // This stream must stay open — never statically optimized or cached.
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+// Allow SSE connections to stay open up to 290s on Vercel before the client
+// auto-reconnects (browser EventSource retries on close automatically).
+export const maxDuration = 290;
 
 /**
  * Server-Sent Events stream for the browser (Section 9.1). Logged-in users receive
@@ -24,6 +27,9 @@ export async function GET() {
   let unsubscribeUser: (() => void) | null = null;
   let unsubscribeGlobal: (() => void) | null = null;
   let heartbeat: ReturnType<typeof setInterval> | null = null;
+  // Self-close after 4 min 30s so the browser reconnects before Vercel's
+  // 290s maxDuration kills the function mid-stream (causing error logs).
+  let selfCloseTimer: ReturnType<typeof setTimeout> | null = null;
 
   const stream = new ReadableStream({
     start(controller) {
@@ -54,6 +60,13 @@ export async function GET() {
 
       // Heartbeat keeps intermediaries from closing an idle connection.
       heartbeat = setInterval(() => send(': ping\n\n'), 25_000);
+
+      // Send a clean "reconnect" event and close just before Vercel's timeout.
+      // Browser EventSource automatically reconnects on stream close.
+      selfCloseTimer = setTimeout(() => {
+        send(': reconnect\n\n');
+        try { controller.close(); } catch { /* already closed */ }
+      }, 270_000); // 270s — safely before 290s maxDuration
     },
     cancel() {
       unsubscribeUser?.();
@@ -63,6 +76,7 @@ export async function GET() {
       }
       bumpConnections(-1);
       if (heartbeat) clearInterval(heartbeat);
+      if (selfCloseTimer) clearTimeout(selfCloseTimer);
     },
   });
 
