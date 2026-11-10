@@ -44,6 +44,13 @@ const schema = z.object({
   ANTHROPIC_API_KEY: z.string().optional().default(''),
   AI_MODEL: z.string().default('claude-opus-4-8'),
 
+  // OCR Vision APIs for ID verification.
+  // GEMINI_API_KEY   — FREE (1,500 req/day). Get at https://aistudio.google.com/app/apikey
+  // GOOGLE_VISION_API_KEY — 1,000 units/month free, plain text extraction only.
+  // Priority: Gemini → Anthropic (above) → Google Vision → manual admin entry.
+  GEMINI_API_KEY: z.string().optional().default(''),
+  GOOGLE_VISION_API_KEY: z.string().optional().default(''),
+
   // SMS is now DORMANT (phone is no longer the auth channel). Retained so the
   // adapter can be reactivated if transactional SMS is ever added.
   SMS_PROVIDER: z.enum(['console', 'pindo', 'africastalking']).default('console'),

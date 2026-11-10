@@ -1,5 +1,6 @@
 import 'server-only';
 import Anthropic from '@anthropic-ai/sdk';
+import { env } from '@/lib/env';
 import { validateRwandanIdNumber, type RwandanIdValidation } from './id-validator';
 
 export { validateRwandanIdNumber, type RwandanIdValidation };
@@ -202,7 +203,7 @@ export async function extractIdDocumentData(options: {
   const { imageBuffer, mimeType = 'image/jpeg', userFullName, fallbackText } = options;
 
   // ── 1. Google Gemini Vision (FREE — 1,500 req/day) ──────────────────────
-  const geminiKey = process.env.GEMINI_API_KEY;
+  const geminiKey = env.GEMINI_API_KEY;
   if (geminiKey && imageBuffer && imageBuffer.length > 0) {
     try {
       const b64 = imageBuffer.toString('base64');
@@ -253,7 +254,7 @@ export async function extractIdDocumentData(options: {
   }
 
   // ── 2. Anthropic Claude Vision (paid fallback) ──────────────────────────
-  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const anthropicKey = env.ANTHROPIC_API_KEY;
   if (anthropicKey && imageBuffer && imageBuffer.length > 0) {
     try {
       const client = new Anthropic({ apiKey: anthropicKey });
@@ -263,7 +264,7 @@ export async function extractIdDocumentData(options: {
         : 'image/jpeg';
 
       const response = await client.messages.create({
-        model: process.env.AI_MODEL || 'claude-3-5-sonnet-20241022',
+        model: env.AI_MODEL || 'claude-3-5-sonnet-20241022',
         max_tokens: 600,
         system: OCR_SYSTEM_PROMPT,
         messages: [
@@ -299,7 +300,7 @@ export async function extractIdDocumentData(options: {
   }
 
   // ── 3. Google Cloud Vision (text detection, 1,000/month free) ───────────
-  const googleKey = process.env.GOOGLE_VISION_API_KEY;
+  const googleKey = env.GOOGLE_VISION_API_KEY;
   if (googleKey && imageBuffer && imageBuffer.length > 0) {
     try {
       const b64 = imageBuffer.toString('base64');
