@@ -335,9 +335,8 @@ export function VerificationReviewModal({
 
                 {/* Image viewport — supports mouse drag + touch pinch/pan */}
                 <div
-                  className={`flex-1 flex items-center justify-center p-4 lg:p-6 min-h-[220px] lg:min-h-[480px] touch-none ${
-                    zoom > 1 ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
-                  }`}
+                  className={`flex-1 flex items-center justify-center p-4 lg:p-6 min-h-[220px] lg:min-h-[480px] touch-none ${zoom > 1 ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
+                    }`}
                   onMouseDown={handleMouseDown}
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}
@@ -415,21 +414,21 @@ export function VerificationReviewModal({
                   </Button>
                 </div>
 
-                {/* ── OCR Pending Banner ── */}
+                {/* ── OCR Pending / No-Key Banner ── */}
                 {ocrHasNoApiKey && (
-                  <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 space-y-1.5">
+                  <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 space-y-2">
                     <div className="flex items-center gap-2 text-amber-800 font-semibold text-xs">
                       <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-                      OCR Extraction Unavailable
+                      OCR Not Yet Extracted
                     </div>
                     <p className="text-xs text-amber-700 leading-relaxed">
-                      No AI Vision API key is configured. Add{' '}
-                      <code className="bg-amber-100 px-1 rounded font-mono text-[11px]">ANTHROPIC_API_KEY</code>{' '}
-                      to Vercel environment variables for automatic extraction.
+                      If you have added <code className="bg-amber-100 px-1 rounded font-mono text-[11px]">GEMINI_API_KEY</code>{' '}
+                      to Vercel, click <strong>Re-run OCR</strong> above to extract the information now.
+                      Otherwise enter the name and ID number manually from the document.
                     </p>
                     <div className="flex items-center gap-1.5 text-xs text-amber-700 font-medium">
                       <Edit3 className="h-3 w-3" />
-                      Please enter the information manually from the document above.
+                      Fields below are editable — type directly from the card image.
                     </div>
                   </div>
                 )}
@@ -651,11 +650,10 @@ export function VerificationReviewModal({
                   </div>
                 ) : (
                   <Button
-                    className={`w-full font-semibold h-11 ${
-                      decisionMode === 'resubmit'
+                    className={`w-full font-semibold h-11 ${decisionMode === 'resubmit'
                         ? 'bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white'
                         : 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white'
-                    }`}
+                      }`}
                     disabled={!rejectionReason.trim() || submitting}
                     onClick={() => handleDecision(decisionMode)}
                   >
@@ -696,11 +694,10 @@ function ToolBtn({
       onClick={onClick}
       title={title}
       aria-label={title}
-      className={`h-8 w-8 flex items-center justify-center rounded-md transition-colors ${
-        active
+      className={`h-8 w-8 flex items-center justify-center rounded-md transition-colors ${active
           ? 'text-amber-400 bg-slate-800'
           : 'text-slate-200 hover:text-white hover:bg-slate-800 active:bg-slate-700'
-      }`}
+        }`}
     >
       {children}
     </button>
