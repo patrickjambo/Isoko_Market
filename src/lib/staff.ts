@@ -34,9 +34,21 @@ export async function ensureStaffRole<T extends Pick<User, 'id' | 'email' | 'rol
   user: T
 ): Promise<T> {
   const target = user.email ? staffRoleForEmail(user.email) : null;
-  if (!target || user.role === 'ADMIN') return user; // not staff, or already an admin
+  // Promote if: user is a configured staff email AND either
+  //   (a) hasn't been given ADMIN role yet, OR
+  //   (b) is already ADMIN but somehow has no adminRole (e.g. seeded manually)
+  // The env config is the bootstrap source of truth; the UI manages sub-role
+  // changes after first promotion, so we only fill a null adminRole, never change
+  // an existing one.
+  if (!target) return user; // not in staff lists
+  if (user.role === 'ADMIN' && user.adminRole) return user; // already fully configured
+
   return prisma.user.update({
     where: { id: user.id },
-    data: { role: 'ADMIN' as Role, adminRole: target },
+    data: {
+      role: 'ADMIN' as Role,
+      // Only assign adminRole if it's currently null — don't override a changed role.
+      adminRole: user.adminRole ? (user.adminRole as AdminRole) : target,
+    },
   }) as unknown as Promise<T>;
 }

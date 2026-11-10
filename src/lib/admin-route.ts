@@ -7,6 +7,7 @@ import { effectivePermissions } from './permissions';
 import { can } from './authz';
 import { rateLimit } from './rate-limit';
 import { recordRequest } from './metrics';
+import { ensureStaffRole } from './staff';
 
 /**
  * Single gateway for every /api/admin/* route (the spec's `withAdminAuth`).
@@ -36,9 +37,16 @@ export function adminRoute<Ctx = unknown>(
     const start = Date.now();
     let errored = false;
     try {
-      const admin = await requireUser();
+      let admin = await requireUser();
       if (admin.role !== 'ADMIN') {
         throw new ApiError('FORBIDDEN', 'Admin access required.');
+      }
+
+      // Self-heal: if the user is ADMIN but has no adminRole (e.g. seeded manually
+      // before the env bootstrap ran), try to reconcile it now so the session's
+      // next request works without requiring a re-login.
+      if (!admin.adminRole) {
+        admin = await ensureStaffRole(admin);
       }
 
       // Per-admin rate limit on every admin call.

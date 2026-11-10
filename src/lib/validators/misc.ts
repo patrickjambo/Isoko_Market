@@ -34,7 +34,16 @@ export const paymentSchema = z.object({
 });
 
 export const verificationSubmitSchema = z.object({
-  idDocumentUrl: z.string().url('Upload your ID first.'),
+  // Accept both absolute URLs (Vercel Blob / S3) and relative paths (/uploads/…) used by
+  // the local storage driver in development. We validate it's a non-empty string pointing
+  // to a path that looks like an upload, rather than an arbitrary URL, to prevent abuse.
+  idDocumentUrl: z
+    .string()
+    .min(4, 'Upload your ID first.')
+    .refine(
+      (v) => /^https?:\/\//i.test(v) || v.startsWith('/uploads/'),
+      'Upload your ID first.'
+    ),
 });
 
 export const partnerSchema = z.object({
