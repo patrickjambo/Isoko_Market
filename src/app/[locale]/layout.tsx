@@ -18,15 +18,43 @@ export const metadata: Metadata = {
     template: '%s · Zenova',
   },
   description:
-    'A trust-first, multilingual marketplace and job board for Rwandan youth. Buy, sell, and find work with verified people. Kinyarwanda, English & French.',
+    'Rwanda\'s trusted online marketplace. Buy, sell, rent, find services and jobs. Verified sellers, secure payments, available in Kinyarwanda, English & French.',
   applicationName: 'Zenova',
-  // Use the validated env (empty/whitespace already normalized to the default)
-  // so an unset/blank NEXT_PUBLIC_APP_URL can't crash the build via new URL('').
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   manifest: '/manifest.webmanifest',
-  // Installable-app polish: home-screen icon + full-screen iOS launch. Both the
-  // favicon and the Apple touch icon use the Zenova logo (a raster PNG — iOS
-  // ignores SVG apple-touch-icons, so a raster is required for a clean install).
+  keywords: [
+    'online marketplace Rwanda',
+    'buy and sell Rwanda',
+    'buy electronics Kigali',
+    'second hand products Rwanda',
+    'rental houses Kigali',
+    'find services Rwanda',
+    'jobs in Rwanda',
+    'Kigali marketplace',
+    'Zenova Rwanda',
+  ],
+  openGraph: {
+    type: 'website',
+    siteName: 'Zenova Rwanda',
+    title: 'Zenova — Buy, Sell, Rent & Find Work in Rwanda',
+    description:
+      'Rwanda\'s trusted online marketplace. Buy, sell, rent, find services and jobs with verified people across Kigali and Rwanda.',
+    url: env.NEXT_PUBLIC_APP_URL,
+    images: [
+      {
+        url: `${env.NEXT_PUBLIC_APP_URL}/icon-512.png`,
+        width: 512,
+        height: 512,
+        alt: 'Zenova Rwanda marketplace',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Zenova — Buy, Sell, Rent & Find Work in Rwanda',
+    description: 'Rwanda\'s trusted online marketplace for buying, selling, renting, and finding jobs.',
+    images: [`${env.NEXT_PUBLIC_APP_URL}/icon-512.png`],
+  },
   icons: {
     icon: [
       { url: '/favicon.ico?v=2', sizes: 'any' },
@@ -85,6 +113,42 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className="min-h-dvh bg-background font-sans">
+        {/* ── Global structured data: Organization + WebSite ── */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              {
+                '@context': 'https://schema.org',
+                '@type': 'Organization',
+                name: 'Zenova',
+                alternateName: 'Zenova Rwanda',
+                url: env.NEXT_PUBLIC_APP_URL,
+                logo: `${env.NEXT_PUBLIC_APP_URL}/icon-512.png`,
+                description:
+                  "Rwanda's trusted online marketplace for buying, selling, renting, finding services and jobs.",
+                areaServed: { '@type': 'Country', name: 'Rwanda' },
+                sameAs: [],
+              },
+              {
+                '@context': 'https://schema.org',
+                '@type': 'WebSite',
+                name: 'Zenova Rwanda',
+                url: env.NEXT_PUBLIC_APP_URL,
+                description:
+                  "Rwanda's trusted online marketplace. Buy, sell, rent, find services and jobs.",
+                potentialAction: {
+                  '@type': 'SearchAction',
+                  target: {
+                    '@type': 'EntryPoint',
+                    urlTemplate: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace?q={search_term_string}`,
+                  },
+                  'query-input': 'required name=search_term_string',
+                },
+              },
+            ]),
+          }}
+        />
         <NextIntlClientProvider messages={messages}>
           <Providers user={user ? toSessionUser(user) : null} initialFlags={flags} initialSubscriptionSettings={{
               subscriptionEnabled: settings.subscriptionEnabled,

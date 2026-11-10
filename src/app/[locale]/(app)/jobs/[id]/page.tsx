@@ -1,5 +1,7 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale, getLocale } from 'next-intl/server';
+import { env } from '@/lib/env';
 import { MapPin, Users, Wallet, Sparkles, Navigation, FileText, Pencil } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +24,56 @@ import { matchScore, labelForSkill } from '@/lib/skills';
 import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const dynamic = 'force-dynamic';
+
+// ── SEO: Per-job metadata ─────────────────────────────────────────────────────
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string; id: string };
+}): Promise<Metadata> {
+  const job = await getJob(params.id);
+  if (!job || job.status === 'CLOSED') return {};
+
+  const BASE = env.NEXT_PUBLIC_APP_URL;
+  const LOCALES = ['en', 'rw', 'fr'] as const;
+
+  const employer = job.employer.businessName || job.employer.fullName;
+  const location = job.location ? ` in ${job.location}` : ' in Rwanda';
+  const jobType = job.type === 'GIG' ? 'Gig' : 'Job';
+
+  const title = `${job.title}${location} – ${jobType} Opportunity | Zenova Rwanda`;
+  const rawDesc = job.description?.replace(/\s+/g, ' ').trim() ?? '';
+  const description = rawDesc.length > 155
+    ? rawDesc.slice(0, 152) + '…'
+    : rawDesc || `${jobType} opportunity: ${job.title}${location}. Posted by ${employer} on Zenova Rwanda.`;
+
+  const canonicalPath = `/en/jobs/${job.id}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE}${canonicalPath}`,
+      languages: Object.fromEntries(
+        LOCALES.map((l) => [l, `${BASE}/${l}/jobs/${job.id}`])
+      ),
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}${canonicalPath}`,
+      siteName: 'Zenova Rwanda',
+      images: [{ url: `${BASE}/icon-512.png`, width: 512, height: 512, alt: 'Zenova Rwanda Jobs' }],
+      type: 'website',
+      locale: params.locale,
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
+  };
+}
 
 export default async function JobDetailPage({
   params,
@@ -87,6 +139,57 @@ export default async function JobDetailPage({
   return (
     <div className="container max-w-4xl py-6">
       <LiveItemStatus topic={`job:${job.id}`} />
+
+      {/* ── Structured data: JobPosting + BreadcrumbList (Google Rich Results) ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              '@context': 'https://schema.org',
+              '@type': 'JobPosting',
+              title: job.title,
+              description: job.description ?? undefined,
+              datePosted: job.createdAt.toISOString(),
+              hiringOrganization: {
+                '@type': 'Organization',
+                name: job.employer.businessName || job.employer.fullName,
+              },
+              jobLocation: {
+                '@type': 'Place',
+                address: {
+                  '@type': 'PostalAddress',
+                  addressLocality: job.location ?? 'Rwanda',
+                  addressCountry: 'RW',
+                },
+              },
+              employmentType: job.type === 'GIG' ? 'TEMPORARY' : 'FULL_TIME',
+              url: `${env.NEXT_PUBLIC_APP_URL}/en/jobs/${job.id}`,
+              ...(job.payMin && {
+                baseSalary: {
+                  '@type': 'MonetaryAmount',
+                  currency: 'RWF',
+                  value: {
+                    '@type': 'QuantitativeValue',
+                    minValue: job.payMin,
+                    ...(job.payMax && { maxValue: job.payMax }),
+                    unitText: job.payPeriod ?? 'MONTH',
+                  },
+                },
+              }),
+            },
+            {
+              '@context': 'https://schema.org',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: `${env.NEXT_PUBLIC_APP_URL}/en` },
+                { '@type': 'ListItem', position: 2, name: 'Jobs', item: `${env.NEXT_PUBLIC_APP_URL}/en/jobs` },
+                { '@type': 'ListItem', position: 3, name: job.title, item: `${env.NEXT_PUBLIC_APP_URL}/en/jobs/${job.id}` },
+              ],
+            },
+          ]),
+        }}
+      />
 
       <div className="grid gap-6 md:grid-cols-3">
         <div className="space-y-5 md:col-span-2">

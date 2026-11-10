@@ -1,5 +1,7 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { env } from '@/lib/env';
 import { MapPin, Tag, Phone, Navigation } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +33,63 @@ import { categoryName } from '@/lib/i18n-helpers';
 import { categoryFallbackImage } from '@/lib/listing-image';
 
 export const dynamic = 'force-dynamic';
+
+// ── SEO: Per-listing metadata ─────────────────────────────────────────────────
+// Called by Next.js before rendering — fetches only the minimum needed fields.
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string; id: string };
+}): Promise<Metadata> {
+  const listing = await getListing(params.id);
+  if (!listing || listing.status === 'REMOVED') return {};
+
+  const BASE = env.NEXT_PUBLIC_APP_URL;
+  const LOCALES = ['en', 'rw', 'fr'] as const;
+
+  const sellerName = listing.seller.businessName || listing.seller.fullName;
+  const locationLabel = listing.location ? ` in ${listing.location}` : '';
+  const kindLabel = listing.kind === 'SERVICE' ? 'Service' : 'For Sale';
+
+  const title = `${listing.title}${locationLabel} – ${kindLabel} | Zenova Rwanda`;
+  const rawDesc = listing.description?.replace(/\s+/g, ' ').trim() ?? '';
+  const description = rawDesc.length > 155 ? rawDesc.slice(0, 152) + '…' : rawDesc ||
+    `${listing.title} listed by ${sellerName}${locationLabel} on Zenova Rwanda marketplace.`;
+
+  const firstImage = listing.images[0]?.url;
+  // Resolve relative upload URLs to absolute (needed for OG crawlers)
+  const ogImage = firstImage
+    ? firstImage.startsWith('http') ? firstImage : `${BASE}${firstImage}`
+    : `${BASE}/icon-512.png`;
+
+  const canonicalPath = `/en/marketplace/${listing.id}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE}${canonicalPath}`,
+      languages: Object.fromEntries(
+        LOCALES.map((l) => [l, `${BASE}/${l}/marketplace/${listing.id}`])
+      ),
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}${canonicalPath}`,
+      siteName: 'Zenova Rwanda',
+      images: [{ url: ogImage, width: 1200, height: 630, alt: listing.title }],
+      type: 'website',
+      locale: params.locale,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function ListingDetailPage({
   params,
@@ -112,6 +171,50 @@ export default async function ListingDetailPage({
   return (
     <div className="container py-6">
       <LiveItemStatus topic={`listing:${listing.id}`} />
+
+      {/* ── Structured data: Product + BreadcrumbList (Google Rich Results) ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              '@context': 'https://schema.org',
+              '@type': listing.kind === 'SERVICE' ? 'Service' : 'Product',
+              name: listing.title,
+              description: listing.description ?? undefined,
+              image: listing.images.map((img) =>
+                img.url.startsWith('http') ? img.url : `${env.NEXT_PUBLIC_APP_URL}${img.url}`
+              ),
+              url: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}`,
+              ...(listing.price > 0 && listing.kind !== 'SERVICE' && {
+                offers: {
+                  '@type': 'Offer',
+                  priceCurrency: 'RWF',
+                  price: (listing.price / 100).toFixed(0),
+                  availability:
+                    listing.status === 'ACTIVE'
+                      ? 'https://schema.org/InStock'
+                      : 'https://schema.org/OutOfStock',
+                  url: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}`,
+                  seller: {
+                    '@type': 'Person',
+                    name: listing.seller.businessName || listing.seller.fullName,
+                  },
+                },
+              }),
+            },
+            {
+              '@context': 'https://schema.org',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: `${env.NEXT_PUBLIC_APP_URL}/en` },
+                { '@type': 'ListItem', position: 2, name: 'Marketplace', item: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace` },
+                { '@type': 'ListItem', position: 3, name: listing.title, item: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}` },
+              ],
+            },
+          ]),
+        }}
+      />
 
       <div className="grid gap-8 lg:grid-cols-2">
         <ImageGallery
