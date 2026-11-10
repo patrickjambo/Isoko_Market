@@ -103,6 +103,13 @@ export function VerificationReviewModal({
   const [submitting, setSubmitting] = useState(false);
   const [ocrRefreshing, setOcrRefreshing] = useState(false);
 
+  // ── Zoom / Pan helpers — MUST be before early return (Rules of Hooks) ──
+  const handleZoomIn = useCallback(() => setZoom((p) => Math.min(p + 0.25, 4)), []);
+  const handleZoomOut = useCallback(() => setZoom((p) => Math.max(p - 0.25, 0.5)), []);
+  const handleResetView = useCallback(() => { setZoom(1); setRotation(0); setPosition({ x: 0, y: 0 }); }, []);
+  const handleRotateCw = useCallback(() => setRotation((p) => (p + 90) % 360), []);
+  const handleRotateCcw = useCallback(() => setRotation((p) => (p - 90 + 360) % 360), []);
+
   // ── Initialize data when request opens ────────────────────────────────
   useEffect(() => {
     if (request) {
@@ -129,13 +136,6 @@ export function VerificationReviewModal({
   // OCR pending — no results yet (not even a manual-review flag with data)
   const ocrIsPending = !request.extractedFullName && !request.extractedIdNumber && !request.ocrConfidence;
   const ocrHasNoApiKey = ocrIsPending || (request.needsManualReview && !request.extractedFullName);
-
-  // ── Zoom / Pan helpers ─────────────────────────────────────────────────
-  const handleZoomIn = useCallback(() => setZoom((p) => Math.min(p + 0.25, 4)), []);
-  const handleZoomOut = useCallback(() => setZoom((p) => Math.max(p - 0.25, 0.5)), []);
-  const handleResetView = useCallback(() => { setZoom(1); setRotation(0); setPosition({ x: 0, y: 0 }); }, []);
-  const handleRotateCw = useCallback(() => setRotation((p) => (p + 90) % 360), []);
-  const handleRotateCcw = useCallback(() => setRotation((p) => (p - 90 + 360) % 360), []);
 
   // ── Mouse drag (desktop) ───────────────────────────────────────────────
   function handleMouseDown(e: MouseEvent<HTMLDivElement>) {
