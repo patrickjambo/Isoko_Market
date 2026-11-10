@@ -3,6 +3,9 @@ import { adminRoute } from '@/lib/admin-route';
 import { prisma } from '@/lib/prisma';
 import { createBackup, pruneExpiredBackups, BACKUP_STORAGE_DIR, DEFAULT_SCOPES } from '@/lib/backup/engine';
 
+// Backup creation can take 30–90s for large databases on Vercel
+export const maxDuration = 120;
+
 const createBackupSchema = z.object({
   type: z.enum(['FULL', 'INCREMENTAL', 'SAFETY_SNAPSHOT']).default('FULL'),
   scope: z.array(z.string()).optional(),

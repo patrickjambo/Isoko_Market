@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, MouseEvent } from 'react';
+import { useState, useRef, useEffect, useCallback, MouseEvent, TouchEvent } from 'react';
 import {
   ZoomIn,
   ZoomOut,
@@ -9,7 +9,7 @@ import {
   Maximize2,
   Check,
   X,
-  RotateCcw as RefreshIcon,
+  RefreshCw,
   ShieldCheck,
   AlertTriangle,
   Info,
@@ -17,11 +17,12 @@ import {
   CheckCircle2,
   Loader2,
   User,
-  Calendar,
   Globe,
   FileText,
-  Eye,
-  Sliders,
+  Contrast,
+  ChevronDown,
+  ChevronUp,
+  Edit3,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
@@ -84,6 +85,11 @@ export function VerificationReviewModal({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [contrastHigh, setContrastHigh] = useState(false);
+  const [imageCollapsed, setImageCollapsed] = useState(false);
+
+  // Touch pinch-zoom tracking
+  const lastTouchDist = useRef<number | null>(null);
+  const lastTouchPos = useRef<{ x: number; y: number } | null>(null);
 
   // Form fields for reviewed data
   const [verifiedName, setVerifiedName] = useState('');
@@ -97,18 +103,21 @@ export function VerificationReviewModal({
   const [submitting, setSubmitting] = useState(false);
   const [ocrRefreshing, setOcrRefreshing] = useState(false);
 
-  // Initialize data when request opens
+  // ── Initialize data when request opens ────────────────────────────────
   useEffect(() => {
     if (request) {
-      setVerifiedName(request.extractedFullName || request.user.fullName || '');
-      setVerifiedIdNum(request.extractedIdNumber || '');
-      setVerifiedCountry(request.extractedCountry || 'Rwanda');
+      // IMPORTANT: Only pre-fill from OCR, NOT from the account name.
+      // If OCR has no result yet, leave fields blank so admin enters them manually.
+      setVerifiedName(request.extractedFullName ?? '');
+      setVerifiedIdNum(request.extractedIdNumber ?? '');
+      setVerifiedCountry(request.extractedCountry ?? 'Rwanda');
       setHasConfirmedVisualReview(false);
       setDecisionMode('view');
       setRejectionReason('');
       setZoom(1);
       setRotation(0);
       setPosition({ x: 0, y: 0 });
+      setImageCollapsed(false);
     }
   }, [request]);
 
@@ -117,51 +126,72 @@ export function VerificationReviewModal({
   const docSrc = `/api/admin/verifications/${request.id}/document`;
   const idValidation = verifiedIdNum ? validateRwandanIdNumber(verifiedIdNum) : null;
 
-  // Zoom / Pan handlers
-  function handleZoomIn() {
-    setZoom((prev) => Math.min(prev + 0.25, 4));
-  }
-  function handleZoomOut() {
-    setZoom((prev) => Math.max(prev - 0.25, 0.5));
-  }
-  function handleResetView() {
-    setZoom(1);
-    setRotation(0);
-    setPosition({ x: 0, y: 0 });
-  }
-  function handleRotateCw() {
-    setRotation((prev) => (prev + 90) % 360);
-  }
-  function handleRotateCcw() {
-    setRotation((prev) => (prev - 90 + 360) % 360);
-  }
+  // OCR pending — no results yet (not even a manual-review flag with data)
+  const ocrIsPending = !request.extractedFullName && !request.extractedIdNumber && !request.ocrConfidence;
+  const ocrHasNoApiKey = ocrIsPending || (request.needsManualReview && !request.extractedFullName);
 
+  // ── Zoom / Pan helpers ─────────────────────────────────────────────────
+  const handleZoomIn = useCallback(() => setZoom((p) => Math.min(p + 0.25, 4)), []);
+  const handleZoomOut = useCallback(() => setZoom((p) => Math.max(p - 0.25, 0.5)), []);
+  const handleResetView = useCallback(() => { setZoom(1); setRotation(0); setPosition({ x: 0, y: 0 }); }, []);
+  const handleRotateCw = useCallback(() => setRotation((p) => (p + 90) % 360), []);
+  const handleRotateCcw = useCallback(() => setRotation((p) => (p - 90 + 360) % 360), []);
+
+  // ── Mouse drag (desktop) ───────────────────────────────────────────────
   function handleMouseDown(e: MouseEvent<HTMLDivElement>) {
     if (zoom > 1) {
       setIsDragging(true);
       setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
     }
   }
-
   function handleMouseMove(e: MouseEvent<HTMLDivElement>) {
     if (isDragging && zoom > 1) {
+      setPosition({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
+    }
+  }
+  function handleMouseUp() { setIsDragging(false); }
+
+  // ── Touch events (mobile pan + pinch-zoom) ─────────────────────────────
+  function getTouchDist(t1: React.Touch, t2: React.Touch) {
+    return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+  }
+  function handleTouchStart(e: TouchEvent<HTMLDivElement>) {
+    const t0 = e.touches[0];
+    const t1 = e.touches[1];
+    if (e.touches.length === 2 && t0 && t1) {
+      lastTouchDist.current = getTouchDist(t0, t1);
+    } else if (e.touches.length === 1 && t0 && zoom > 1) {
+      lastTouchPos.current = { x: t0.clientX - position.x, y: t0.clientY - position.y };
+      setIsDragging(true);
+    }
+  }
+  function handleTouchMove(e: TouchEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const t0 = e.touches[0];
+    const t1 = e.touches[1];
+    if (e.touches.length === 2 && t0 && t1 && lastTouchDist.current !== null) {
+      const dist = getTouchDist(t0, t1);
+      const delta = dist / lastTouchDist.current;
+      setZoom((p) => Math.min(Math.max(p * delta, 0.5), 4));
+      lastTouchDist.current = dist;
+    } else if (e.touches.length === 1 && t0 && isDragging && lastTouchPos.current && zoom > 1) {
       setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
+        x: t0.clientX - lastTouchPos.current.x,
+        y: t0.clientY - lastTouchPos.current.y,
       });
     }
   }
-
-  function handleMouseUp() {
+  function handleTouchEnd() {
     setIsDragging(false);
+    lastTouchDist.current = null;
+    lastTouchPos.current = null;
   }
 
+  // ── Re-run OCR ─────────────────────────────────────────────────────────
   async function handleRerunOcr() {
     setOcrRefreshing(true);
     try {
-      const res = await fetch(`/api/admin/verifications/${request!.id}/ocr`, {
-        method: 'POST',
-      });
+      const res = await fetch(`/api/admin/verifications/${request!.id}/ocr`, { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message || 'Failed to re-run OCR');
 
@@ -170,7 +200,7 @@ export function VerificationReviewModal({
         if (ocr.fullName) setVerifiedName(ocr.fullName);
         if (ocr.idNumber) setVerifiedIdNum(ocr.idNumber);
         if (ocr.country) setVerifiedCountry(ocr.country);
-        toast('OCR re-scanned successfully', 'success');
+        toast(ocr.needsManualReview ? 'OCR complete — please review and correct the fields' : 'OCR extracted successfully', 'success');
       }
     } catch (err) {
       toast(err instanceof Error ? err.message : 'OCR scan failed', 'error');
@@ -179,12 +209,12 @@ export function VerificationReviewModal({
     }
   }
 
+  // ── Admin Decision ─────────────────────────────────────────────────────
   async function handleDecision(decision: 'approve' | 'reject' | 'resubmit') {
     if (decision === 'approve' && !hasConfirmedVisualReview) {
       toast('Please confirm visual verification before approving.', 'error');
       return;
     }
-
     if ((decision === 'reject' || decision === 'resubmit') && !rejectionReason.trim()) {
       toast('A reason must be provided.', 'error');
       return;
@@ -192,11 +222,10 @@ export function VerificationReviewModal({
 
     setSubmitting(true);
     try {
-      const payload: Record<string, any> = {
+      const payload: Record<string, unknown> = {
         decision,
         reason: rejectionReason.trim() || undefined,
       };
-
       if (decision === 'approve') {
         payload.verifiedFullName = verifiedName.trim();
         payload.verifiedIdNumber = verifiedIdNum.trim();
@@ -230,143 +259,130 @@ export function VerificationReviewModal({
     }
   }
 
+  // ── Render ─────────────────────────────────────────────────────────────
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[92vh] overflow-hidden flex flex-col p-0">
-        <DialogHeader className="p-4 border-b border-border bg-slate-50/50 flex flex-row items-center justify-between">
-          <div>
-            <DialogTitle className="text-lg font-bold flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-emerald-600" />
-              Identity Verification & Document Inspection
+      {/*
+        Mobile: full-screen sheet from bottom (flex-col).
+        Desktop: wide side-by-side dialog (max-w-6xl).
+      */}
+      <DialogContent className="w-full max-w-6xl max-h-[95dvh] h-full sm:h-auto overflow-hidden flex flex-col p-0 gap-0">
+        {/* ── Header ── */}
+        <DialogHeader className="flex-shrink-0 px-4 py-3 border-b border-border bg-slate-50/60 flex flex-row items-center gap-3">
+          <ShieldCheck className="h-5 w-5 text-emerald-600 flex-shrink-0" />
+          <div className="min-w-0">
+            <DialogTitle className="text-base font-bold leading-tight truncate">
+              Identity Verification &amp; Document Inspection
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Visually inspect the original document and compare with extracted identity records.
+              Inspect the document and verify the extracted information.
             </DialogDescription>
           </div>
         </DialogHeader>
 
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-          {/* LEFT: Document Inspection Canvas (7 Cols) */}
-          <div className="lg:col-span-7 bg-slate-950 flex flex-col relative select-none overflow-hidden min-h-[380px] lg:min-h-[550px]">
-            {/* Toolbar */}
-            <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
-              <div className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur rounded-lg p-1.5 border border-slate-800 pointer-events-auto shadow-lg">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 w-8 p-0 text-slate-200 hover:text-white hover:bg-slate-800"
-                  onClick={handleZoomIn}
-                  title="Zoom In"
-                >
-                  <ZoomIn className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 w-8 p-0 text-slate-200 hover:text-white hover:bg-slate-800"
-                  onClick={handleZoomOut}
-                  title="Zoom Out"
-                >
-                  <ZoomOut className="h-4 w-4" />
-                </Button>
-                <div className="h-4 w-px bg-slate-700 mx-0.5" />
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 w-8 p-0 text-slate-200 hover:text-white hover:bg-slate-800"
-                  onClick={handleRotateCcw}
-                  title="Rotate Left"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 w-8 p-0 text-slate-200 hover:text-white hover:bg-slate-800"
-                  onClick={handleRotateCw}
-                  title="Rotate Right"
-                >
-                  <RotateCw className="h-4 w-4" />
-                </Button>
-                <div className="h-4 w-px bg-slate-700 mx-0.5" />
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 w-8 p-0 text-slate-200 hover:text-white hover:bg-slate-800"
-                  onClick={handleResetView}
-                  title="Reset View"
-                >
-                  <Maximize2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className={`h-8 w-8 p-0 ${
-                    contrastHigh ? 'text-amber-400 bg-slate-800' : 'text-slate-200 hover:text-white hover:bg-slate-800'
-                  }`}
-                  onClick={() => setContrastHigh(!contrastHigh)}
-                  title="Toggle High Contrast"
-                >
-                  <Sliders className="h-4 w-4" />
-                </Button>
-              </div>
+        {/* ── Body: stacked on mobile, side-by-side on lg ── */}
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
 
-              <div className="flex items-center gap-2 pointer-events-auto">
-                <a
-                  href={docSrc}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/90 text-xs text-slate-200 border border-slate-800 hover:bg-slate-800 hover:text-white transition-colors"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" /> Full Size
-                </a>
-              </div>
-            </div>
+          {/* ══ LEFT: Document Viewer ══════════════════════════════════════ */}
+          <div className="flex-shrink-0 lg:flex-1 bg-slate-950 flex flex-col relative select-none overflow-hidden"
+            style={{ minHeight: imageCollapsed ? 'auto' : undefined }}>
 
-            {/* Interactive Image Viewport */}
-            <div
-              className={`flex-1 flex items-center justify-center p-6 ${
-                zoom > 1 ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
-              }`}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
+            {/* Mobile collapse toggle */}
+            <button
+              type="button"
+              onClick={() => setImageCollapsed((v) => !v)}
+              className="lg:hidden w-full flex items-center justify-between px-4 py-2 text-xs text-slate-300 bg-slate-900 border-b border-slate-800 active:bg-slate-800"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={docSrc}
-                alt="National ID Document"
-                draggable={false}
-                style={{
-                  transform: `translate(${position.x}px, ${position.y}px) scale(${zoom}) rotate(${rotation}deg)`,
-                  transition: isDragging ? 'none' : 'transform 0.15s ease-out',
-                  filter: contrastHigh ? 'contrast(160%) brightness(110%)' : 'none',
-                }}
-                className="max-h-[82vh] max-w-full object-contain rounded shadow-2xl origin-center"
-              />
-            </div>
+              <span className="font-medium">{imageCollapsed ? 'Show Document' : 'Hide Document'}</span>
+              {imageCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            </button>
 
-            {/* Bottom Status bar */}
-            <div className="p-2.5 px-4 bg-slate-900/80 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between z-10">
-              <span>Zoom: {Math.round(zoom * 100)}% · Angle: {rotation}°</span>
-              <span className="text-[11px] text-slate-500">
-                Drag to pan when zoomed · Review all details before approving
-              </span>
-            </div>
+            {!imageCollapsed && (
+              <>
+                {/* Toolbar */}
+                <div className="absolute top-2 left-2 right-2 z-20 flex items-center justify-between pointer-events-none">
+                  {/* Controls group */}
+                  <div className="flex items-center gap-1 bg-slate-900/90 backdrop-blur-sm rounded-lg p-1 border border-slate-800 pointer-events-auto shadow-lg">
+                    <ToolBtn onClick={handleZoomIn} title="Zoom In"><ZoomIn className="h-4 w-4" /></ToolBtn>
+                    <ToolBtn onClick={handleZoomOut} title="Zoom Out"><ZoomOut className="h-4 w-4" /></ToolBtn>
+                    <div className="h-4 w-px bg-slate-700 mx-0.5" />
+                    <ToolBtn onClick={handleRotateCcw} title="Rotate Left"><RotateCcw className="h-4 w-4" /></ToolBtn>
+                    <ToolBtn onClick={handleRotateCw} title="Rotate Right"><RotateCw className="h-4 w-4" /></ToolBtn>
+                    <div className="h-4 w-px bg-slate-700 mx-0.5" />
+                    <ToolBtn onClick={handleResetView} title="Reset View"><Maximize2 className="h-4 w-4" /></ToolBtn>
+                    <ToolBtn
+                      onClick={() => setContrastHigh((v) => !v)}
+                      title="Toggle High Contrast"
+                      active={contrastHigh}
+                    >
+                      <Contrast className="h-4 w-4" />
+                    </ToolBtn>
+                  </div>
+
+                  {/* Full Size link */}
+                  <div className="pointer-events-auto">
+                    <a
+                      href={docSrc}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900/90 text-xs text-slate-200 border border-slate-800 hover:bg-slate-800 hover:text-white transition-colors"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Full Size</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Image viewport — supports mouse drag + touch pinch/pan */}
+                <div
+                  className={`flex-1 flex items-center justify-center p-4 lg:p-6 min-h-[220px] lg:min-h-[480px] touch-none ${
+                    zoom > 1 ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
+                  }`}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={docSrc}
+                    alt="National ID Document"
+                    draggable={false}
+                    style={{
+                      transform: `translate(${position.x}px, ${position.y}px) scale(${zoom}) rotate(${rotation}deg)`,
+                      transition: isDragging ? 'none' : 'transform 0.15s ease-out',
+                      filter: contrastHigh ? 'contrast(165%) brightness(110%)' : 'none',
+                    }}
+                    className="max-h-[55vh] lg:max-h-[72vh] max-w-full object-contain rounded shadow-2xl origin-center"
+                  />
+                </div>
+
+                {/* Status bar */}
+                <div className="flex-shrink-0 px-4 py-2 bg-slate-900/80 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+                  <span>Zoom: {Math.round(zoom * 100)}% · Angle: {rotation}°</span>
+                  <span className="hidden sm:inline text-slate-500 text-[11px]">
+                    Pinch/drag to explore · review all details before approving
+                  </span>
+                </div>
+              </>
+            )}
           </div>
 
-          {/* RIGHT: Extracted Information & Admin Comparison (5 Cols) */}
-          <div className="lg:col-span-5 flex flex-col border-l border-border bg-card overflow-y-auto max-h-[85vh]">
-            <div className="p-5 space-y-5">
-              {/* Registered Profile Header */}
-              <div className="rounded-xl border border-border p-3.5 bg-slate-50/70 space-y-2">
+          {/* ══ RIGHT: Extracted Info & Decision ══════════════════════════ */}
+          <div className="lg:w-[400px] xl:w-[440px] flex-shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-border bg-card overflow-y-auto">
+            <div className="p-4 space-y-4">
+
+              {/* ── Registered Account Card ── */}
+              <div className="rounded-xl border border-border p-3 bg-slate-50/70 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                    <User className="h-3.5 w-3.5" /> Registered Customer Account
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <User className="h-3.5 w-3.5" /> Registered Account
                   </span>
                   <Badge variant="outline" className="text-[10px] font-mono">
-                    ID: {request.user.id.slice(0, 12)}...
+                    {request.user.id.slice(0, 10)}…
                   </Badge>
                 </div>
                 <div className="text-sm font-bold text-foreground">{request.user.fullName}</div>
@@ -377,83 +393,108 @@ export function VerificationReviewModal({
                 </div>
               </div>
 
-              {/* Automated Extraction OCR Card */}
+              {/* ── OCR Section ── */}
               <div className="rounded-xl border border-border p-4 space-y-3 bg-white">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                    <FileText className="h-3.5 w-3.5 text-primary" /> Extracted Information (OCR)
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5 text-primary" /> Extracted Info (OCR)
                   </span>
                   <Button
                     size="sm"
-                    variant="ghost"
-                    className="h-7 text-xs px-2 text-muted-foreground hover:text-foreground"
+                    variant="outline"
+                    className="h-7 text-xs px-2.5 gap-1.5 flex-shrink-0"
                     onClick={handleRerunOcr}
                     disabled={ocrRefreshing}
                   >
                     {ocrRefreshing ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     ) : (
-                      <RefreshIcon className="h-3.5 w-3.5 mr-1" />
+                      <RefreshCw className="h-3.5 w-3.5" />
                     )}
                     Re-run OCR
                   </Button>
                 </div>
 
-                {/* Confidence Badge */}
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant={
-                      (request.ocrConfidence ?? 0) >= 0.75
-                        ? 'success'
-                        : (request.ocrConfidence ?? 0) >= 0.5
-                          ? 'outline'
-                          : 'destructive'
-                    }
-                    className="text-[11px]"
-                  >
-                    {Math.round((request.ocrConfidence ?? 0.8) * 100)}% Extraction Confidence
-                  </Badge>
-                  {request.needsManualReview && (
-                    <Badge variant="destructive" className="text-[10px] flex items-center gap-1">
-                      <AlertTriangle className="h-3 w-3" /> Manual Review Flagged
-                    </Badge>
-                  )}
-                </div>
+                {/* ── OCR Pending Banner ── */}
+                {ocrHasNoApiKey && (
+                  <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 space-y-1.5">
+                    <div className="flex items-center gap-2 text-amber-800 font-semibold text-xs">
+                      <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+                      OCR Extraction Unavailable
+                    </div>
+                    <p className="text-xs text-amber-700 leading-relaxed">
+                      No AI Vision API key is configured. Add{' '}
+                      <code className="bg-amber-100 px-1 rounded font-mono text-[11px]">ANTHROPIC_API_KEY</code>{' '}
+                      to Vercel environment variables for automatic extraction.
+                    </p>
+                    <div className="flex items-center gap-1.5 text-xs text-amber-700 font-medium">
+                      <Edit3 className="h-3 w-3" />
+                      Please enter the information manually from the document above.
+                    </div>
+                  </div>
+                )}
 
-                {/* Comparison Fields: Name */}
+                {/* Confidence badge (only if OCR ran) */}
+                {!ocrIsPending && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge
+                      variant={
+                        (request.ocrConfidence ?? 0) >= 0.75
+                          ? 'success'
+                          : (request.ocrConfidence ?? 0) >= 0.5
+                            ? 'outline'
+                            : 'destructive'
+                      }
+                      className="text-[11px]"
+                    >
+                      {Math.round((request.ocrConfidence ?? 0) * 100)}% Confidence
+                    </Badge>
+                    {request.needsManualReview && (
+                      <Badge variant="destructive" className="text-[10px] flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" /> Review Flagged
+                      </Badge>
+                    )}
+                  </div>
+                )}
+
+                {/* ── Cardholder Full Name ── */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <Label htmlFor="vName" className="font-semibold text-slate-700">
                       Cardholder Full Name
                     </Label>
-                    {verifiedName.toLowerCase() === request.user.fullName.toLowerCase() ? (
-                      <span className="text-emerald-600 text-[11px] flex items-center gap-0.5">
-                        <Check className="h-3 w-3" /> Matches Account
-                      </span>
-                    ) : (
-                      <span className="text-amber-600 text-[11px] flex items-center gap-0.5">
-                        <Info className="h-3 w-3" /> Name diff vs account
-                      </span>
+                    {verifiedName && (
+                      verifiedName.toLowerCase() === request.user.fullName.toLowerCase() ? (
+                        <span className="text-emerald-600 text-[11px] flex items-center gap-0.5">
+                          <Check className="h-3 w-3" /> Matches Account
+                        </span>
+                      ) : (
+                        <span className="text-amber-600 text-[11px] flex items-center gap-0.5">
+                          <Info className="h-3 w-3" /> Differs from account
+                        </span>
+                      )
                     )}
                   </div>
                   <Input
                     id="vName"
                     value={verifiedName}
                     onChange={(e) => setVerifiedName(e.target.value)}
-                    className="h-9 text-xs"
+                    className="h-9 text-sm"
                     placeholder="Full name as printed on card"
+                    autoComplete="off"
                   />
+                  <p className="text-[11px] text-muted-foreground">Edit if OCR is incorrect</p>
                 </div>
 
-                {/* Comparison Fields: National ID Number */}
+                {/* ── National ID Number ── */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <Label htmlFor="vId" className="font-semibold text-slate-700">
-                      National Identification Number
+                      National ID Number
                     </Label>
                     {idValidation?.valid && (
                       <span className="text-emerald-600 text-[11px] flex items-center gap-0.5 font-medium">
-                        <Check className="h-3 w-3" /> Valid Rwandan 16-Digit NID
+                        <Check className="h-3 w-3" /> Valid 16-Digit NID
                       </span>
                     )}
                   </div>
@@ -461,17 +502,19 @@ export function VerificationReviewModal({
                     id="vId"
                     value={verifiedIdNum}
                     onChange={(e) => setVerifiedIdNum(e.target.value.replace(/\s+/g, ''))}
-                    className="h-9 text-xs font-mono font-bold tracking-wider"
-                    placeholder="1 1995 8 0012345 0 24"
+                    className="h-9 text-sm font-mono font-bold tracking-wider"
+                    placeholder="e.g. 1199980083076077"
                     maxLength={16}
+                    inputMode="numeric"
+                    autoComplete="off"
                   />
                   {idValidation && (
-                    <div className="text-[11px] text-muted-foreground flex flex-wrap gap-2 pt-0.5">
+                    <div className="text-[11px] text-muted-foreground flex flex-wrap gap-x-2 gap-y-0.5 pt-0.5">
                       {idValidation.valid ? (
                         <>
                           <span>Birth Year: {idValidation.birthYear}</span>
                           <span>·</span>
-                          <span>Category: {idValidation.isCitizen ? 'Citizen' : 'Foreigner/Refugee'}</span>
+                          <span>{idValidation.isCitizen ? 'Citizen' : 'Foreigner/Refugee'}</span>
                           <span>·</span>
                           <span>Gender: {idValidation.genderIndicator}</span>
                         </>
@@ -482,7 +525,7 @@ export function VerificationReviewModal({
                   )}
                 </div>
 
-                {/* Comparison Fields: Country */}
+                {/* ── Issuing Country ── */}
                 <div className="space-y-1">
                   <Label htmlFor="vCountry" className="text-xs font-semibold text-slate-700 flex items-center gap-1">
                     <Globe className="h-3.5 w-3.5" /> Issuing Country
@@ -491,8 +534,9 @@ export function VerificationReviewModal({
                     id="vCountry"
                     value={verifiedCountry}
                     onChange={(e) => setVerifiedCountry(e.target.value)}
-                    className="h-9 text-xs"
+                    className="h-9 text-sm"
                     placeholder="Rwanda"
+                    autoComplete="off"
                   />
                   <p className="text-[11px] text-muted-foreground">
                     Recognized from &quot;Republic of Rwanda&quot; / &quot;Repubulika y&apos;u Rwanda&quot;
@@ -500,24 +544,25 @@ export function VerificationReviewModal({
                 </div>
               </div>
 
-              {/* Legal Review Confirmation Checkbox */}
-              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-2">
-                <label className="flex items-start gap-2.5 cursor-pointer text-xs leading-relaxed text-slate-700">
+              {/* ── Visual Review Confirmation ── */}
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
+                <label className="flex items-start gap-3 cursor-pointer text-xs leading-relaxed text-slate-700">
                   <input
                     type="checkbox"
                     checked={hasConfirmedVisualReview}
                     onChange={(e) => setHasConfirmedVisualReview(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary flex-shrink-0"
                   />
                   <span>
-                    <strong>Administrator Visual Review Confirmation:</strong> I have personally reviewed
-                    the uploaded ID photo, confirmed it is genuine and unmanipulated, and verified that
-                    the full name and 16-digit ID number accurately correspond with the customer.
+                    <strong>Administrator Visual Review Confirmation:</strong> I have personally
+                    reviewed the uploaded ID photo, confirmed it is genuine and unmanipulated, and
+                    verified that the full name and 16-digit ID number accurately correspond with
+                    the customer.
                   </span>
                 </label>
               </div>
 
-              {/* Conditional Reason Drawer for Reject or Resubmit */}
+              {/* ── Conditional Reason Drawer ── */}
               {decisionMode !== 'view' && (
                 <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3.5 space-y-2">
                   <div className="flex items-center justify-between">
@@ -527,7 +572,7 @@ export function VerificationReviewModal({
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-6 text-xs p-1 text-slate-500"
+                      className="h-6 text-xs p-1 text-slate-500 hover:text-slate-800"
                       onClick={() => setDecisionMode('view')}
                     >
                       Cancel
@@ -547,7 +592,7 @@ export function VerificationReviewModal({
                           key={preset}
                           type="button"
                           onClick={() => setRejectionReason(preset)}
-                          className="text-[10px] px-2 py-0.5 rounded bg-white border border-amber-200 text-amber-900 hover:bg-amber-100 transition-colors"
+                          className="text-[10px] px-2 py-0.5 rounded bg-white border border-amber-200 text-amber-900 hover:bg-amber-100 active:bg-amber-200 transition-colors"
                         >
                           {preset}
                         </button>
@@ -565,12 +610,12 @@ export function VerificationReviewModal({
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="space-y-2 pt-2">
+              {/* ── Action Buttons ── */}
+              <div className="space-y-2 pb-4">
                 {decisionMode === 'view' ? (
                   <div className="flex flex-col gap-2">
                     <Button
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-semibold"
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white gap-2 font-semibold h-11"
                       disabled={!hasConfirmedVisualReview || submitting}
                       onClick={() => handleDecision('approve')}
                     >
@@ -579,37 +624,37 @@ export function VerificationReviewModal({
                       ) : (
                         <CheckCircle2 className="h-4 w-4" />
                       )}
-                      Approve & Verify Customer ID
+                      Approve &amp; Verify Customer ID
                     </Button>
 
                     <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
-                        className="text-amber-700 border-amber-300 hover:bg-amber-50 text-xs"
+                        className="text-amber-700 border-amber-300 hover:bg-amber-50 active:bg-amber-100 h-10"
                         onClick={() => setDecisionMode('resubmit')}
                         disabled={submitting}
                       >
-                        <RefreshIcon className="h-3.5 w-3.5 mr-1.5" />
-                        Request Re-upload
+                        <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                        Re-upload
                       </Button>
 
                       <Button
                         variant="outline"
-                        className="text-rose-700 border-rose-300 hover:bg-rose-50 text-xs"
+                        className="text-rose-700 border-rose-300 hover:bg-rose-50 active:bg-rose-100 h-10"
                         onClick={() => setDecisionMode('reject')}
                         disabled={submitting}
                       >
                         <X className="h-3.5 w-3.5 mr-1.5" />
-                        Reject Submission
+                        Reject
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <Button
-                    className={`w-full font-semibold ${
+                    className={`w-full font-semibold h-11 ${
                       decisionMode === 'resubmit'
-                        ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                        : 'bg-rose-600 hover:bg-rose-700 text-white'
+                        ? 'bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white'
+                        : 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white'
                     }`}
                     disabled={!rejectionReason.trim() || submitting}
                     onClick={() => handleDecision(decisionMode)}
@@ -617,7 +662,7 @@ export function VerificationReviewModal({
                     {submitting ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : decisionMode === 'resubmit' ? (
-                      <RefreshIcon className="h-4 w-4 mr-2" />
+                      <RefreshCw className="h-4 w-4 mr-2" />
                     ) : (
                       <X className="h-4 w-4 mr-2" />
                     )}
@@ -630,5 +675,34 @@ export function VerificationReviewModal({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// ── Small icon button for the document toolbar ──────────────────────────
+function ToolBtn({
+  onClick,
+  title,
+  active,
+  children,
+}: {
+  onClick: () => void;
+  title: string;
+  active?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      className={`h-8 w-8 flex items-center justify-center rounded-md transition-colors ${
+        active
+          ? 'text-amber-400 bg-slate-800'
+          : 'text-slate-200 hover:text-white hover:bg-slate-800 active:bg-slate-700'
+      }`}
+    >
+      {children}
+    </button>
   );
 }

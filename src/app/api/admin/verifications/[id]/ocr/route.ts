@@ -4,6 +4,9 @@ import { ApiError } from '@/lib/api';
 import { getFileBytes } from '@/lib/storage';
 import { extractIdDocumentData } from '@/lib/verification/ocr';
 
+// Allow up to 60s for OCR on Vercel (Pro plan allows up to 300s)
+export const maxDuration = 60;
+
 /**
  * POST /api/admin/verifications/[id]/ocr — Re-trigger OCR extraction on an ID document.
  */

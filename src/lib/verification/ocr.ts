@@ -15,8 +15,9 @@ export interface IdExtractionResult {
 }
 
 /**
- * Heuristic text parser that extracts Name, Rwandan 16-digit ID, and Country
- * from raw OCR text. Used as primary deterministic extractor or fallback.
+ * Heuristic text parser — works on actual text (not raw binary image bytes).
+ * Used when Claude Vision is unavailable or for processing text extracted from
+ * the filename / metadata signals.
  */
 export function parseIdTextHeuristically(text: string, userFullName?: string): IdExtractionResult {
   const reviewReasons: string[] = [];
@@ -26,38 +27,41 @@ export function parseIdTextHeuristically(text: string, userFullName?: string): I
   let fullName: string | null = null;
 
   const normalizedText = text.trim();
+  if (!normalizedText) {
+    return {
+      fullName: null,
+      idNumber: null,
+      country: null,
+      confidence: 0,
+      rawText: text,
+      needsManualReview: true,
+      reviewReasons: ['No text available for heuristic extraction — image requires visual OCR'],
+    };
+  }
 
-  // 1. Country Recognition - specific recognition for Republic of Rwanda
-  const rwandaPattern = /(republic\s+of\s+rwanda|repubulika\s+y['’]u\s+rwanda|r[eé]publique\s+du\s+rwanda|rwanda)/i;
+  // 1. Country Recognition
+  const rwandaPattern = /(republic\s+of\s+rwanda|repubulika\s+y['']u\s+rwanda|r[eé]publique\s+du\s+rwanda|rwanda)/i;
   if (rwandaPattern.test(normalizedText)) {
     country = 'Rwanda';
     confidence += 0.35;
   } else {
-    // Check other EAC / international countries if present
     const uganda = /uganda/i.test(normalizedText);
     const kenya = /kenya/i.test(normalizedText);
     const burundi = /burundi/i.test(normalizedText);
     const drc = /(congo|drc)/i.test(normalizedText);
     const tanzania = /tanzania/i.test(normalizedText);
-
     if (uganda) country = 'Uganda';
     else if (kenya) country = 'Kenya';
     else if (burundi) country = 'Burundi';
     else if (drc) country = 'DR Congo';
     else if (tanzania) country = 'Tanzania';
-
-    if (country) {
-      confidence += 0.25;
-    } else {
-      reviewReasons.push('Issuing country could not be identified from document');
-    }
+    if (country) confidence += 0.25;
+    else reviewReasons.push('Issuing country could not be identified from document');
   }
 
-  // 2. Rwandan 16-digit ID Number extraction
-  // Handles formatted strings: "1 1998 8 0012345 0 24" or unspaced: "1199880012345024"
+  // 2. Rwandan 16-digit ID Number
   const spacedIdMatch = normalizedText.match(/\b([12]\s*\d{4}\s*[78]\s*\d{7}\s*\d\s*\d{2})\b/);
   const strict16Match = normalizedText.match(/\b([12]\d{15})\b/);
-
   const matchedId = spacedIdMatch ? spacedIdMatch[1] : strict16Match ? strict16Match[1] : null;
 
   if (matchedId) {
@@ -72,24 +76,21 @@ export function parseIdTextHeuristically(text: string, userFullName?: string): I
       reviewReasons.push(`Extracted ID number failed checksum/structure: ${validation.reason}`);
     }
   } else {
-    // Look for any 16-digit sequence
     const any16 = normalizedText.match(/\b(\d{16})\b/);
-    if (any16 && any16[1]) {
+    if (any16?.[1]) {
       idNumber = any16[1];
       confidence += 0.25;
-      reviewReasons.push('16-digit sequence found but doesn\'t strictly match Rwandan national ID structure');
+      reviewReasons.push('16-digit sequence found but may not be a valid Rwandan NID');
     } else {
-      reviewReasons.push('National ID number could not be found or read clearly');
+      reviewReasons.push('National ID number could not be found');
     }
   }
 
-  // 3. Name Extraction
-  // Look for label markers: "Amazina / Names / Noms", "Names:", "Nom:", "Amazina:"
+  // 3. Name Extraction from text labels
   const nameLabelMatch = normalizedText.match(
-    /(?:amazina|names?|noms?|holder['’]?s?\s*name)[:\s]+([A-Z\s\-]{3,40})/i
+    /(?:amazina|names?|noms?|holder['']?s?\s*name)[:\s]+([A-Z\s\-]{3,40})/i
   );
-
-  if (nameLabelMatch && nameLabelMatch[1]) {
+  if (nameLabelMatch?.[1]) {
     const rawName = nameLabelMatch[1].trim().replace(/\n+/g, ' ');
     if (rawName.length >= 3) {
       fullName = rawName;
@@ -97,7 +98,7 @@ export function parseIdTextHeuristically(text: string, userFullName?: string): I
     }
   }
 
-  // If name label was not explicitly found, but applicant's registered name appears in OCR text
+  // Cross-check: if registered name appears in OCR text
   if (!fullName && userFullName) {
     const parts = userFullName.trim().split(/\s+/).filter((p) => p.length >= 3);
     const matchesAll = parts.length > 0 && parts.every((p) => new RegExp(`\\b${p}\\b`, 'i').test(normalizedText));
@@ -107,11 +108,7 @@ export function parseIdTextHeuristically(text: string, userFullName?: string): I
     }
   }
 
-  if (!fullName) {
-    reviewReasons.push('Full name could not be automatically extracted');
-  }
-
-  const needsManualReview = confidence < 0.75 || !idNumber || !country;
+  if (!fullName) reviewReasons.push('Full name could not be automatically extracted');
 
   return {
     fullName,
@@ -119,15 +116,22 @@ export function parseIdTextHeuristically(text: string, userFullName?: string): I
     country,
     confidence: Math.min(1.0, Math.round(confidence * 100) / 100),
     rawText: text,
-    needsManualReview,
+    needsManualReview: confidence < 0.75 || !idNumber || !country,
     reviewReasons,
   };
 }
 
 /**
- * Extracts identity details from an uploaded ID document.
- * Leverages Claude Vision when ANTHROPIC_API_KEY is configured,
- * combined with deterministic Rwandan ID validation and fallback parsing.
+ * Extracts identity details from an uploaded ID document image.
+ *
+ * Priority order:
+ * 1. Anthropic Claude Vision (best accuracy, requires ANTHROPIC_API_KEY)
+ * 2. Google Cloud Vision (alternative, requires GOOGLE_VISION_API_KEY)
+ * 3. Manual review flag (no API — admin fills in fields manually)
+ *
+ * When no vision API is configured, we do NOT try to parse binary image bytes
+ * as text (that produced garbage). Instead we return a clean "needs manual
+ * review" result so the admin knows to fill the fields themselves.
  */
 export async function extractIdDocumentData(options: {
   imageBuffer?: Buffer;
@@ -137,58 +141,43 @@ export async function extractIdDocumentData(options: {
 }): Promise<IdExtractionResult> {
   const { imageBuffer, mimeType = 'image/jpeg', userFullName, fallbackText } = options;
 
-  // If Anthropic Claude AI is configured and an image buffer is provided
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (apiKey && imageBuffer && imageBuffer.length > 0) {
+  // ── 1. Anthropic Claude Vision (primary) ───────────────────────────────
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  if (anthropicKey && imageBuffer && imageBuffer.length > 0) {
     try {
-      const client = new Anthropic({ apiKey });
+      const client = new Anthropic({ apiKey: anthropicKey });
       const validMediaTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'] as const;
-      const mediaType = validMediaTypes.includes(mimeType as any)
+      const mediaType = validMediaTypes.includes(mimeType as (typeof validMediaTypes)[number])
         ? (mimeType as (typeof validMediaTypes)[number])
         : 'image/jpeg';
 
-      const base64Data = imageBuffer.toString('base64');
-
       const response = await client.messages.create({
         model: process.env.AI_MODEL || 'claude-3-5-sonnet-20241022',
-        max_tokens: 800,
+        max_tokens: 600,
         system: `You are an official Identity Verification OCR engine for the Zenova platform in Rwanda.
-Your role is to accurately extract identity information from uploaded National ID cards or official passports.
+Extract ONLY what is clearly visible on the ID card. Do not guess or infer data not on the card.
 
-Extract strictly:
-1. fullName: The full legal name of the cardholder (look for Amazina / Names / Noms).
-2. idNumber: The national identity number. For Rwandan National IDs (Indangamuntu), this is a 16-digit number starting with 1 or 2 (e.g. "1 1995 8 0012345 0 24" or "1199580012345024"). Strip all spaces and return pure 16 digits.
-3. country: Issuing country. If "Republic of Rwanda", "Repubulika y'u Rwanda", or Rwandan national coat of arms is detected, return "Rwanda". Otherwise return the detected issuing country name.
-4. confidence: A score from 0.0 to 1.0 based on visual clarity and legibility.
-5. rawText: The full raw text read from the document.
-6. needsManualReview: true if text is blurry, truncated, obscured, or confidence is below 0.75, false if clearly legible.
-7. reviewReasons: Array of strings explaining any issues or reasons for manual review.
+Extract:
+1. fullName: Full legal name from "Amazina / Names / Noms" field. Return EXACTLY as printed.
+2. idNumber: The national ID number. For Rwandan IDs (Indangamuntu) it starts with 1 or 2 and is 16 digits (e.g. "1199880012345024"). Strip all spaces, return pure digits.
+3. country: If you see "Republic of Rwanda", "Repubulika y'u Rwanda", or Rwandan coat of arms → return "Rwanda". Otherwise return the detected country.
+4. confidence: 0.0–1.0 based on image clarity.
+5. rawText: All text you can read from the document.
+6. needsManualReview: true if anything is blurry/unclear or confidence < 0.75.
+7. reviewReasons: Array explaining any issues.
 
-Respond ONLY with valid JSON in this exact structure:
-{
-  "fullName": string | null,
-  "idNumber": string | null,
-  "country": string | null,
-  "confidence": number,
-  "rawText": string,
-  "needsManualReview": boolean,
-  "reviewReasons": string[]
-}`,
+Respond with ONLY valid JSON, no markdown:`,
         messages: [
           {
             role: 'user',
             content: [
               {
                 type: 'image',
-                source: {
-                  type: 'base64',
-                  media_type: mediaType,
-                  data: base64Data,
-                },
+                source: { type: 'base64', media_type: mediaType, data: imageBuffer.toString('base64') },
               },
               {
                 type: 'text',
-                text: `Extract the Full Name, National ID Number, and Country from this document. The registered user name is "${userFullName || 'Unknown'}". Return strictly valid JSON.`,
+                text: `Extract the identity information from this ID card. The registered account name is "${userFullName || 'Unknown'}". Return ONLY JSON.`,
               },
             ],
           },
@@ -196,12 +185,10 @@ Respond ONLY with valid JSON in this exact structure:
       });
 
       const textBlock = response.content.find((c) => c.type === 'text') as Anthropic.TextBlock | undefined;
-      if (textBlock && textBlock.text) {
+      if (textBlock?.text) {
         const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const parsed = JSON.parse(jsonMatch[0]);
-
-          // Normalize ID number
           let idNum = parsed.idNumber ? String(parsed.idNumber).replace(/\s+/g, '') : null;
           let needsReview = Boolean(parsed.needsManualReview);
           const reasons: string[] = Array.isArray(parsed.reviewReasons) ? parsed.reviewReasons : [];
@@ -210,7 +197,7 @@ Respond ONLY with valid JSON in this exact structure:
             const val = validateRwandanIdNumber(idNum);
             if (!val.valid) {
               needsReview = true;
-              reasons.push(val.reason || 'Rwandan ID number format validation failed');
+              reasons.push(val.reason || 'Rwandan ID number validation failed');
             } else {
               idNum = val.normalizedId || idNum;
             }
@@ -227,7 +214,7 @@ Respond ONLY with valid JSON in this exact structure:
           return {
             fullName: parsed.fullName || null,
             idNumber: idNum,
-            country: parsed.country || 'Rwanda',
+            country: parsed.country || null,
             confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.85,
             rawText: parsed.rawText || textBlock.text,
             needsManualReview: needsReview,
@@ -236,11 +223,57 @@ Respond ONLY with valid JSON in this exact structure:
         }
       }
     } catch (err) {
-      console.error('[ocr] Anthropic vision OCR error, falling back to heuristic engine:', err);
+      console.error('[ocr] Anthropic Vision error:', err);
     }
   }
 
-  // Fallback heuristic extraction
-  const sourceText = fallbackText || (imageBuffer ? imageBuffer.toString('utf8', 0, Math.min(imageBuffer.length, 2048)) : '');
-  return parseIdTextHeuristically(sourceText, userFullName);
+  // ── 2. Google Cloud Vision (alternative) ──────────────────────────────
+  const googleKey = process.env.GOOGLE_VISION_API_KEY;
+  if (googleKey && imageBuffer && imageBuffer.length > 0) {
+    try {
+      const b64 = imageBuffer.toString('base64');
+      const res = await fetch(
+        `https://vision.googleapis.com/v1/images:annotate?key=${googleKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            requests: [{ image: { content: b64 }, features: [{ type: 'TEXT_DETECTION' }] }],
+          }),
+          signal: AbortSignal.timeout(8000),
+        }
+      );
+      if (res.ok) {
+        const gv = await res.json();
+        const rawText = gv.responses?.[0]?.fullTextAnnotation?.text || '';
+        if (rawText.trim()) {
+          return parseIdTextHeuristically(rawText, userFullName);
+        }
+      }
+    } catch (err) {
+      console.error('[ocr] Google Vision error:', err);
+    }
+  }
+
+  // ── 3. Fallback text source (e.g. from PDF or provided text) ──────────
+  if (fallbackText?.trim()) {
+    return parseIdTextHeuristically(fallbackText, userFullName);
+  }
+
+  // ── 4. No vision API configured — flag for manual admin review ─────────
+  // IMPORTANT: We do NOT parse raw binary image bytes as UTF-8 (that produces
+  // garbage data). The admin will manually enter the correct information.
+  return {
+    fullName: null,
+    idNumber: null,
+    country: 'Rwanda', // default for the platform context
+    confidence: 0,
+    rawText: '',
+    needsManualReview: true,
+    reviewReasons: [
+      'No OCR API configured (ANTHROPIC_API_KEY or GOOGLE_VISION_API_KEY required for automatic extraction)',
+      'Please configure an AI Vision API key in environment variables to enable automatic extraction',
+      'Admin must manually verify and enter the name and ID number from the document',
+    ],
+  };
 }
