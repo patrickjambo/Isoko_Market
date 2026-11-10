@@ -10,14 +10,12 @@ import { recordRequest } from './metrics';
 import { ensureStaffRole } from './staff';
 
 /**
- * Single gateway for every /api/admin/* route (the spec's `withAdminAuth`).
- * It authenticates the session, requires the ADMIN platform role, checks the
- * specific permission key server-side, rate-limits, and wraps the result in the
- * shared envelope `{ data, meta, error }` so cards, tables and exports can share
- * one fetching hook. Pass `permissionKey: null` for endpoints any admin may hit.
+ * Single gateway for every /api/admin/* route.
+ * Authenticates, checks admin role + specific permission, rate-limits,
+ * and wraps the result in the shared envelope { data, meta, error }.
+ * Pass permissionKey: null for endpoints any admin may hit.
  */
 export type AdminContext = { admin: User; permissions: Set<string> };
-
 export type AdminResult = { data?: unknown; meta?: unknown } | Response | void;
 
 function envelope(
@@ -37,37 +35,34 @@ export function adminRoute<Ctx = unknown>(
     const start = Date.now();
     let errored = false;
     try {
+      // ── 1. Auth ────────────────────────────────────────────────────────
       let admin = await requireUser();
       if (admin.role !== 'ADMIN') {
         throw new ApiError('FORBIDDEN', 'Admin access required.');
       }
 
-      // Self-heal: if the user is ADMIN but has no adminRole (e.g. seeded manually
-      // before the env bootstrap ran), try to reconcile it now so the session's
-      // next request works without requiring a re-login.
-      if (!admin.adminRole) {
-        admin = await ensureStaffRole(admin);
-      }
+      // ── 2. Self-heal adminRole ─────────────────────────────────────────
+      // ensureStaffRole now corrects wrong roles too — if the DB has MODERATOR
+      // but the email is in ADMIN_EMAILS it becomes SUPER_ADMIN automatically.
+      // Skipped (no DB write) when the role is already correct.
+      admin = await ensureStaffRole(admin);
 
-      // Per-admin rate limit on every admin call.
+      // ── 3. Rate limit ──────────────────────────────────────────────────
       const limit = rateLimit(`admin:${admin.id}`, 300, 60 * 1000);
       if (!limit.success) throw new ApiError('RATE_LIMITED', 'Slow down.');
 
-      // Same can() the ownership routes use — admin RBAC is not a separate
-      // authorization system (Unified rule 5). Pass the resolved set so we don't
-      // refetch it here.
+      // ── 4. Permission check ────────────────────────────────────────────
       const permissions = await effectivePermissions(admin);
       if (permissionKey && !(await can(admin, `admin:${permissionKey}`, undefined, { permissions }))) {
         throw new ApiError('FORBIDDEN', `Missing permission: ${permissionKey}`);
       }
 
+      // ── 5. Handler ─────────────────────────────────────────────────────
       const result = await handler(req, ctx, { admin, permissions });
-      // Handlers may return a raw Response (e.g. CSV/file downloads) — pass through.
       if (result instanceof Response) return result;
       return envelope(result?.data, result?.meta, null, 200);
     } catch (err) {
-      // Let Next.js control-flow signals (redirect / notFound / dynamic bailout)
-      // propagate instead of turning them into an error envelope.
+      // Let Next.js control-flow signals propagate
       if (
         err &&
         typeof err === 'object' &&

@@ -73,6 +73,8 @@ export const ROLE_DEFAULTS: Record<AdminRoleName, string[] | '*'> = {
     'support.reply',
     'audit.view',
     'backup.view',
+    'backup.create',
+    'backup.restore',
   ],
   SUPPORT: [
     'users.view',

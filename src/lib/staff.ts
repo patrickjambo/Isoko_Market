@@ -23,32 +23,27 @@ export function staffRoleForEmail(email: string): AdminRole | null {
 }
 
 /**
- * Bootstrap platform staff at login: if the user's email is in ADMIN_EMAILS /
- * MODERATOR_EMAILS and they aren't an admin yet, promote them to ADMIN with the
- * matching sub-role. Deliberately one-way — it never demotes and never overrides
- * an EXISTING admin's sub-role (that's managed in Admin → Roles), so env config
- * can't fight the UI or accidentally lock staff out. Returns the (possibly
- * updated) user so the caller mints the session with the right role.
+ * Bootstrap platform staff at login (and self-heal on every admin API call).
+ *
+ * Sets role=ADMIN and adminRole from env config. This is now idempotent AND
+ * corrective — if the DB has the wrong adminRole (e.g. MODERATOR when the email
+ * is in ADMIN_EMAILS and should be SUPER_ADMIN), it corrects it.
+ *
+ * The env config is the single source of truth for who is an admin and at what
+ * level. Per-admin permission overrides (via the Roles UI) layer on top.
  */
 export async function ensureStaffRole<T extends Pick<User, 'id' | 'email' | 'role' | 'adminRole'>>(
   user: T
 ): Promise<T> {
   const target = user.email ? staffRoleForEmail(user.email) : null;
-  // Promote if: user is a configured staff email AND either
-  //   (a) hasn't been given ADMIN role yet, OR
-  //   (b) is already ADMIN but somehow has no adminRole (e.g. seeded manually)
-  // The env config is the bootstrap source of truth; the UI manages sub-role
-  // changes after first promotion, so we only fill a null adminRole, never change
-  // an existing one.
-  if (!target) return user; // not in staff lists
-  if (user.role === 'ADMIN' && user.adminRole) return user; // already fully configured
+  if (!target) return user; // email not in any staff list — leave unchanged
 
+  // Already correct — no DB write needed
+  if (user.role === 'ADMIN' && user.adminRole === target) return user;
+
+  // Promote or correct the role (idempotent upsert)
   return prisma.user.update({
     where: { id: user.id },
-    data: {
-      role: 'ADMIN' as Role,
-      // Only assign adminRole if it's currently null — don't override a changed role.
-      adminRole: user.adminRole ? (user.adminRole as AdminRole) : target,
-    },
+    data: { role: 'ADMIN' as Role, adminRole: target as AdminRole },
   }) as unknown as Promise<T>;
 }

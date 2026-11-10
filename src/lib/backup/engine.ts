@@ -5,7 +5,15 @@ import { prisma } from '@/lib/prisma';
 import { emitAdmin } from '@/lib/admin-realtime';
 import { encryptBackupData, decryptBackupData, computeSha256, type EncryptedPayload } from './crypto';
 
-export const BACKUP_STORAGE_DIR = path.join(process.cwd(), 'storage', 'backups');
+/**
+ * On Vercel the project root is read-only; use /tmp which is writable (512 MB,
+ * ephemeral per-instance). On local dev use the project-relative storage/ dir.
+ * After writing, we optionally upload to Vercel Blob for durable off-instance
+ * storage so the file survives beyond the function lifetime.
+ */
+export const BACKUP_STORAGE_DIR = process.env.VERCEL
+  ? '/tmp/zenova-backups'
+  : path.join(process.cwd(), 'storage', 'backups');
 export const DEFAULT_SCOPES = [
   'users',
   'listings',
@@ -67,6 +75,99 @@ async function ensureBackupDirectory(): Promise<void> {
 }
 
 /**
+ * Persist a backup file and return the durable storage location string.
+ * - Local dev: writes to storage/backups/ and returns the absolute path.
+ * - Vercel: writes to /tmp (staging), uploads to Vercel Blob, returns the
+ *   Blob URL so the file survives beyond the serverless function lifetime.
+ * - S3/R2: writes to /tmp (staging), uploads to S3, returns the object key.
+ */
+async function persistBackupFile(filename: string, contents: string): Promise<string> {
+  const localPath = path.join(BACKUP_STORAGE_DIR, filename);
+  await ensureBackupDirectory();
+  await writeFile(localPath, contents, 'utf8');
+
+  const driver = process.env.STORAGE_DRIVER ?? 'local';
+
+  // On Vercel Blob — upload the temp file to Blob for durable storage
+  if (driver === 'vercel_blob') {
+    try {
+      const { put } = await import('@vercel/blob');
+      const token = process.env.BLOB_READ_WRITE_TOKEN;
+      const blob = await put(`backups/${filename}`, contents, {
+        access: 'public',
+        contentType: 'application/octet-stream',
+        addRandomSuffix: false,
+        ...(token ? { token } : {}),
+      });
+      return blob.url; // durable CDN URL
+    } catch (blobErr) {
+      console.error('[backup] Vercel Blob upload failed, falling back to /tmp path:', blobErr);
+      return localPath; // still usable within this function instance
+    }
+  }
+
+  // S3 / R2 — upload to object storage
+  if (driver === 's3' || driver === 'r2') {
+    try {
+      const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
+      const client = new S3Client({
+        region: process.env.S3_REGION || 'auto',
+        ...(process.env.S3_ENDPOINT ? { endpoint: process.env.S3_ENDPOINT, forcePathStyle: true } : {}),
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
+        },
+      });
+      const key = `backups/${filename}`;
+      await client.send(new PutObjectCommand({
+        Bucket: process.env.S3_BUCKET ?? 'isoko',
+        Key: key,
+        Body: contents,
+        ContentType: 'application/octet-stream',
+      }));
+      return key; // S3 object key
+    } catch (s3Err) {
+      console.error('[backup] S3 upload failed, falling back to local path:', s3Err);
+      return localPath;
+    }
+  }
+
+  return localPath; // local dev
+}
+
+/**
+ * Load backup file bytes from wherever persistBackupFile stored them.
+ */
+async function loadBackupFile(storageLocation: string): Promise<string> {
+  // Vercel Blob or S3 public URL
+  if (/^https?:\/\//.test(storageLocation)) {
+    const res = await fetch(storageLocation);
+    if (!res.ok) throw new Error(`Failed to fetch backup from ${storageLocation}: ${res.status}`);
+    return res.text();
+  }
+
+  // S3 key (no protocol)
+  const driver = process.env.STORAGE_DRIVER ?? 'local';
+  if ((driver === 's3' || driver === 'r2') && !path.isAbsolute(storageLocation)) {
+    const { S3Client, GetObjectCommand } = await import('@aws-sdk/client-s3');
+    const client = new S3Client({
+      region: process.env.S3_REGION || 'auto',
+      ...(process.env.S3_ENDPOINT ? { endpoint: process.env.S3_ENDPOINT, forcePathStyle: true } : {}),
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
+      },
+    });
+    const res = await client.send(new GetObjectCommand({ Bucket: process.env.S3_BUCKET ?? 'isoko', Key: storageLocation }));
+    if (!res.Body) throw new Error('Empty S3 response');
+    return res.Body.transformToString();
+  }
+
+  // Local filesystem (dev or /tmp on Vercel)
+  return readFile(storageLocation, 'utf8');
+}
+
+/**
  * Scans local public/uploads directory for file manifests.
  */
 async function collectFilesManifest(): Promise<Array<{ path: string; size: number }>> {
@@ -114,6 +215,8 @@ export async function createBackup(options: CreateBackupOptions = {}) {
 
   await ensureBackupDirectory();
 
+  await ensureBackupDirectory();
+
   // Find parent backup if incremental
   let parentBackupId: string | null = null;
   let since: Date | null = null;
@@ -132,6 +235,7 @@ export async function createBackup(options: CreateBackupOptions = {}) {
   const backupId = 'bck_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 8);
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const filename = `zenova-${type.toLowerCase()}-${timestamp}.zbak`;
+  // storageLocation is placeholder until persistBackupFile resolves the durable URL
   const storageLocation = path.join(BACKUP_STORAGE_DIR, filename);
 
   // Initial DB record marked IN_PROGRESS
@@ -293,12 +397,11 @@ export async function createBackup(options: CreateBackupOptions = {}) {
     const encryptedPayload = encryptBackupData(rawArchiveData);
     const serializedPayload = JSON.stringify(encryptedPayload);
 
-    // Write to disk
-    await writeFile(storageLocation, serializedPayload, 'utf8');
-    const fileStats = await stat(storageLocation);
-    const sizeBytes = fileStats.size;
+    // Persist to storage (handles Vercel read-only fs, Blob, S3, local dev)
+    const durableLocation = await persistBackupFile(filename, serializedPayload);
+    const sizeBytes = Buffer.byteLength(serializedPayload, 'utf8');
 
-    // Update DB record
+    // Update DB record with the durable storage location
     const updatedRecord = await prisma.backupRecord.update({
       where: { id: backupId },
       data: {
@@ -307,6 +410,7 @@ export async function createBackup(options: CreateBackupOptions = {}) {
         fileCount: totalFiles,
         sizeBytes,
         checksumSha256: plaintextChecksum,
+        storageLocation: durableLocation, // may differ from initial path (Blob URL)
         metadata: {
           counts,
           parentBackupId,
@@ -363,7 +467,7 @@ export async function loadBackupArchive(backupId: string): Promise<BackupArchive
     throw new Error(`Backup record not found: ${backupId}`);
   }
 
-  const rawEncrypted = await readFile(record.storageLocation, 'utf8');
+  const rawEncrypted = await loadBackupFile(record.storageLocation);
   const payload: EncryptedPayload = JSON.parse(rawEncrypted);
 
   // Decrypt and verify checksum
@@ -447,7 +551,10 @@ export async function pruneExpiredBackups(): Promise<{ deletedCount: number; pru
 
   for (const b of toDelete) {
     try {
-      await unlink(b.storageLocation).catch(() => {});
+      // Only attempt local file deletion — Blob/S3 URLs are cleaned up separately
+      if (!(/^https?:\/\//.test(b.storageLocation))) {
+        await unlink(b.storageLocation).catch(() => {});
+      }
       await prisma.backupRecord.delete({ where: { id: b.id } });
       prunedIds.push(b.id);
     } catch {
