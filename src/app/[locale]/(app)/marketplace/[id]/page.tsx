@@ -179,29 +179,51 @@ export default async function ListingDetailPage({
           __html: JSON.stringify([
             {
               '@context': 'https://schema.org',
-              '@type': listing.kind === 'SERVICE' ? 'Service' : 'Product',
+              '@type': 'Product',
               name: listing.title,
-              description: listing.description ?? undefined,
-              image: listing.images.map((img) =>
-                img.url.startsWith('http') ? img.url : `${env.NEXT_PUBLIC_APP_URL}${img.url}`
-              ),
+              description: listing.description || listing.title,
+              image:
+                listing.images.length > 0
+                  ? listing.images.map((img) =>
+                      img.url.startsWith('http') ? img.url : `${env.NEXT_PUBLIC_APP_URL}${img.url}`
+                    )
+                  : [
+                      categoryFallbackImage(listing.category?.slug).startsWith('http')
+                        ? categoryFallbackImage(listing.category?.slug)
+                        : `${env.NEXT_PUBLIC_APP_URL}${categoryFallbackImage(listing.category?.slug)}`,
+                    ],
               url: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}`,
-              ...(listing.price > 0 && listing.kind !== 'SERVICE' && {
-                offers: {
-                  '@type': 'Offer',
-                  priceCurrency: 'RWF',
-                  price: (listing.price / 100).toFixed(0),
-                  availability:
-                    listing.status === 'ACTIVE'
-                      ? 'https://schema.org/InStock'
-                      : 'https://schema.org/OutOfStock',
-                  url: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}`,
-                  seller: {
-                    '@type': 'Person',
-                    name: listing.seller.businessName || listing.seller.fullName,
-                  },
+              brand: {
+                '@type': 'Brand',
+                name: listing.seller.businessName || 'Zenova',
+              },
+              offers: {
+                '@type': 'Offer',
+                priceCurrency: 'RWF',
+                price: ((listing.price || 0) / 100).toFixed(0),
+                priceValidUntil: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)
+                  .toISOString()
+                  .split('T')[0],
+                availability:
+                  listing.status === 'ACTIVE'
+                    ? 'https://schema.org/InStock'
+                    : 'https://schema.org/OutOfStock',
+                url: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}`,
+                itemCondition: 'https://schema.org/UsedCondition',
+                seller: {
+                  '@type': 'Person',
+                  name: listing.seller.businessName || listing.seller.fullName,
                 },
-              }),
+              },
+              ...(listing.ratingCount > 0 && listing.ratingAvg > 0
+                ? {
+                    aggregateRating: {
+                      '@type': 'AggregateRating',
+                      ratingValue: listing.ratingAvg.toFixed(1),
+                      reviewCount: listing.ratingCount,
+                    },
+                  }
+                : {}),
             },
             {
               '@context': 'https://schema.org',

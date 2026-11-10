@@ -52,9 +52,12 @@ export const POST = route(async (req: NextRequest) => {
     await prisma.user.update({ where: { id: user.id }, data: { role: 'SELLER' } });
   }
 
-  await emitAdmin('listing.created', `New listing: ${input.title}`);
-  // Buyers who saved a matching search hear about it immediately (see jobs parity).
-  await notifyMatchingListingAlerts({ ...listing, sellerId: user.id });
+  try {
+    await emitAdmin('listing.created', `New listing: ${input.title}`);
+    await notifyMatchingListingAlerts({ ...listing, sellerId: user.id });
+  } catch (err) {
+    console.error('[listings] Failed to emit admin or notify alerts:', err);
+  }
 
   return jsonOk({ id: listing.id }, { status: 201 });
 });

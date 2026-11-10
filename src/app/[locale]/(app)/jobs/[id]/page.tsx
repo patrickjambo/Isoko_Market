@@ -149,8 +149,10 @@ export default async function JobDetailPage({
               '@context': 'https://schema.org',
               '@type': 'JobPosting',
               title: job.title,
-              description: job.description ?? undefined,
+              description: job.description || job.title,
               datePosted: job.createdAt.toISOString(),
+              validThrough: new Date(job.createdAt.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+              directApply: true,
               hiringOrganization: {
                 '@type': 'Organization',
                 name: job.employer.businessName || job.employer.fullName,

@@ -59,15 +59,20 @@ export const POST = route(async (req: NextRequest) => {
     select: { id: true, title: true, description: true, categoryId: true, kind: true, condition: true, location: true, price: true },
   });
 
-  await prisma.listingDraft.deleteMany({ where: { sellerId: user.id } });
+  await prisma.listingDraft.deleteMany({ where: { sellerId: user.id } }).catch(() => {});
   // Buyers who saved a matching search hear about it immediately (see jobs parity).
-  await notifyMatchingListingAlerts({ ...listing, sellerId: user.id });
+  // Wrapped safely so alert dispatch failures never prevent listing creation.
+  try {
+    await notifyMatchingListingAlerts({ ...listing, sellerId: user.id });
+  } catch (err) {
+    console.error('[seller/listings] Failed to notify matching alerts:', err);
+  }
   // Adopt BUYER→SELLER (see /api/listings): fires only for BUYER, so an ADMIN who
   // sells keeps ADMIN — `role === 'SELLER'` is not "has sold". Query listings.
   if (user.role === 'BUYER') {
-    await prisma.user.update({ where: { id: user.id }, data: { role: 'SELLER' } });
+    await prisma.user.update({ where: { id: user.id }, data: { role: 'SELLER' } }).catch(() => {});
   }
-  await emitAdmin('listing.created', `New listing: ${input.title}`);
+  await emitAdmin('listing.created', `New listing: ${input.title}`).catch(() => {});
 
   return jsonOk({ id: listing.id }, { status: 201 });
 });

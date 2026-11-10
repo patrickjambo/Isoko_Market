@@ -148,13 +148,20 @@ export function AddProductWizard({
     setPublishing(true);
     setDuplicate(null);
     try {
+      const cleanPrice =
+        data.price === '' || data.price === null || data.price === undefined
+          ? 0
+          : typeof data.price === 'string'
+            ? parseFloat(String(data.price).replace(/[^0-9.]/g, '')) || 0
+            : Number(data.price) || 0;
+
       const res = await fetch(`/api/seller/listings${force ? '?force=1' : ''}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: data.title,
           description: data.description,
-          price: Number(data.price || 0),
+          price: Math.round(cleanPrice),
           categoryId: data.categoryId || null,
           kind: data.kind,
           condition: data.condition,
@@ -526,11 +533,18 @@ function PriceField({
     <div className="space-y-1.5">
       <Label>{serviceLabel ?? t('priceLabel')}</Label>
       <Input
-        type="number"
+        type="text"
         inputMode="numeric"
-        min={0}
-        value={value}
-        onChange={(e) => onChange(e.target.value === '' ? '' : Number(e.target.value))}
+        value={value === '' || value === 0 ? '' : value}
+        onChange={(e) => {
+          const raw = e.target.value;
+          if (raw === '') {
+            onChange('');
+          } else {
+            const cleaned = raw.replace(/[^0-9]/g, '');
+            onChange(cleaned === '' ? '' : Number(cleaned));
+          }
+        }}
         placeholder="0"
       />
       {range && (

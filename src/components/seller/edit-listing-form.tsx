@@ -69,7 +69,10 @@ export function EditListingForm({
         body: JSON.stringify({
           title: d.title,
           description: d.description,
-          price: Number(d.price || 0),
+          price:
+            typeof d.price === 'string'
+              ? Math.round(parseFloat(d.price.replace(/[^0-9.]/g, '')) || 0)
+              : Math.round(Number(d.price || 0)),
           categoryId: d.categoryId || null,
           condition: d.condition,
           location: d.location,

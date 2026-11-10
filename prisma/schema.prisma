@@ -420,7 +420,7 @@ model Listing {
   seller      User             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   title       String
   description String
-  price       Int // RWF minor units
+  price       Float // RWF minor units (supports high-value items: cars, land, houses)
   categoryId  String?
   category    Category?        @relation(fields: [categoryId], references: [id])
   kind        ListingKind      @default(PRODUCT) // product for sale vs. service offered
