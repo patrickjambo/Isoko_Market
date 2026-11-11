@@ -74,19 +74,19 @@ export default async function VerificationsPage({ params }: { params: { locale: 
             return (
               <li
                 key={v.id}
-                className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center justify-between shadow-sm hover:border-slate-300 transition-colors"
+                className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3 sm:p-4 sm:flex-row sm:items-center justify-between shadow-sm hover:border-slate-300 transition-colors"
               >
                 {/* The actual National ID thumbnail with zoom modal */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <IdPhoto requestId={v.id} />
-                  <Link href={`/profile/${v.user.id}`} className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
+                  <Link href={`/profile/${v.user.id}`} className="flex items-center gap-3 min-w-0">
+                    <Avatar className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0">
                       {v.user.avatarUrl && <AvatarImage src={v.user.avatarUrl} alt={v.user.fullName} />}
                       <AvatarFallback>{initials(v.user.fullName)}</AvatarFallback>
                     </Avatar>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-sm">{v.user.fullName}</p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-sm truncate">{v.user.fullName}</p>
                         {v.extractedCountry && (
                           <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
                             {v.extractedCountry}

@@ -124,9 +124,31 @@ export function VerificationReviewModal({
       setZoom(1);
       setRotation(0);
       setPosition({ x: 0, y: 0 });
-      setImageCollapsed(false);
+      setImageCollapsed(true); // Collapsed by default on mobile so form/buttons are visible
     }
   }, [request]);
+
+  // ── Auto-trigger OCR if data is missing when modal opens ──────────────
+  // This covers the case where background OCR didn't finish (Vercel killed
+  // the function) or no API key was set at submission time but was added later.
+  const hasTriedAutoOcr = useRef(false);
+  useEffect(() => {
+    if (
+      open &&
+      request &&
+      !request.extractedFullName &&
+      !request.extractedIdNumber &&
+      !hasTriedAutoOcr.current &&
+      !ocrRefreshing
+    ) {
+      hasTriedAutoOcr.current = true;
+      handleRerunOcr();
+    }
+    if (!open) {
+      hasTriedAutoOcr.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, request]);
 
   if (!request) return null;
 
@@ -263,18 +285,18 @@ export function VerificationReviewModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/*
-        Mobile: full-screen sheet from bottom (flex-col).
+        Mobile: full-screen sheet from bottom (flex-col), image collapsed by default.
         Desktop: wide side-by-side dialog (max-w-6xl).
       */}
-      <DialogContent className="w-full max-w-6xl max-h-[95dvh] h-full sm:h-auto overflow-hidden flex flex-col p-0 gap-0">
+      <DialogContent className="w-full max-w-6xl max-h-[95dvh] h-[100dvh] sm:h-auto overflow-hidden flex flex-col p-0 gap-0">
         {/* ── Header ── */}
-        <DialogHeader className="flex-shrink-0 px-4 py-3 border-b border-border bg-slate-50/60 flex flex-row items-center gap-3">
+        <DialogHeader className="flex-shrink-0 px-3 sm:px-4 py-2.5 sm:py-3 border-b border-border bg-slate-50/60 flex flex-row items-center gap-2 sm:gap-3">
           <ShieldCheck className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-          <div className="min-w-0">
-            <DialogTitle className="text-base font-bold leading-tight truncate">
-              Identity Verification &amp; Document Inspection
+          <div className="min-w-0 flex-1">
+            <DialogTitle className="text-sm sm:text-base font-bold leading-tight truncate">
+              Identity Verification
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
+            <DialogDescription className="text-[11px] sm:text-xs text-muted-foreground">
               Inspect the document and verify the extracted information.
             </DialogDescription>
           </div>
@@ -284,16 +306,15 @@ export function VerificationReviewModal({
         <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
 
           {/* ══ LEFT: Document Viewer ══════════════════════════════════════ */}
-          <div className="flex-shrink-0 lg:flex-1 bg-slate-950 flex flex-col relative select-none overflow-hidden"
-            style={{ minHeight: imageCollapsed ? 'auto' : undefined }}>
+          <div className={`flex-shrink-0 bg-slate-950 flex flex-col relative select-none overflow-hidden ${imageCollapsed ? '' : 'lg:flex-1 max-h-[40vh] lg:max-h-none'}`}>
 
             {/* Mobile collapse toggle */}
             <button
               type="button"
               onClick={() => setImageCollapsed((v) => !v)}
-              className="lg:hidden w-full flex items-center justify-between px-4 py-2 text-xs text-slate-300 bg-slate-900 border-b border-slate-800 active:bg-slate-800"
+              className="lg:hidden w-full flex items-center justify-between px-4 py-3 text-xs text-slate-300 bg-slate-900 border-b border-slate-800 active:bg-slate-800"
             >
-              <span className="font-medium">{imageCollapsed ? 'Show Document' : 'Hide Document'}</span>
+              <span className="font-medium">{imageCollapsed ? '📄 Show ID Document' : '▲ Hide Document'}</span>
               {imageCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
             </button>
 
@@ -335,7 +356,7 @@ export function VerificationReviewModal({
 
                 {/* Image viewport — supports mouse drag + touch pinch/pan */}
                 <div
-                  className={`flex-1 flex items-center justify-center p-4 lg:p-6 min-h-[220px] lg:min-h-[480px] touch-none ${zoom > 1 ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
+                  className={`flex-1 flex items-center justify-center p-3 lg:p-6 min-h-[180px] lg:min-h-[480px] touch-none ${zoom > 1 ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
                     }`}
                   onMouseDown={handleMouseDown}
                   onMouseMove={handleMouseMove}
@@ -355,7 +376,7 @@ export function VerificationReviewModal({
                       transition: isDragging ? 'none' : 'transform 0.15s ease-out',
                       filter: contrastHigh ? 'contrast(165%) brightness(110%)' : 'none',
                     }}
-                    className="max-h-[55vh] lg:max-h-[72vh] max-w-full object-contain rounded shadow-2xl origin-center"
+                    className="max-h-[35vh] lg:max-h-[72vh] max-w-full object-contain rounded shadow-2xl origin-center"
                   />
                 </div>
 
@@ -371,8 +392,8 @@ export function VerificationReviewModal({
           </div>
 
           {/* ══ RIGHT: Extracted Info & Decision ══════════════════════════ */}
-          <div className="lg:w-[400px] xl:w-[440px] flex-shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-border bg-card overflow-y-auto">
-            <div className="p-4 space-y-4">
+          <div className="flex-1 lg:w-[400px] xl:w-[440px] lg:flex-shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-border bg-card overflow-y-auto min-h-0">
+            <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
 
               {/* ── Registered Account Card ── */}
               <div className="rounded-xl border border-border p-3 bg-slate-50/70 space-y-1.5">
@@ -393,7 +414,7 @@ export function VerificationReviewModal({
               </div>
 
               {/* ── OCR Section ── */}
-              <div className="rounded-xl border border-border p-4 space-y-3 bg-white">
+              <div className="rounded-xl border border-border p-3 sm:p-4 space-y-2.5 sm:space-y-3 bg-white">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                     <FileText className="h-3.5 w-3.5 text-primary" /> Extracted Info (OCR)
@@ -418,14 +439,24 @@ export function VerificationReviewModal({
                 {ocrHasNoApiKey && (
                   <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 space-y-2">
                     <div className="flex items-center gap-2 text-amber-800 font-semibold text-xs">
-                      <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-                      OCR Not Yet Extracted
+                      {ocrRefreshing ? (
+                        <>
+                          <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
+                          Extracting ID information…
+                        </>
+                      ) : (
+                        <>
+                          <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+                          OCR Not Yet Extracted
+                        </>
+                      )}
                     </div>
-                    <p className="text-xs text-amber-700 leading-relaxed">
-                      If you have added <code className="bg-amber-100 px-1 rounded font-mono text-[11px]">GEMINI_API_KEY</code>{' '}
-                      to Vercel, click <strong>Re-run OCR</strong> above to extract the information now.
-                      Otherwise enter the name and ID number manually from the document.
-                    </p>
+                    {!ocrRefreshing && (
+                      <p className="text-xs text-amber-700 leading-relaxed">
+                        Click <strong>Re-run OCR</strong> above to extract the information now,
+                        or type the name and ID number manually from the document.
+                      </p>
+                    )}
                     <div className="flex items-center gap-1.5 text-xs text-amber-700 font-medium">
                       <Edit3 className="h-3 w-3" />
                       Fields below are editable — type directly from the card image.
@@ -609,12 +640,12 @@ export function VerificationReviewModal({
                 </div>
               )}
 
-              {/* ── Action Buttons ── */}
-              <div className="space-y-2 pb-4">
+              {/* ── Action Buttons (sticky bottom on mobile) ── */}
+              <div className="space-y-2 pb-4 pt-2 sticky bottom-0 bg-card border-t border-border lg:border-t-0 -mx-3 sm:-mx-4 px-3 sm:px-4 lg:mx-0 lg:px-0 lg:static lg:bg-transparent">
                 {decisionMode === 'view' ? (
                   <div className="flex flex-col gap-2">
                     <Button
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white gap-2 font-semibold h-11"
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white gap-2 font-semibold h-10 sm:h-11 text-sm"
                       disabled={!hasConfirmedVisualReview || submitting}
                       onClick={() => handleDecision('approve')}
                     >
@@ -623,13 +654,13 @@ export function VerificationReviewModal({
                       ) : (
                         <CheckCircle2 className="h-4 w-4" />
                       )}
-                      Approve &amp; Verify Customer ID
+                      Approve & Verify
                     </Button>
 
                     <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
-                        className="text-amber-700 border-amber-300 hover:bg-amber-50 active:bg-amber-100 h-10"
+                        className="text-amber-700 border-amber-300 hover:bg-amber-50 active:bg-amber-100 h-9 sm:h-10 text-xs sm:text-sm"
                         onClick={() => setDecisionMode('resubmit')}
                         disabled={submitting}
                       >
@@ -639,7 +670,7 @@ export function VerificationReviewModal({
 
                       <Button
                         variant="outline"
-                        className="text-rose-700 border-rose-300 hover:bg-rose-50 active:bg-rose-100 h-10"
+                        className="text-rose-700 border-rose-300 hover:bg-rose-50 active:bg-rose-100 h-9 sm:h-10 text-xs sm:text-sm"
                         onClick={() => setDecisionMode('reject')}
                         disabled={submitting}
                       >
@@ -650,7 +681,7 @@ export function VerificationReviewModal({
                   </div>
                 ) : (
                   <Button
-                    className={`w-full font-semibold h-11 ${decisionMode === 'resubmit'
+                    className={`w-full font-semibold h-10 sm:h-11 text-sm ${decisionMode === 'resubmit'
                         ? 'bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white'
                         : 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white'
                       }`}

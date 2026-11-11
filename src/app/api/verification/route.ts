@@ -6,6 +6,17 @@ import { verificationSubmitSchema } from '@/lib/validators/misc';
 import { emitAdmin } from '@/lib/admin-realtime';
 import { publish } from '@/lib/realtime';
 
+// Vercel waitUntil — keeps the serverless function alive for background work
+// after the HTTP response has been sent. This is critical for OCR to complete.
+async function getWaitUntil(): Promise<((p: Promise<unknown>) => void) | null> {
+  try {
+    const { waitUntil } = await import('@vercel/functions');
+    return waitUntil ?? null;
+  } catch {
+    return null; // Not on Vercel or package not available
+  }
+}
+
 /**
  * GET /api/verification — get the current user's verification status.
  */
@@ -88,11 +99,15 @@ export const POST = route(async (req: NextRequest) => {
   publish(user.id, { type: 'verification_updated', status: 'PENDING' });
 
   // ── Step 3: Fire background OCR (non-blocking, never fails the request) ──
-  // We deliberately do NOT await this. It updates the DB record after the
-  // response has already been sent. On Vercel, use waitUntil if available,
-  // otherwise the background microtask runs until the function cold-terminates
-  // (fine — if it doesn't finish, the admin can manually trigger re-OCR).
-  runOcrInBackground(user.id, idDocumentUrl, user.fullName ?? undefined);
+  // Use Vercel waitUntil to keep the serverless function alive for OCR.
+  // Without waitUntil the function terminates after the response is sent,
+  // killing the OCR before it finishes — this was the root cause of
+  // "OCR not extracting" in production.
+  const ocrPromise = runOcrInBackground(user.id, idDocumentUrl, user.fullName ?? undefined);
+  const waitUntil = await getWaitUntil();
+  if (waitUntil) {
+    waitUntil(ocrPromise);
+  }
 
   return jsonOk({ ok: true, status: 'PENDING' });
 });
