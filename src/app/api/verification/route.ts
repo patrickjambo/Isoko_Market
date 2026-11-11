@@ -1,10 +1,11 @@
 import type { NextRequest } from 'next/server';
-import { route, jsonOk } from '@/lib/api';
+import { route, jsonOk, ApiError } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { verificationSubmitSchema } from '@/lib/validators/misc';
 import { emitAdmin } from '@/lib/admin-realtime';
 import { publish } from '@/lib/realtime';
+import { rateLimit } from '@/lib/rate-limit';
 
 // Vercel waitUntil — keeps the serverless function alive for background work
 // after the HTTP response has been sent. This is critical for OCR to complete.
@@ -43,6 +44,12 @@ export const GET = route(async () => {
  */
 export const POST = route(async (req: NextRequest) => {
   const user = await requireUser();
+
+  const limit = rateLimit(`verify:${user.id}`, 10, 60 * 60 * 1000);
+  if (!limit.success) {
+    throw new ApiError('RATE_LIMITED', 'Too many verification attempts. Please wait a bit.');
+  }
+
   const { idDocumentUrl } = verificationSubmitSchema.parse(await req.json().catch(() => ({})));
 
   // ── Step 1: Save submission immediately ──────────────────────────────────

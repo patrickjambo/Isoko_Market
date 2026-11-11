@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { route, jsonOk } from '@/lib/api';
+import { route, jsonOk, ApiError } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { createListingSchema } from '@/lib/validators/listing';
@@ -9,6 +9,7 @@ import { findDuplicate } from '@/lib/suggestions';
 import { emitAdmin } from '@/lib/admin-realtime';
 import { notifyMatchingListingAlerts } from '@/lib/listing-alert';
 import { getPlatformSettings } from '@/lib/commission';
+import { rateLimit } from '@/lib/rate-limit';
 
 /**
  * POST /api/seller/listings?force= — publish a listing from the wizard.
@@ -17,6 +18,12 @@ import { getPlatformSettings } from '@/lib/commission';
  */
 export const POST = route(async (req: NextRequest) => {
   const user = await requireUser();
+
+  const limit = rateLimit(`seller_listing:${user.id}`, 30, 60 * 60 * 1000);
+  if (!limit.success) {
+    throw new ApiError('RATE_LIMITED', 'Listing creation limit reached for this hour. Please try again later.');
+  }
+
   const force = new URL(req.url).searchParams.get('force') === '1';
   const input = createListingSchema.parse(await req.json().catch(() => ({})));
 

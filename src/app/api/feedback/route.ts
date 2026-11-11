@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { rateLimit } from '@/lib/rate-limit';
 
 const feedbackSchema = z.object({
   name: z.string().trim().max(60).optional().nullable(),
@@ -32,6 +33,15 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';
+    const limit = rateLimit(`feedback:ip:${ip}`, 10, 15 * 60 * 1000);
+    if (!limit.success) {
+      return NextResponse.json(
+        { error: 'Too many feedback submissions. Please wait a few minutes.' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json().catch(() => null);
     const parsed = feedbackSchema.safeParse(body);
     if (!parsed.success) {

@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { route, jsonOk } from '@/lib/api';
+import { route, jsonOk, ApiError } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
 import { rwandaCoords } from '@/lib/rwanda';
 import { prisma } from '@/lib/prisma';
@@ -9,6 +9,7 @@ import { francsToMinor } from '@/lib/utils';
 import { searchListings } from '@/lib/queries';
 import { emitAdmin } from '@/lib/admin-realtime';
 import { notifyMatchingListingAlerts } from '@/lib/listing-alert';
+import { rateLimit } from '@/lib/rate-limit';
 
 /** GET /api/listings — public, filtered search (also used by the mobile app). */
 export const GET = route(async (req: NextRequest) => {
@@ -21,6 +22,12 @@ export const GET = route(async (req: NextRequest) => {
 /** POST /api/listings — create a listing (free core action; any logged-in user). */
 export const POST = route(async (req: NextRequest) => {
   const user = await requireUser();
+
+  const limit = rateLimit(`listing:${user.id}`, 30, 60 * 60 * 1000);
+  if (!limit.success) {
+    throw new ApiError('RATE_LIMITED', 'Listing creation limit reached for this hour. Please try again later.');
+  }
+
   const input = createListingSchema.parse(await req.json().catch(() => ({})));
 
   const listing = await prisma.listing.create({
