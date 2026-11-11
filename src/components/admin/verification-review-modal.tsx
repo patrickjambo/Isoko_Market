@@ -209,9 +209,10 @@ export function VerificationReviewModal({
 
   // ── Re-run OCR ─────────────────────────────────────────────────────────
   async function handleRerunOcr() {
+    if (!request) return;
     setOcrRefreshing(true);
     try {
-      const res = await fetch(`/api/admin/verifications/${request!.id}/ocr`, { method: 'POST' });
+      const res = await fetch(`/api/admin/verifications/${request.id}/ocr`, { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message || 'Failed to re-run OCR');
 
@@ -219,7 +220,7 @@ export function VerificationReviewModal({
         const ocr = data.data.ocr;
         if (ocr.fullName) {
           setVerifiedName(ocr.fullName);
-        } else if (!verifiedName && request.user.fullName) {
+        } else if (!verifiedName && request.user?.fullName) {
           setVerifiedName(request.user.fullName);
         }
         if (ocr.idNumber) {
@@ -246,6 +247,7 @@ export function VerificationReviewModal({
 
   // ── Admin Decision ─────────────────────────────────────────────────────
   async function handleDecision(decision: 'approve' | 'reject' | 'resubmit') {
+    if (!request) return;
     if (decision === 'approve' && !hasConfirmedVisualReview) {
       toast('Please confirm visual verification before approving.', 'error');
       return;
@@ -267,7 +269,7 @@ export function VerificationReviewModal({
         payload.verifiedCountry = verifiedCountry.trim();
       }
 
-      const res = await fetch(`/api/admin/verifications/${request!.id}`, {
+      const res = await fetch(`/api/admin/verifications/${request.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
