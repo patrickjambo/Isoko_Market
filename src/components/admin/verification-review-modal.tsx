@@ -113,11 +113,12 @@ export function VerificationReviewModal({
   // ── Initialize data when request opens ────────────────────────────────
   useEffect(() => {
     if (request) {
-      // IMPORTANT: Only pre-fill from OCR, NOT from the account name.
-      // If OCR has no result yet, leave fields blank so admin enters them manually.
-      setVerifiedName(request.extractedFullName ?? '');
+      // Auto-populate extracted OCR data into the form inputs immediately.
+      // Fallback to the user's registered name so the admin never has to retype
+      // the full name from scratch — they only need to verify or correct any typo.
+      setVerifiedName(request.extractedFullName || request.user.fullName || '');
       setVerifiedIdNum(request.extractedIdNumber ?? '');
-      setVerifiedCountry(request.extractedCountry ?? 'Rwanda');
+      setVerifiedCountry(request.extractedCountry || 'Rwanda');
       setHasConfirmedVisualReview(false);
       setDecisionMode('view');
       setRejectionReason('');
@@ -128,15 +129,12 @@ export function VerificationReviewModal({
     }
   }, [request]);
 
-  // ── Auto-trigger OCR if data is missing when modal opens ──────────────
-  // This covers the case where background OCR didn't finish (Vercel killed
-  // the function) or no API key was set at submission time but was added later.
+  // ── Auto-trigger OCR if ID number is missing when modal opens ──────────
   const hasTriedAutoOcr = useRef(false);
   useEffect(() => {
     if (
       open &&
       request &&
-      !request.extractedFullName &&
       !request.extractedIdNumber &&
       !hasTriedAutoOcr.current &&
       !ocrRefreshing
@@ -155,9 +153,9 @@ export function VerificationReviewModal({
   const docSrc = `/api/admin/verifications/${request.id}/document`;
   const idValidation = verifiedIdNum ? validateRwandanIdNumber(verifiedIdNum) : null;
 
-  // OCR pending — no results yet (not even a manual-review flag with data)
-  const ocrIsPending = !request.extractedFullName && !request.extractedIdNumber && !request.ocrConfidence;
-  const ocrHasNoApiKey = ocrIsPending || (request.needsManualReview && !request.extractedFullName);
+  // Show banner only if neither OCR nor manual entry has populated the ID number
+  const ocrIsPending = !request.extractedFullName && !request.extractedIdNumber && !verifiedIdNum;
+  const ocrHasNoApiKey = ocrIsPending && !verifiedIdNum;
 
   // ── Mouse drag (desktop) ───────────────────────────────────────────────
   function handleMouseDown(e: MouseEvent<HTMLDivElement>) {
@@ -219,10 +217,25 @@ export function VerificationReviewModal({
 
       if (data.data?.ocr) {
         const ocr = data.data.ocr;
-        if (ocr.fullName) setVerifiedName(ocr.fullName);
-        if (ocr.idNumber) setVerifiedIdNum(ocr.idNumber);
-        if (ocr.country) setVerifiedCountry(ocr.country);
-        toast(ocr.needsManualReview ? 'OCR complete — please review and correct the fields' : 'OCR extracted successfully', 'success');
+        if (ocr.fullName) {
+          setVerifiedName(ocr.fullName);
+        } else if (!verifiedName && request.user.fullName) {
+          setVerifiedName(request.user.fullName);
+        }
+        if (ocr.idNumber) {
+          setVerifiedIdNum(ocr.idNumber);
+        }
+        if (ocr.country) {
+          setVerifiedCountry(ocr.country);
+        }
+        toast(
+          ocr.idNumber
+            ? 'ID details auto-extracted successfully'
+            : ocr.needsManualReview
+              ? 'OCR scanned — review and adjust fields if needed'
+              : 'OCR extracted successfully',
+          'success'
+        );
       }
     } catch (err) {
       toast(err instanceof Error ? err.message : 'OCR scan failed', 'error');
@@ -510,10 +523,12 @@ export function VerificationReviewModal({
                     value={verifiedName}
                     onChange={(e) => setVerifiedName(e.target.value)}
                     className="h-9 text-sm"
-                    placeholder="Full name as printed on card"
+                    placeholder={ocrRefreshing ? 'Scanning ID card in realtime...' : 'Full name as printed on card'}
                     autoComplete="off"
                   />
-                  <p className="text-[11px] text-muted-foreground">Edit if OCR is incorrect</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {verifiedName ? 'Auto-filled — edit if there is any typo' : 'Edit if OCR is incorrect'}
+                  </p>
                 </div>
 
                 {/* ── National ID Number ── */}
@@ -533,7 +548,7 @@ export function VerificationReviewModal({
                     value={verifiedIdNum}
                     onChange={(e) => setVerifiedIdNum(e.target.value.replace(/\s+/g, ''))}
                     className="h-9 text-sm font-mono font-bold tracking-wider"
-                    placeholder="e.g. 1199980083076077"
+                    placeholder={ocrRefreshing ? 'Extracting 16-digit ID in realtime...' : 'e.g. 1199980083076077'}
                     maxLength={16}
                     inputMode="numeric"
                     autoComplete="off"
@@ -594,10 +609,20 @@ export function VerificationReviewModal({
 
               {/* ── Conditional Reason Drawer ── */}
               {decisionMode !== 'view' && (
-                <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3.5 space-y-2">
+                <div
+                  className={`rounded-xl border p-3 sm:p-3.5 space-y-2.5 ${
+                    decisionMode === 'resubmit'
+                      ? 'border-amber-200 bg-amber-50/70'
+                      : 'border-rose-200 bg-rose-50/70'
+                  }`}
+                >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-amber-900">
-                      {decisionMode === 'resubmit' ? 'Reason for Re-upload Request' : 'Rejection Reason'}
+                    <span
+                      className={`text-xs font-bold ${
+                        decisionMode === 'resubmit' ? 'text-amber-900' : 'text-rose-900'
+                      }`}
+                    >
+                      {decisionMode === 'resubmit' ? 'Reason for Re-upload Request' : 'Reason for Rejection'}
                     </span>
                     <Button
                       size="sm"
@@ -609,33 +634,60 @@ export function VerificationReviewModal({
                     </Button>
                   </div>
 
-                  {decisionMode === 'resubmit' && (
-                    <div className="flex flex-wrap gap-1.5 pb-1">
-                      {[
-                        'Image is blurry / unreadable',
-                        'Corners cut off / uncropped card required',
-                        'Glare or flash obscuring text',
-                        'Expired identification card',
-                        'Back of card also required',
-                      ].map((preset) => (
-                        <button
-                          key={preset}
-                          type="button"
-                          onClick={() => setRejectionReason(preset)}
-                          className="text-[10px] px-2 py-0.5 rounded bg-white border border-amber-200 text-amber-900 hover:bg-amber-100 active:bg-amber-200 transition-colors"
-                        >
-                          {preset}
-                        </button>
-                      ))}
+                  {/* Suggestion Chips: Admin taps to auto-fill, or types custom message below */}
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-medium text-slate-600 block">
+                      Quick suggestions (tap to fill, or type custom feedback below):
+                    </span>
+                    <div className="flex flex-wrap gap-1.5 pb-0.5">
+                      {(decisionMode === 'resubmit'
+                        ? [
+                            'Image is blurry / unreadable',
+                            'Corners cut off / uncropped card required',
+                            'Glare or flash obscuring text',
+                            'Back of ID card also required',
+                            'Please upload a clearer, brighter photo',
+                          ]
+                        : [
+                            'Name does not match account name',
+                            'Document is not a valid National ID or Passport',
+                            'Expired identification document',
+                            'Suspected altered or edited document',
+                            'Photocopy / screen photo not accepted (upload original card)',
+                            'ID already registered to another account',
+                          ]
+                      ).map((preset) => {
+                        const isSelected = rejectionReason === preset;
+                        return (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() => setRejectionReason(preset)}
+                            className={`text-[10px] sm:text-[11px] px-2.5 py-1 rounded-md border transition-all text-left ${
+                              isSelected
+                                ? decisionMode === 'resubmit'
+                                  ? 'bg-amber-600 text-white border-amber-600 shadow-sm font-semibold'
+                                  : 'bg-rose-600 text-white border-rose-600 shadow-sm font-semibold'
+                                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
+                            }`}
+                          >
+                            {preset}
+                          </button>
+                        );
+                      })}
                     </div>
-                  )}
+                  </div>
 
                   <Textarea
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
-                    placeholder="Provide clear instructions for the customer..."
+                    placeholder={
+                      decisionMode === 'resubmit'
+                        ? 'Select a suggestion above or type instructions for re-upload...'
+                        : 'Select a suggestion above or type reason for rejection...'
+                    }
                     rows={2}
-                    className="text-xs bg-white"
+                    className="text-xs bg-white border-slate-300 focus:border-primary"
                   />
                 </div>
               )}

@@ -205,99 +205,124 @@ export async function extractIdDocumentData(options: {
   // ── 1. Google Gemini Vision (FREE — 1,500 req/day) ──────────────────────
   const geminiKey = env.GEMINI_API_KEY;
   if (geminiKey && imageBuffer && imageBuffer.length > 0) {
-    try {
-      const b64 = imageBuffer.toString('base64');
-      // Gemini 2.0 Flash — v1 stable API, correct request format
-      const body = {
-        systemInstruction: { parts: [{ text: OCR_SYSTEM_PROMPT }] },
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              { inlineData: { mimeType: mimeType, data: b64 } },
-              {
-                text: `Extract the identity information from this ID card. The registered account name is "${userFullName || 'Unknown'}". Return ONLY JSON.`,
-              },
-            ],
-          },
-        ],
-        generationConfig: { temperature: 0, maxOutputTokens: 600 },
-      };
-
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
+    const b64 = imageBuffer.toString('base64');
+    const body = {
+      systemInstruction: { parts: [{ text: OCR_SYSTEM_PROMPT }] },
+      contents: [
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-          signal: AbortSignal.timeout(25000),
-        }
-      );
+          role: 'user',
+          parts: [
+            { inlineData: { mimeType: mimeType, data: b64 } },
+            {
+              text: `Extract the identity information from this ID card. The registered account name is "${userFullName || 'Unknown'}". Return ONLY valid JSON with fullName, idNumber, country, confidence, rawText, needsManualReview.`,
+            },
+          ],
+        },
+      ],
+      generationConfig: { temperature: 0, maxOutputTokens: 600 },
+    };
 
-      if (res.ok) {
-        const gm = await res.json() as {
-          candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-        };
-        const text = gm.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-        if (text.trim()) {
-          const result = tryParseOcrJson(text, text);
-          if (result) {
-            console.log('[ocr] Gemini Vision success');
-            return result;
+    // Try Gemini 1.5 Flash (v1beta stable) first, then Gemini 2.0 Flash
+    const geminiModels = ['gemini-1.5-flash', 'gemini-2.0-flash'];
+    for (const model of geminiModels) {
+      try {
+        const cleanKey = geminiKey.trim();
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(cleanKey)}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-goog-api-key': cleanKey,
+            },
+            body: JSON.stringify(body),
+            signal: AbortSignal.timeout(20000),
           }
+        );
+
+        if (res.ok) {
+          const gm = (await res.json()) as {
+            candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+          };
+          const text = gm.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+          if (text.trim()) {
+            const result = tryParseOcrJson(text, text);
+            if (result) {
+              console.log(`[ocr] Gemini Vision (${model}) success:`, result.fullName, result.idNumber);
+              return result;
+            }
+          }
+        } else {
+          const errText = await res.text();
+          console.error(`[ocr] Gemini Vision (${model}) error:`, res.status, errText.slice(0, 200));
         }
-      } else {
-        const errText = await res.text();
-        console.error('[ocr] Gemini Vision HTTP error:', res.status, errText.slice(0, 300));
+      } catch (err) {
+        console.error(`[ocr] Gemini Vision (${model}) request error:`, err);
       }
-    } catch (err) {
-      console.error('[ocr] Gemini Vision error:', err);
     }
   }
 
   // ── 2. Anthropic Claude Vision (paid fallback) ──────────────────────────
   const anthropicKey = env.ANTHROPIC_API_KEY;
   if (anthropicKey && imageBuffer && imageBuffer.length > 0) {
+    const validMediaTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'] as const;
+    const mediaType = validMediaTypes.includes(mimeType as (typeof validMediaTypes)[number])
+      ? (mimeType as (typeof validMediaTypes)[number])
+      : 'image/jpeg';
+
+    // Must use a valid, supported vision model. If env.AI_MODEL contains an invalid or
+    // non-vision name (e.g. claude-opus-4-8), fallback to official vision models.
+    const candidateModels = [
+      'claude-3-5-sonnet-20241022',
+      'claude-3-5-haiku-20241022',
+      'claude-3-haiku-20240307',
+    ];
+    if (env.AI_MODEL && candidateModels.includes(env.AI_MODEL)) {
+      candidateModels.unshift(env.AI_MODEL);
+    }
+
     try {
       const client = new Anthropic({ apiKey: anthropicKey });
-      const validMediaTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'] as const;
-      const mediaType = validMediaTypes.includes(mimeType as (typeof validMediaTypes)[number])
-        ? (mimeType as (typeof validMediaTypes)[number])
-        : 'image/jpeg';
 
-      const response = await client.messages.create({
-        model: env.AI_MODEL || 'claude-3-5-sonnet-20241022',
-        max_tokens: 600,
-        system: OCR_SYSTEM_PROMPT,
-        messages: [
-          {
-            role: 'user',
-            content: [
+      for (const model of candidateModels) {
+        try {
+          const response = await client.messages.create({
+            model,
+            max_tokens: 600,
+            system: OCR_SYSTEM_PROMPT,
+            messages: [
               {
-                type: 'image',
-                source: { type: 'base64', media_type: mediaType, data: imageBuffer.toString('base64') },
-              },
-              {
-                type: 'text',
-                text: `Extract the identity information from this ID card. The registered account name is "${userFullName || 'Unknown'}". Return ONLY JSON.`,
+                role: 'user',
+                content: [
+                  {
+                    type: 'image',
+                    source: { type: 'base64', media_type: mediaType, data: imageBuffer.toString('base64') },
+                  },
+                  {
+                    type: 'text',
+                    text: `Extract the identity information from this ID card. The registered account name is "${userFullName || 'Unknown'}". Return ONLY JSON.`,
+                  },
+                ],
               },
             ],
-          },
-        ],
-      });
+          });
 
-      const textBlock = response.content.find((c) => c.type === 'text') as
-        | Anthropic.TextBlock
-        | undefined;
-      if (textBlock?.text) {
-        const result = tryParseOcrJson(textBlock.text, textBlock.text);
-        if (result) {
-          console.log('[ocr] Anthropic Vision success');
-          return result;
+          const textBlock = response.content.find((c) => c.type === 'text') as
+            | Anthropic.TextBlock
+            | undefined;
+          if (textBlock?.text) {
+            const result = tryParseOcrJson(textBlock.text, textBlock.text);
+            if (result) {
+              console.log(`[ocr] Anthropic Vision (${model}) success:`, result.fullName, result.idNumber);
+              return result;
+            }
+          }
+        } catch (mErr) {
+          console.error(`[ocr] Anthropic Vision (${model}) failed:`, mErr instanceof Error ? mErr.message : mErr);
         }
       }
     } catch (err) {
-      console.error('[ocr] Anthropic Vision error:', err);
+      console.error('[ocr] Anthropic Vision client error:', err);
     }
   }
 
