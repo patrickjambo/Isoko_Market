@@ -102,6 +102,7 @@ export function VerificationReviewModal({
   const [rejectionReason, setRejectionReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [ocrRefreshing, setOcrRefreshing] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{ name?: string; idNum?: string; country?: string }>({});
 
   // ── Zoom / Pan helpers — MUST be before early return (Rules of Hooks) ──
   const handleZoomIn = useCallback(() => setZoom((p) => Math.min(p + 0.25, 4)), []);
@@ -110,18 +111,56 @@ export function VerificationReviewModal({
   const handleRotateCw = useCallback(() => setRotation((p) => (p + 90) % 360), []);
   const handleRotateCcw = useCallback(() => setRotation((p) => (p - 90 + 360) % 360), []);
 
+  // ── Re-run OCR (defined before the auto-trigger useEffect so it's in scope) ──
+  const handleRerunOcr = useCallback(async () => {
+    if (!request) return;
+    setOcrRefreshing(true);
+    try {
+      const res = await fetch(`/api/admin/verifications/${request.id}/ocr`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed to re-run OCR');
+
+      const ocr = data.data?.ocr as {
+        fullName?: string | null;
+        idNumber?: string | null;
+        country?: string | null;
+        needsManualReview?: boolean;
+      } | undefined;
+
+      if (ocr) {
+        if (ocr.fullName) setVerifiedName(ocr.fullName);
+        if (ocr.idNumber) setVerifiedIdNum(ocr.idNumber);
+        if (ocr.country) setVerifiedCountry(ocr.country);
+        const gotUsefulData = Boolean(ocr.fullName || ocr.idNumber);
+        toast(
+          gotUsefulData
+            ? 'ID details extracted — review and confirm below'
+            : 'OCR ran but could not read the document clearly — enter details manually',
+          gotUsefulData ? 'success' : 'info'
+        );
+      } else {
+        toast('OCR returned no data — enter details manually', 'info');
+      }
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'OCR scan failed', 'error');
+    } finally {
+      setOcrRefreshing(false);
+    }
+  }, [request, toast]);
+
   // ── Initialize data when request opens ────────────────────────────────
   useEffect(() => {
     if (request) {
-      // Auto-populate extracted OCR data into the form inputs immediately.
-      // Fallback to the user's registered name so the admin never has to retype
-      // the full name from scratch — they only need to verify or correct any typo.
-      setVerifiedName(request.extractedFullName || request.user.fullName || '');
+      // Populate ONLY from OCR-extracted fields. Do NOT fall back to the account
+      // name for the cardholder field — the two values are different things and
+      // conflating them is misleading for the admin.
+      setVerifiedName(request.extractedFullName ?? '');
       setVerifiedIdNum(request.extractedIdNumber ?? '');
       setVerifiedCountry(request.extractedCountry || 'Rwanda');
       setHasConfirmedVisualReview(false);
       setDecisionMode('view');
       setRejectionReason('');
+      setValidationErrors({});
       setZoom(1);
       setRotation(0);
       setPosition({ x: 0, y: 0 });
@@ -145,17 +184,17 @@ export function VerificationReviewModal({
     if (!open) {
       hasTriedAutoOcr.current = false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, request]);
+  }, [open, request, handleRerunOcr, ocrRefreshing]);
 
   if (!request) return null;
 
   const docSrc = `/api/admin/verifications/${request.id}/document`;
   const idValidation = verifiedIdNum ? validateRwandanIdNumber(verifiedIdNum) : null;
 
-  // Show banner only if neither OCR nor manual entry has populated the ID number
-  const ocrIsPending = !request.extractedFullName && !request.extractedIdNumber && !verifiedIdNum;
-  const ocrHasNoApiKey = ocrIsPending && !verifiedIdNum;
+  // "OCR pending" = OCR has never run OR it ran and failed to extract anything useful.
+  // We show the warning banner in both cases so the admin knows to enter data manually.
+  const ocrRanSuccessfully = Boolean(request.extractedFullName || request.extractedIdNumber);
+  const ocrIsPending = !ocrRanSuccessfully;
 
   // ── Mouse drag (desktop) ───────────────────────────────────────────────
   function handleMouseDown(e: MouseEvent<HTMLDivElement>) {
@@ -207,44 +246,6 @@ export function VerificationReviewModal({
     lastTouchPos.current = null;
   }
 
-  // ── Re-run OCR ─────────────────────────────────────────────────────────
-  async function handleRerunOcr() {
-    if (!request) return;
-    setOcrRefreshing(true);
-    try {
-      const res = await fetch(`/api/admin/verifications/${request.id}/ocr`, { method: 'POST' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || 'Failed to re-run OCR');
-
-      if (data.data?.ocr) {
-        const ocr = data.data.ocr;
-        if (ocr.fullName) {
-          setVerifiedName(ocr.fullName);
-        } else if (!verifiedName && request.user?.fullName) {
-          setVerifiedName(request.user.fullName);
-        }
-        if (ocr.idNumber) {
-          setVerifiedIdNum(ocr.idNumber);
-        }
-        if (ocr.country) {
-          setVerifiedCountry(ocr.country);
-        }
-        toast(
-          ocr.idNumber
-            ? 'ID details auto-extracted successfully'
-            : ocr.needsManualReview
-              ? 'OCR scanned — review and adjust fields if needed'
-              : 'OCR extracted successfully',
-          'success'
-        );
-      }
-    } catch (err) {
-      toast(err instanceof Error ? err.message : 'OCR scan failed', 'error');
-    } finally {
-      setOcrRefreshing(false);
-    }
-  }
-
   // ── Admin Decision ─────────────────────────────────────────────────────
   async function handleDecision(decision: 'approve' | 'reject' | 'resubmit') {
     if (!request) return;
@@ -256,6 +257,21 @@ export function VerificationReviewModal({
       toast('A reason must be provided.', 'error');
       return;
     }
+
+    // Validate OCR fields before approving
+    if (decision === 'approve') {
+      const errs: { name?: string; idNum?: string; country?: string } = {};
+      if (!verifiedName.trim()) errs.name = 'Full name is required';
+      const idVal = validateRwandanIdNumber(verifiedIdNum);
+      if (!idVal.valid) errs.idNum = idVal.reason || 'ID number must be exactly 16 digits';
+      if (!verifiedCountry.trim()) errs.country = 'Country is required';
+      if (Object.keys(errs).length > 0) {
+        setValidationErrors(errs);
+        toast('Please fix the highlighted fields before approving.', 'error');
+        return;
+      }
+    }
+    setValidationErrors({});
 
     setSubmitting(true);
     try {
@@ -451,7 +467,7 @@ export function VerificationReviewModal({
                 </div>
 
                 {/* ── OCR Pending / No-Key Banner ── */}
-                {ocrHasNoApiKey && (
+                {ocrIsPending && (
                   <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 space-y-2">
                     <div className="flex items-center gap-2 text-amber-800 font-semibold text-xs">
                       {ocrRefreshing ? (
@@ -523,14 +539,18 @@ export function VerificationReviewModal({
                   <Input
                     id="vName"
                     value={verifiedName}
-                    onChange={(e) => setVerifiedName(e.target.value)}
-                    className="h-9 text-sm"
+                    onChange={(e) => { setVerifiedName(e.target.value); setValidationErrors((p) => ({ ...p, name: undefined })); }}
+                    className={`h-9 text-sm ${validationErrors.name ? 'border-rose-400 focus:ring-rose-400' : ''}`}
                     placeholder={ocrRefreshing ? 'Scanning ID card in realtime...' : 'Full name as printed on card'}
                     autoComplete="off"
                   />
-                  <p className="text-[11px] text-muted-foreground">
-                    {verifiedName ? 'Auto-filled — edit if there is any typo' : 'Edit if OCR is incorrect'}
-                  </p>
+                  {validationErrors.name ? (
+                    <p className="text-[11px] text-rose-600 font-medium">{validationErrors.name}</p>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">
+                      {verifiedName ? 'From ID card OCR — edit if incorrect' : 'Type full name exactly as printed on the card'}
+                    </p>
+                  )}
                 </div>
 
                 {/* ── National ID Number ── */}
@@ -548,13 +568,16 @@ export function VerificationReviewModal({
                   <Input
                     id="vId"
                     value={verifiedIdNum}
-                    onChange={(e) => setVerifiedIdNum(e.target.value.replace(/\s+/g, ''))}
-                    className="h-9 text-sm font-mono font-bold tracking-wider"
+                    onChange={(e) => { setVerifiedIdNum(e.target.value.replace(/\s+/g, '')); setValidationErrors((p) => ({ ...p, idNum: undefined })); }}
+                    className={`h-9 text-sm font-mono font-bold tracking-wider ${validationErrors.idNum ? 'border-rose-400 focus:ring-rose-400' : ''}`}
                     placeholder={ocrRefreshing ? 'Extracting 16-digit ID in realtime...' : 'e.g. 1199980083076077'}
                     maxLength={16}
                     inputMode="numeric"
                     autoComplete="off"
                   />
+                  {validationErrors.idNum && (
+                    <p className="text-[11px] text-rose-600 font-medium">{validationErrors.idNum}</p>
+                  )}
                   {idValidation && (
                     <div className="text-[11px] text-muted-foreground flex flex-wrap gap-x-2 gap-y-0.5 pt-0.5">
                       {idValidation.valid ? (
@@ -580,14 +603,18 @@ export function VerificationReviewModal({
                   <Input
                     id="vCountry"
                     value={verifiedCountry}
-                    onChange={(e) => setVerifiedCountry(e.target.value)}
-                    className="h-9 text-sm"
+                    onChange={(e) => { setVerifiedCountry(e.target.value); setValidationErrors((p) => ({ ...p, country: undefined })); }}
+                    className={`h-9 text-sm ${validationErrors.country ? 'border-rose-400 focus:ring-rose-400' : ''}`}
                     placeholder="Rwanda"
                     autoComplete="off"
                   />
-                  <p className="text-[11px] text-muted-foreground">
-                    Recognized from &quot;Republic of Rwanda&quot; / &quot;Repubulika y&apos;u Rwanda&quot;
-                  </p>
+                  {validationErrors.country ? (
+                    <p className="text-[11px] text-rose-600 font-medium">{validationErrors.country}</p>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">
+                      Recognized from &quot;Republic of Rwanda&quot; / &quot;Repubulika y&apos;u Rwanda&quot;
+                    </p>
+                  )}
                 </div>
               </div>
 

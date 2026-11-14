@@ -33,7 +33,7 @@ export default async function AppLayout({
   const [flags, user] = await Promise.all([getFeatureFlags(), getCurrentUser()]);
 
   return (
-    <div className="flex min-h-dvh flex-col max-w-full overflow-x-clip">
+    <div className="flex md:min-h-dvh flex-col max-w-full overflow-x-clip">
       <Header />
       <InstallBanner />
       {user && user.verificationStatus !== 'VERIFIED' && (
