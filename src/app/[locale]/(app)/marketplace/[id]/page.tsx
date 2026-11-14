@@ -239,16 +239,19 @@ export default async function ListingDetailPage({
       />
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <ImageGallery
-          images={
-            listing.images.length
-              ? listing.images
-              : [{ url: categoryFallbackImage(listing.category?.slug) }]
-          }
-          alt={listing.title}
-        />
+        {/* min-w-0 prevents the thumbnail strip from expanding the column beyond viewport width */}
+        <div className="min-w-0">
+          <ImageGallery
+            images={
+              listing.images.length
+                ? listing.images
+                : [{ url: categoryFallbackImage(listing.category?.slug) }]
+            }
+            alt={listing.title}
+          />
+        </div>
 
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               {listing.status === 'SOLD' && <Badge variant="secondary">{t('sold')}</Badge>}
@@ -260,6 +263,32 @@ export default async function ListingDetailPage({
               ) : (
                 <Badge variant="outline">{t(`condition.${listing.condition}`)}</Badge>
               )}
+              {/* Stock badge — only for products with explicit stock tracking */}
+              {(() => {
+                // @ts-ignore — stockQty field added in migration; present after prisma generate
+                const stockQty = (listing as unknown as { stockQty?: number | null }).stockQty ?? null;
+                if (listing.kind === 'SERVICE' || stockQty === null) return null;
+                if (stockQty === 0) return (
+                  <Badge variant="secondary" className="bg-destructive/10 text-destructive">
+                    {t('outOfStock')}
+                  </Badge>
+                );
+                if (stockQty === 1) return (
+                  <Badge variant="secondary" className="bg-accent/15 text-accent">
+                    {t('stockOne')}
+                  </Badge>
+                );
+                if (stockQty <= 5) return (
+                  <Badge variant="secondary" className="bg-accent/15 text-accent">
+                    {t('stockLow', { count: stockQty })}
+                  </Badge>
+                );
+                return (
+                  <Badge variant="secondary" className="text-muted-foreground">
+                    {t('stockLeft', { count: stockQty })}
+                  </Badge>
+                );
+              })()}
             </div>
             <p className="text-3xl font-extrabold text-primary">
               {listing.price > 0 ? formatRWF(listing.price, params.locale) : '—'}

@@ -439,6 +439,9 @@ model Listing {
   specs       Json?
   showPhone   Boolean          @default(false) // seller's contact preference (Section 8)
   contactInfo Json? // structured, clickable contact: { phone?, whatsapp?, email?, instagram? }
+  // Optional stock/quantity management. null = no stock limit (backward-compatible).
+  // When set, decrements on each order and auto-marks SOLD at 0.
+  stockQty      Int? // total units in stock; null = unlimited
   staleNudgedAt DateTime? // when the "still available?" nudge was sent (Section 5)
   // Denormalised product/service rating (recomputed on each review) so the stars
   // render on marketplace/home cards without an aggregate per card.

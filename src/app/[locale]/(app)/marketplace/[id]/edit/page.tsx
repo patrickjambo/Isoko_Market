@@ -61,6 +61,10 @@ export default async function EditListingPage({
                 .filter((s) => s?.label && s?.value)
                 .map((s) => ({ label: String(s.label), value: String(s.value) }))
             : [],
+          // @ts-ignore — stockQty field added in migration; present after prisma generate
+          stockQty: (listing as unknown as { stockQty?: number | null }).stockQty != null
+            ? String((listing as unknown as { stockQty?: number | null }).stockQty)
+            : '',
         }}
       />
     </div>

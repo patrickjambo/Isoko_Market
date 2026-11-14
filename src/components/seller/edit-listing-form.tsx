@@ -34,6 +34,7 @@ export type EditListingInitial = {
   showPhone: boolean;
   tags: string[];
   specs: ListingSpec[];
+  stockQty: string; // whole units as string for input; '' = unlimited
 };
 
 /** Single-page edit form for a seller's own listing (photos, price, name, …). */
@@ -83,6 +84,15 @@ export function EditListingForm({
           specs: isService ? [] : d.specs.filter((s) => s.label.trim() && s.value.trim()),
           showPhone: d.showPhone,
           contactInfo: d.contact,
+          // stockQty: '' = remove limit (null); number = set new qty
+          ...(!isService
+            ? {
+                stockQty:
+                  d.stockQty === '' || d.stockQty === undefined
+                    ? null
+                    : Math.max(0, parseInt(String(d.stockQty), 10) || 0),
+              }
+            : {}),
         }),
       });
       const j = await res.json();
@@ -155,6 +165,23 @@ export function EditListingForm({
           categorySlug={categories.find((c) => c.id === d.categoryId)?.slug}
           categoryName={categories.find((c) => c.id === d.categoryId)?.name}
         />
+      )}
+
+      {/* Stock quantity — optional, products only */}
+      {!isService && (
+        <div className="space-y-1.5">
+          <Label>{ts('stockQtyLabel')}</Label>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={100000}
+            value={d.stockQty ?? ''}
+            onChange={(e) => set({ stockQty: e.target.value })}
+            placeholder={ts('stockQtyPlaceholder')}
+          />
+          <p className="text-xs text-muted-foreground">{ts('stockQtyHint')}</p>
+        </div>
       )}
 
       <div className="space-y-1.5">

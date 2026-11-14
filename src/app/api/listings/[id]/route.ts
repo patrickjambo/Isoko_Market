@@ -54,6 +54,13 @@ export const PUT = route(async (req: NextRequest, ctx: { params: { id: string } 
         specs: input.specs === undefined ? undefined : input.specs.length ? input.specs : Prisma.DbNull,
         showPhone: input.showPhone,
         contactInfo: contact ?? Prisma.DbNull,
+        // Stock: undefined = keep existing; null = remove limit; number = set new qty.
+        // @ts-ignore — stockQty field added in migration; present after prisma generate
+        ...(input.stockQty === undefined
+          ? {}
+          : input.stockQty === null || input.stockQty <= 0
+            ? { stockQty: null }
+            : { stockQty: input.stockQty }),
         images: { create: input.images.map((url, position) => ({ url, position })) },
       },
     }),

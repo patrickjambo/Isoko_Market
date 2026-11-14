@@ -61,6 +61,9 @@ export const POST = route(async (req: NextRequest) => {
       ...(input.specs?.length ? { specs: input.specs } : {}),
       tags: input.tags,
       showPhone: input.showPhone,
+      // Stock: only set when the seller explicitly provided a positive quantity.
+      // @ts-ignore — stockQty field added in migration; present after prisma generate
+      ...(input.stockQty != null && input.stockQty > 0 ? { stockQty: input.stockQty } : {}),
       images: { create: input.images.map((url, position) => ({ url, position })) },
     },
     select: { id: true, title: true, description: true, categoryId: true, kind: true, condition: true, location: true, price: true },

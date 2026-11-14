@@ -334,7 +334,11 @@
     "storesMatching": "Boutiques correspondant à votre recherche",
     "rateService": "Noter le service",
     "reviewsTitle": "Avis",
-    "locationTitle": "Emplacement"
+    "locationTitle": "Emplacement",
+    "stockLeft": "{count} en stock",
+    "stockLow": "Plus que {count}!",
+    "outOfStock": "Rupture de stock",
+    "stockOne": "Dernière pièce!"
   },
   "jobs": {
     "title": "Emplois & missions",
@@ -1202,7 +1206,12 @@
     "service6Hint": "Vérifiez que votre service est correct.",
     "resumeTitle": "Terminez votre annonce",
     "resumeContinue": "Continuer",
-    "resumeDiscard": "Supprimer"
+    "resumeDiscard": "Supprimer",
+    "stockQtyLabel": "Quantité disponible (optionnel)",
+    "stockQtyHint": "Combien d'unités avez-vous? Laissez vide pour illimité.",
+    "stockQtyPlaceholder": "ex. 10",
+    "stockQtyUpdate": "Mettre à jour le stock",
+    "stockQtySaved": "Stock mis à jour"
   },
   "orders": {
     "title": "Commandes",

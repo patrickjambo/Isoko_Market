@@ -58,6 +58,11 @@ export const createListingSchema = z.object({
   showPhone: z.boolean().default(false),
   // Structured, clickable contact channels (phone / WhatsApp / email / Instagram).
   contactInfo: contactSchema.optional(),
+  // Optional stock quantity (whole units). null/undefined = no limit.
+  stockQty: z.preprocess(
+    (v) => (v === '' || v === null || v === undefined ? null : Number(v)),
+    z.number().int().min(0).max(100_000).nullable().optional()
+  ),
 });
 
 /** Partial draft — every field optional so autosave never blocks on a dropped step. */
@@ -89,6 +94,10 @@ export const draftDataSchema = z.object({
   images: z.array(imagePathSchema).max(6).optional(),
   tags: z.array(z.string().trim().max(40)).max(10).optional(),
   showPhone: z.boolean().optional(),
+  stockQty: z.preprocess(
+    (v) => (v === '' || v === null || v === undefined ? null : Number(v)),
+    z.number().int().min(0).max(100_000).nullable().optional()
+  ),
 });
 
 export const listingFilterSchema = z.object({

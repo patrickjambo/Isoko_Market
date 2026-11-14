@@ -181,9 +181,24 @@ export const PATCH = userRoute(async (req, ctx: { params: { id: string } }, { us
     if (order.status !== 'PENDING_PAYMENT') throw new ApiError('CONFLICT', 'Too late to cancel.');
     next = 'CANCELLED';
     evReason = 'cancelled';
+    // Fetch current stockQty so we know whether to restore stock or just relist.
+    // @ts-ignore — stockQty field added in migration; present after prisma generate
+    const listingSnap = await prisma.listing.findUnique({
+      where: { id: order.listingId },
+      // @ts-ignore
+      select: { stockQty: true },
+    }) as { stockQty: number | null } | null;
+    const hasStock = listingSnap?.stockQty !== null && listingSnap?.stockQty !== undefined;
     await prisma.$transaction([
       prisma.order.update({ where: { id: order.id }, data: { status: next } }),
-      prisma.listing.update({ where: { id: order.listingId }, data: { status: 'ACTIVE' } }),
+      prisma.listing.update({
+        where: { id: order.listingId },
+        // @ts-ignore
+        data: {
+          status: 'ACTIVE',
+          ...(hasStock ? { stockQty: { increment: 1 } } : {}),
+        },
+      }),
     ]);
     publishTopic(`listing:${order.listingId}`, { type: 'entity_update', entity: 'listing', id: order.listingId, status: 'ACTIVE', reason: 'relisted' });
     await notify({

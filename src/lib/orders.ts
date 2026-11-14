@@ -7,6 +7,13 @@ import { publishTopic } from './realtime';
 import { emitAdmin } from './admin-realtime';
 import { getProvider, startPayment } from './payments';
 
+// stockQty is a new schema field not yet in the generated Prisma client types.
+// Once `prisma generate` runs (at Vercel build time) the cast is redundant but harmless.
+type ListingWithStock = Awaited<ReturnType<typeof prisma.listing.findUnique>> & {
+  stockQty?: number | null;
+  seller: { paymentNumber: string | null; paymentProvider: string | null };
+};
+
 const rwf = (minor: number) => Math.round(minor / 100).toLocaleString();
 
 /**
@@ -26,7 +33,7 @@ export async function createOrder(params: {
   listingId: string;
   deliveryMethod?: string;
 }) {
-  const listing = await prisma.listing.findUnique({
+  const listing = (await prisma.listing.findUnique({
     where: { id: params.listingId },
     select: {
       id: true,
@@ -34,12 +41,20 @@ export async function createOrder(params: {
       title: true,
       price: true,
       status: true,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore — stockQty added in migration; present after prisma generate
+      stockQty: true,
       seller: { select: { paymentNumber: true, paymentProvider: true } },
     },
-  });
+  })) as ListingWithStock | null;
   if (!listing || listing.status === 'REMOVED') throw new ApiError('NOT_FOUND', 'Listing not found.');
   if (listing.sellerId === params.buyerId) throw new ApiError('BAD_REQUEST', 'You cannot buy your own listing.');
   if (listing.status !== 'ACTIVE') throw new ApiError('CONFLICT', 'This item is no longer available.');
+  // If stock tracking is enabled, enforce it before entering the transaction.
+  const stockQty = listing.stockQty ?? null;
+  if (stockQty !== null && stockQty <= 0) {
+    throw new ApiError('CONFLICT', 'This item is out of stock.');
+  }
 
   // A payout number is NOT required to place an order. The buyer signals intent,
   // the seller is notified to add their MoMo/Airtel number, and the buyer pays
@@ -54,14 +69,39 @@ export async function createOrder(params: {
   // update inside the transaction — it only flips ACTIVE→SOLD and the DB row lock
   // guarantees exactly one concurrent buyer wins. If two people tap Buy at once,
   // the loser updates 0 rows and the whole transaction rolls back (no double-sell).
+  //
+  // Stock-aware logic:
+  //  • null stockQty → unlimited; mark SOLD immediately (original behaviour).
+  //  • stockQty > 1   → decrement by 1, stay ACTIVE so the next buyer can purchase.
+  //  • stockQty = 1   → decrement to 0 AND mark SOLD (last unit sold).
+  //  • stockQty = 0   → already blocked above; this branch is unreachable.
   const order = await prisma.$transaction(async (tx) => {
-    const reserved = await tx.listing.updateMany({
-      where: { id: listing.id, status: 'ACTIVE' },
-      data: { status: 'SOLD' },
-    });
-    if (reserved.count !== 1) {
-      throw new ApiError('CONFLICT', 'This item is no longer available.');
+    const hasStock = stockQty !== null;
+
+    if (hasStock) {
+      // Atomic decrement guarded by stock > 0 (prevents oversell under concurrency).
+      // @ts-ignore — stockQty field added in migration; present after prisma generate
+      const updated = await (tx.listing.updateMany as Function)({
+        where: { id: listing.id, status: 'ACTIVE', stockQty: { gt: 0 } } as object,
+        data: {
+          stockQty: { decrement: 1 },
+          ...(stockQty === 1 ? { status: 'SOLD' } : {}),
+        } as object,
+      }) as { count: number };
+      if (updated.count !== 1) {
+        throw new ApiError('CONFLICT', 'This item is out of stock.');
+      }
+    } else {
+      // No stock tracking — original single-unit behaviour.
+      const reserved = await tx.listing.updateMany({
+        where: { id: listing.id, status: 'ACTIVE' },
+        data: { status: 'SOLD' },
+      });
+      if (reserved.count !== 1) {
+        throw new ApiError('CONFLICT', 'This item is no longer available.');
+      }
     }
+
     return tx.order.create({
       data: {
         listingId: listing.id,

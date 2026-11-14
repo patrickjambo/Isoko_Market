@@ -334,7 +334,11 @@
     "storesMatching": "Amaduka ahuye n'ishakisha ryawe",
     "rateService": "Tanga amanota",
     "reviewsTitle": "Ibitekerezo",
-    "locationTitle": "Aho biherereye"
+    "locationTitle": "Aho biherereye",
+    "stockLeft": "{count} isigaye mu bubiko",
+    "stockLow": "{count} gusa isigaye!",
+    "outOfStock": "Nta bisigaye",
+    "stockOne": "Iryo ni ryo rya nyuma!"
   },
   "jobs": {
     "title": "Akazi & Imirimo",
@@ -1202,7 +1206,12 @@
     "service6Hint": "Suzuma niba serivisi yawe imeze neza.",
     "resumeTitle": "Rangiza kwandika igicuruzwa",
     "resumeContinue": "Komeza",
-    "resumeDiscard": "Siba"
+    "resumeDiscard": "Siba",
+    "stockQtyLabel": "Umubare w'ibicuruzwa (uruhinja)",
+    "stockQtyHint": "Ufite ingahe? Siga ubusa niba udashaka gukurikirana.",
+    "stockQtyPlaceholder": "urugero: 10",
+    "stockQtyUpdate": "Hindura umubare",
+    "stockQtySaved": "Umubare wahindutse"
   },
   "orders": {
     "title": "Amateka y'ubugure",

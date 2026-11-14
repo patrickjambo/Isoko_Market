@@ -334,7 +334,11 @@
     "storesMatching": "Shops matching your search",
     "rateService": "Rate service",
     "reviewsTitle": "Reviews",
-    "locationTitle": "Location"
+    "locationTitle": "Location",
+    "stockLeft": "{count} left in stock",
+    "stockLow": "Only {count} left!",
+    "outOfStock": "Out of stock",
+    "stockOne": "Last one!"
   },
   "jobs": {
     "title": "Jobs & Gigs",
@@ -1202,7 +1206,12 @@
     "service6Hint": "Check your service looks right.",
     "resumeTitle": "Finish your listing",
     "resumeContinue": "Continue",
-    "resumeDiscard": "Discard"
+    "resumeDiscard": "Discard",
+    "stockQtyLabel": "Available quantity (optional)",
+    "stockQtyHint": "How many units do you have? Leave blank for unlimited.",
+    "stockQtyPlaceholder": "e.g. 10",
+    "stockQtyUpdate": "Update stock",
+    "stockQtySaved": "Stock updated"
   },
   "orders": {
     "title": "Orders",

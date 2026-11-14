@@ -45,6 +45,7 @@ type Data = {
   specs: ListingSpec[];
   showPhone: boolean;
   contact: ContactChannels;
+  stockQty: number | '';
 };
 
 const EMPTY: Data = {
@@ -62,6 +63,7 @@ const EMPTY: Data = {
   specs: [],
   showPhone: false,
   contact: {},
+  stockQty: '',
 };
 
 const TOTAL = 6;
@@ -173,6 +175,10 @@ export function AddProductWizard({
           specs: isService ? [] : data.specs.filter((s) => s.label.trim() && s.value.trim()),
           showPhone: data.showPhone,
           contactInfo: data.contact,
+          // Only send stockQty for products when the seller filled it in.
+          ...(!isService && data.stockQty !== '' && Number(data.stockQty) > 0
+            ? { stockQty: Number(data.stockQty) }
+            : {}),
         }),
       });
       const j = await res.json();
@@ -310,6 +316,26 @@ export function AddProductWizard({
               categorySlug={selectedCategory?.slug}
               categoryName={selectedCategory?.name}
             />
+          )}
+
+          {/* Stock quantity — optional, products only. Services don't have stock. */}
+          {!isService && (
+            <div className="space-y-1.5">
+              <Label>{t('stockQtyLabel')}</Label>
+              <Input
+                type="number"
+                inputMode="numeric"
+                min={0}
+                max={100000}
+                value={data.stockQty}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  set('stockQty', raw === '' ? '' : Math.max(0, parseInt(raw, 10) || 0));
+                }}
+                placeholder={t('stockQtyPlaceholder')}
+              />
+              <p className="text-xs text-muted-foreground">{t('stockQtyHint')}</p>
+            </div>
           )}
 
           {data.categoryId && (
