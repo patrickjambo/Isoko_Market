@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Briefcase, Plus } from 'lucide-react';
 import { Link } from '@/i18n/routing';
@@ -19,8 +20,45 @@ import { prisma } from '@/lib/prisma';
 import { storeName } from '@/lib/store';
 import { matchScore } from '@/lib/skills';
 import { getFeatureFlags } from '@/lib/feature-flags';
+import { env } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
+
+const BASE = env.NEXT_PUBLIC_APP_URL;
+const LOCALES = ['en', 'rw', 'fr'] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const title = 'Jobs in Rwanda — Find Work & Gigs | Zenova Rwanda';
+  const description =
+    'Browse open jobs, gigs, and freelance opportunities in Kigali and across Rwanda. Apply directly on Zenova Rwanda — Rwanda\'s trusted jobs & marketplace platform.';
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE}/en/jobs`,
+      languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE}/${l}/jobs`])),
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/${params.locale}/jobs`,
+      siteName: 'Zenova Rwanda | Buy & Sell',
+      images: [{ url: `${BASE}/og-default.png`, width: 1200, height: 630, alt: 'Jobs in Rwanda on Zenova' }],
+      type: 'website',
+      locale: params.locale,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${BASE}/og-default.png`],
+    },
+  };
+}
 
 export default async function JobsPage({
   params,

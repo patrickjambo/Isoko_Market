@@ -1,8 +1,37 @@
+import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 import { Prose } from '@/components/shared/prose';
 import { getFeatureFlags } from '@/lib/feature-flags';
+import { env } from '@/lib/env';
 
-export const metadata = { title: 'Terms of Service' };
+const BASE = env.NEXT_PUBLIC_APP_URL;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const title = 'Terms of Service | Zenova Rwanda';
+  const description =
+    'Zenova Rwanda terms of use: free listings, verified sellers, trust & safety rules, mobile money payments, and your rights as a buyer or seller.';
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE}/en/terms`,
+      languages: { en: `${BASE}/en/terms`, rw: `${BASE}/rw/terms`, fr: `${BASE}/fr/terms` },
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/${params.locale}/terms`,
+      siteName: 'Zenova Rwanda | Buy & Sell',
+      images: [{ url: `${BASE}/og-default.png`, width: 1200, height: 630, alt: 'Zenova Rwanda Terms' }],
+      type: 'website',
+    },
+    twitter: { card: 'summary', title, description },
+  };
+}
 
 export default async function TermsPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);

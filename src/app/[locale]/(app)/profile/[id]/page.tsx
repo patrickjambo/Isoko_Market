@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Package, Star, Briefcase } from 'lucide-react';
@@ -12,8 +13,58 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { initials, timeAgo } from '@/lib/utils';
 import { getFeatureFlags } from '@/lib/feature-flags';
+import { env } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
+
+const BASE = env.NEXT_PUBLIC_APP_URL;
+const LOCALES = ['en', 'rw', 'fr'] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string; id: string };
+}): Promise<Metadata> {
+  const person = await prisma.user.findUnique({
+    where: { id: params.id },
+    select: { fullName: true, businessName: true, avatarUrl: true, location: true, isVerified: true },
+  });
+  if (!person) return {};
+
+  const sellerName = person.businessName || person.fullName;
+  const locationLabel = person.location ? ` — ${person.location}` : ' — Rwanda';
+  const verifiedLabel = person.isVerified ? ' ✓ Verified Seller' : '';
+  const title = `${sellerName}${locationLabel}${verifiedLabel} | Zenova Rwanda`;
+  const description = `View ${sellerName}'s listings and ratings on Zenova Rwanda. Shop directly from verified sellers across Rwanda.`;
+
+  const ogImage = person.avatarUrl
+    ? (person.avatarUrl.startsWith('http') ? person.avatarUrl : `${BASE}${person.avatarUrl}`)
+    : `${BASE}/og-default.png`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE}/en/profile/${params.id}`,
+      languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE}/${l}/profile/${params.id}`])),
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/${params.locale}/profile/${params.id}`,
+      siteName: 'Zenova Rwanda | Buy & Sell',
+      images: [{ url: ogImage, width: 400, height: 400, alt: sellerName }],
+      type: 'profile',
+      locale: params.locale,
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function PublicProfilePage({
   params,

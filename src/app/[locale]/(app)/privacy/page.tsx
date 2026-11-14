@@ -1,8 +1,37 @@
+import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 import { Prose } from '@/components/shared/prose';
 import { getFeatureFlags } from '@/lib/feature-flags';
+import { env } from '@/lib/env';
 
-export const metadata = { title: 'Privacy Policy' };
+const BASE = env.NEXT_PUBLIC_APP_URL;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const title = 'Privacy Policy | Zenova Rwanda';
+  const description =
+    'How Zenova Rwanda collects, uses, and protects your personal data under Rwanda\'s Data Protection Law. Your rights, ID document handling, and contact details.';
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE}/en/privacy`,
+      languages: { en: `${BASE}/en/privacy`, rw: `${BASE}/rw/privacy`, fr: `${BASE}/fr/privacy` },
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/${params.locale}/privacy`,
+      siteName: 'Zenova Rwanda | Buy & Sell',
+      images: [{ url: `${BASE}/og-default.png`, width: 1200, height: 630, alt: 'Zenova Rwanda Privacy Policy' }],
+      type: 'website',
+    },
+    twitter: { card: 'summary', title, description },
+  };
+}
 
 export default async function PrivacyPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);

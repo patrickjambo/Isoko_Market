@@ -62,15 +62,16 @@ export async function generateMetadata({
       title,
       description,
       url: `${BASE}${canonicalPath}`,
-      siteName: 'Zenova Rwanda',
-      images: [{ url: `${BASE}/icon-512.png`, width: 512, height: 512, alt: 'Zenova Rwanda Jobs' }],
+      siteName: 'Zenova Rwanda | Buy & Sell',
+      images: [{ url: `${BASE}/og-default.png`, width: 1200, height: 630, alt: 'Zenova Rwanda Jobs' }],
       type: 'website',
       locale: params.locale,
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
+      images: [`${BASE}/og-default.png`],
     },
   };
 }

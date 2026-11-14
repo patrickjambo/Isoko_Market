@@ -22,6 +22,7 @@ export function ImageGallery({ images, alt }: { images: { url: string }[]; alt: 
         <Image
           src={images[active]!.url}
           alt={alt}
+          title={alt}
           fill
           priority
           sizes="(max-width: 768px) 100vw, 50vw"
@@ -38,13 +39,36 @@ export function ImageGallery({ images, alt }: { images: { url: string }[]; alt: 
                 'relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-colors',
                 i === active ? 'border-primary' : 'border-transparent'
               )}
-              aria-label={`Image ${i + 1}`}
+              aria-label={`${alt} - Photo ${i + 1}`}
             >
-              <Image src={img.url} alt="" fill sizes="64px" className="object-cover" />
+              <Image
+                src={img.url}
+                alt={`${alt} - Photo ${i + 1}`}
+                fill
+                sizes="64px"
+                className="object-cover"
+              />
             </button>
           ))}
         </div>
       )}
+      {/* Fallback for search engine crawlers without JavaScript execution */}
+      <noscript>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {images.map((img, i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={img.url}
+              src={img.url}
+              alt={`${alt} - Photo ${i + 1} | Zenova Rwanda`}
+              loading="lazy"
+              width={160}
+              height={160}
+              className="rounded-lg object-cover"
+            />
+          ))}
+        </div>
+      </noscript>
     </div>
   );
 }

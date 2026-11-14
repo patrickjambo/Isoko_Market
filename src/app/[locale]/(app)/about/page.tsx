@@ -27,16 +27,16 @@ export async function generateMetadata({
       title,
       description,
       url: `${BASE}/${params.locale}/about`,
-      siteName: 'Zenova Rwanda',
-      images: [{ url: `${BASE}/icon-512.png`, width: 512, height: 512, alt: 'About Zenova Rwanda' }],
+      siteName: 'Zenova Rwanda | Buy & Sell',
+      images: [{ url: `${BASE}/og-default.png`, width: 1200, height: 630, alt: 'About Zenova Rwanda' }],
       type: 'website',
       locale: params.locale,
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
-      images: [`${BASE}/icon-512.png`],
+      images: [`${BASE}/og-default.png`],
     },
   };
 }

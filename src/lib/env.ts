@@ -15,6 +15,10 @@ const schema = z.object({
   GOOGLE_CLIENT_ID: z.string().optional().default(''),
   GOOGLE_CLIENT_SECRET: z.string().optional().default(''),
 
+  // Google Search Console & Bing site verification tokens
+  GOOGLE_SITE_VERIFICATION: z.string().optional().default(''),
+  BING_SITE_VERIFICATION: z.string().optional().default(''),
+
   // Shared secret for scheduled jobs (Vercel Cron). Falls back to AUTH_SECRET.
   CRON_SECRET: z.string().optional(),
   // Shared secret a payment-provider webhook must present. Falls back to

@@ -16,7 +16,7 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        // Allow all well-behaved search engines to crawl public content
+        // Allow all search engines (Google, Bing, Yandex, DuckDuckGo, etc.) to crawl public content
         userAgent: '*',
         allow: [
           '/',
@@ -24,12 +24,38 @@ export default function robots(): MetadataRoute.Robots {
           '/rw/',
           '/fr/',
           '/en/marketplace',
+          '/rw/marketplace',
+          '/fr/marketplace',
+          '/en/marketplace/*',
+          '/rw/marketplace/*',
+          '/fr/marketplace/*',
           '/en/jobs',
+          '/rw/jobs',
+          '/fr/jobs',
+          '/en/jobs/*',
+          '/rw/jobs/*',
+          '/fr/jobs/*',
+          '/en/profile/*',
+          '/rw/profile/*',
+          '/fr/profile/*',
           '/en/about',
+          '/rw/about',
+          '/fr/about',
           '/en/how-it-works',
+          '/rw/how-it-works',
+          '/fr/how-it-works',
           '/en/privacy',
+          '/rw/privacy',
+          '/fr/privacy',
           '/en/terms',
+          '/rw/terms',
+          '/fr/terms',
           '/en/safety',
+          '/rw/safety',
+          '/fr/safety',
+          '/uploads/public/',
+          '/_next/image',
+          '/_next/static/',
         ],
         disallow: [
           // Auth flows — no SEO value, never index
@@ -70,7 +96,29 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
       {
-        // AI and Generative Engine crawlers (OpenAI, Perplexity, Anthropic, Google Gemini, Cohere)
+        // Google Image Search crawler — specifically allow public product & service images
+        userAgent: ['Googlebot-Image', 'bingbot'],
+        allow: [
+          '/uploads/public/',
+          '/_next/image',
+          '/icon*',
+          '/og-*',
+          '/*.jpg',
+          '/*.jpeg',
+          '/*.png',
+          '/*.webp',
+          '/*.avif',
+          '/*.svg',
+        ],
+        disallow: [
+          '/uploads/private/',
+          '/*/dashboard/*',
+          '/*/admin/*',
+          '/api/',
+        ],
+      },
+      {
+        // AI and Generative Engine crawlers (OpenAI, Perplexity, Anthropic, Google Gemini, Cohere, Applebot)
         // Allowed to index public brand and marketplace content for Generative Engine Optimization (GEO)
         userAgent: [
           'GPTBot',
@@ -80,6 +128,7 @@ export default function robots(): MetadataRoute.Robots {
           'PerplexityBot',
           'Google-Extended',
           'cohere-ai',
+          'Applebot',
         ],
         allow: [
           '/',
@@ -89,9 +138,18 @@ export default function robots(): MetadataRoute.Robots {
           '/en/marketplace',
           '/rw/marketplace',
           '/fr/marketplace',
+          '/en/marketplace/*',
+          '/rw/marketplace/*',
+          '/fr/marketplace/*',
           '/en/jobs',
           '/rw/jobs',
           '/fr/jobs',
+          '/en/jobs/*',
+          '/rw/jobs/*',
+          '/fr/jobs/*',
+          '/en/profile/*',
+          '/rw/profile/*',
+          '/fr/profile/*',
           '/en/about',
           '/rw/about',
           '/fr/about',
@@ -101,6 +159,7 @@ export default function robots(): MetadataRoute.Robots {
           '/en/safety',
           '/rw/safety',
           '/fr/safety',
+          '/uploads/public/',
         ],
         disallow: [
           '/*/dashboard',

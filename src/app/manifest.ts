@@ -8,9 +8,9 @@ import type { MetadataRoute } from 'next';
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Zenova',
+    name: 'Zenova Rwanda | Buy & Sell',
     short_name: 'Zenova',
-    description: 'Buy and sell, offer services, and find work near you in Rwanda.',
+    description: 'Rwanda\'s trusted marketplace — buy, sell, find services and jobs near you.',
     start_url: '/',
     scope: '/',
     display: 'standalone',

@@ -172,14 +172,14 @@ export default async function ListingDetailPage({
     <div className="container py-6">
       <LiveItemStatus topic={`listing:${listing.id}`} />
 
-      {/* ── Structured data: Product + BreadcrumbList (Google Rich Results) ── */}
+      {/* ── Structured data: Product / Service + BreadcrumbList (Google Rich Results) ── */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([
             {
               '@context': 'https://schema.org',
-              '@type': 'Product',
+              '@type': listing.kind === 'SERVICE' ? 'Service' : 'Product',
               name: listing.title,
               description: listing.description || listing.title,
               image:
@@ -193,10 +193,25 @@ export default async function ListingDetailPage({
                         : `${env.NEXT_PUBLIC_APP_URL}${categoryFallbackImage(listing.category?.slug)}`,
                     ],
               url: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}`,
-              brand: {
-                '@type': 'Brand',
-                name: listing.seller.businessName || 'Zenova',
-              },
+              ...(listing.kind === 'SERVICE'
+                ? {
+                    provider: {
+                      '@type': 'Person',
+                      name: listing.seller.businessName || listing.seller.fullName,
+                    },
+                    areaServed: {
+                      '@type': 'Country',
+                      name: 'Rwanda',
+                    },
+                    serviceType: listing.category ? categoryName(listing.category, params.locale) : 'Service',
+                  }
+                : {
+                    brand: {
+                      '@type': 'Brand',
+                      name: listing.seller.businessName || 'Zenova Rwanda',
+                    },
+                    category: listing.category ? categoryName(listing.category, params.locale) : undefined,
+                  }),
               offers: {
                 '@type': 'Offer',
                 priceCurrency: 'RWF',
@@ -209,7 +224,18 @@ export default async function ListingDetailPage({
                     ? 'https://schema.org/InStock'
                     : 'https://schema.org/OutOfStock',
                 url: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}`,
-                itemCondition: 'https://schema.org/UsedCondition',
+                ...(listing.kind !== 'SERVICE'
+                  ? {
+                      itemCondition:
+                        listing.condition === 'NEW'
+                          ? 'https://schema.org/NewCondition'
+                          : listing.condition === 'LIKE_NEW'
+                            ? 'https://schema.org/LikeNewCondition'
+                            : listing.condition === 'FOR_PARTS'
+                              ? 'https://schema.org/DamagedCondition'
+                              : 'https://schema.org/UsedCondition',
+                    }
+                  : {}),
                 seller: {
                   '@type': 'Person',
                   name: listing.seller.businessName || listing.seller.fullName,
@@ -231,7 +257,29 @@ export default async function ListingDetailPage({
               itemListElement: [
                 { '@type': 'ListItem', position: 1, name: 'Home', item: `${env.NEXT_PUBLIC_APP_URL}/en` },
                 { '@type': 'ListItem', position: 2, name: 'Marketplace', item: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace` },
-                { '@type': 'ListItem', position: 3, name: listing.title, item: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}` },
+                ...(listing.category
+                  ? [
+                      {
+                        '@type': 'ListItem',
+                        position: 3,
+                        name: categoryName(listing.category, params.locale),
+                        item: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace?categoryId=${listing.category.id}`,
+                      },
+                      {
+                        '@type': 'ListItem',
+                        position: 4,
+                        name: listing.title,
+                        item: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}`,
+                      },
+                    ]
+                  : [
+                      {
+                        '@type': 'ListItem',
+                        position: 3,
+                        name: listing.title,
+                        item: `${env.NEXT_PUBLIC_APP_URL}/en/marketplace/${listing.id}`,
+                      },
+                    ]),
               ],
             },
           ]),

@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import type { Metadata } from 'next';
 import { PackageSearch, Plus } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
@@ -28,8 +29,54 @@ import { categoryName } from '@/lib/i18n-helpers';
 import { districtCentroid } from '@/lib/rwanda';
 import { storeName } from '@/lib/store';
 import { prisma } from '@/lib/prisma';
+import { env } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
+
+const BASE = env.NEXT_PUBLIC_APP_URL;
+const LOCALES = ['en', 'rw', 'fr'] as const;
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: { locale: string };
+  searchParams: Record<string, string | undefined>;
+}): Promise<Metadata> {
+  const q = searchParams.q?.trim();
+  const title = q
+    ? `"${q}" — Marketplace | Zenova Rwanda`
+    : 'Marketplace — Buy & Sell Products and Services | Zenova Rwanda';
+  const description = q
+    ? `Search results for "${q}" on Zenova Rwanda. Find products, services, and sellers near you.`
+    : 'Browse thousands of listings on Zenova Rwanda — buy and sell products, find services, and connect with verified sellers across Kigali and Rwanda.';
+
+  const canonicalPath = `/en/marketplace`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE}${canonicalPath}`,
+      languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE}/${l}/marketplace`])),
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/${params.locale}/marketplace`,
+      siteName: 'Zenova Rwanda | Buy & Sell',
+      images: [{ url: `${BASE}/og-default.png`, width: 1200, height: 630, alt: 'Zenova Rwanda Marketplace' }],
+      type: 'website',
+      locale: params.locale,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${BASE}/og-default.png`],
+    },
+  };
+}
 
 export default async function MarketplacePage({
   params,

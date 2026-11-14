@@ -14,46 +14,49 @@ import '../globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Zenova — Connecting Communities • Empowering Trade',
-    template: '%s · Zenova',
+    default: 'Zenova Rwanda | Buy & Sell',
+    template: '%s | Zenova Rwanda',
   },
   description:
-    'Rwanda\'s trusted online marketplace. Buy, sell, rent, find services and jobs. Verified sellers, secure payments, available in Kinyarwanda, English & French.',
-  applicationName: 'Zenova',
+    'Rwanda\'s trusted online marketplace. Buy, sell, find services and jobs near you. Verified sellers, secure payments, in Kinyarwanda, English & French.',
+  applicationName: 'Zenova Rwanda | Buy & Sell',
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   manifest: '/manifest.webmanifest',
   keywords: [
+    'Zenova Rwanda',
+    'Zenova Buy and Sell',
     'online marketplace Rwanda',
     'buy and sell Rwanda',
     'buy electronics Kigali',
     'second hand products Rwanda',
-    'rental houses Kigali',
     'find services Rwanda',
     'jobs in Rwanda',
     'Kigali marketplace',
-    'Zenova Rwanda',
+    'zenova.rw',
+    'Rwanda online shopping',
+    'sell items Rwanda',
   ],
   openGraph: {
     type: 'website',
-    siteName: 'Zenova Rwanda',
-    title: 'Zenova — Buy, Sell, Rent & Find Work in Rwanda',
+    siteName: 'Zenova Rwanda | Buy & Sell',
+    title: 'Zenova Rwanda | Buy & Sell — Marketplace, Services & Jobs',
     description:
-      'Rwanda\'s trusted online marketplace. Buy, sell, rent, find services and jobs with verified people across Kigali and Rwanda.',
+      'Rwanda\'s trusted online marketplace. Buy, sell, find services and jobs with verified people across Kigali and Rwanda.',
     url: env.NEXT_PUBLIC_APP_URL,
     images: [
       {
-        url: `${env.NEXT_PUBLIC_APP_URL}/icon-512.png`,
-        width: 512,
-        height: 512,
-        alt: 'Zenova Rwanda marketplace',
+        url: `${env.NEXT_PUBLIC_APP_URL}/og-default.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Zenova Rwanda — Buy & Sell Marketplace',
       },
     ],
   },
   twitter: {
-    card: 'summary',
-    title: 'Zenova — Buy, Sell, Rent & Find Work in Rwanda',
-    description: 'Rwanda\'s trusted online marketplace for buying, selling, renting, and finding jobs.',
-    images: [`${env.NEXT_PUBLIC_APP_URL}/icon-512.png`],
+    card: 'summary_large_image',
+    title: 'Zenova Rwanda | Buy & Sell',
+    description: 'Rwanda\'s trusted online marketplace for buying, selling, finding services and jobs.',
+    images: [`${env.NEXT_PUBLIC_APP_URL}/og-default.png`],
   },
   icons: {
     icon: [
@@ -70,7 +73,11 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Zenova',
+    title: 'Zenova Rwanda',
+  },
+  verification: {
+    ...(env.GOOGLE_SITE_VERIFICATION ? { google: env.GOOGLE_SITE_VERIFICATION } : {}),
+    ...(env.BING_SITE_VERIFICATION ? { other: { 'msvalidate.01': env.BING_SITE_VERIFICATION } } : {}),
   },
 };
 
@@ -121,22 +128,35 @@ export default async function LocaleLayout({
               {
                 '@context': 'https://schema.org',
                 '@type': 'Organization',
-                name: 'Zenova',
-                alternateName: 'Zenova Rwanda',
+                name: 'Zenova Rwanda',
+                alternateName: ['Zenova', 'Zenova Rwanda | Buy & Sell', 'zenova.rw'],
                 url: env.NEXT_PUBLIC_APP_URL,
-                logo: `${env.NEXT_PUBLIC_APP_URL}/icon-512.png`,
+                logo: {
+                  '@type': 'ImageObject',
+                  url: `${env.NEXT_PUBLIC_APP_URL}/icon-512.png`,
+                  width: 512,
+                  height: 512,
+                },
                 description:
-                  "Rwanda's trusted online marketplace for buying, selling, renting, finding services and jobs.",
+                  "Rwanda's trusted online marketplace for buying, selling, finding services and jobs across Kigali and all of Rwanda.",
                 areaServed: { '@type': 'Country', name: 'Rwanda' },
+                foundingLocation: { '@type': 'City', name: 'Kigali', containedInPlace: { '@type': 'Country', name: 'Rwanda' } },
+                contactPoint: {
+                  '@type': 'ContactPoint',
+                  contactType: 'customer support',
+                  availableLanguage: ['English', 'Kinyarwanda', 'French'],
+                },
                 sameAs: [],
               },
               {
                 '@context': 'https://schema.org',
                 '@type': 'WebSite',
-                name: 'Zenova Rwanda',
+                name: 'Zenova Rwanda | Buy & Sell',
+                alternateName: ['Zenova', 'Zenova Rwanda', 'zenova.rw', 'Zenova Market'],
                 url: env.NEXT_PUBLIC_APP_URL,
                 description:
-                  "Rwanda's trusted online marketplace. Buy, sell, rent, find services and jobs.",
+                  "Rwanda's trusted online marketplace. Buy, sell, find services and jobs across Kigali and all of Rwanda.",
+                inLanguage: ['en', 'rw', 'fr'],
                 potentialAction: {
                   '@type': 'SearchAction',
                   target: {

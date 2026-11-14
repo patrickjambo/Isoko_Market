@@ -116,5 +116,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('[sitemap] Failed to load jobs:', err);
   }
 
-  return [...staticEntries, ...listingEntries, ...jobEntries];
+  // ── Verified & active seller profiles ──────────────────────────────────
+  // Public storefronts for verified sellers who have active listings
+  let profileEntries: MetadataRoute.Sitemap = [];
+  try {
+    const sellers = await prisma.user.findMany({
+      where: {
+        isVerified: true,
+        listings: { some: { status: 'ACTIVE' } },
+      },
+      select: { id: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
+      take: 5000,
+    });
+
+    profileEntries = sellers.flatMap((seller) =>
+      LOCALES.map((locale) => ({
+        url: `${BASE}/${locale}/profile/${seller.id}`,
+        lastModified: seller.updatedAt,
+        changeFrequency: 'weekly' as const,
+        priority: 0.6,
+        alternates: {
+          languages: Object.fromEntries(
+            LOCALES.map((l) => [l, `${BASE}/${l}/profile/${seller.id}`])
+          ),
+        },
+      }))
+    );
+  } catch (err) {
+    console.error('[sitemap] Failed to load seller profiles:', err);
+  }
+
+  return [...staticEntries, ...listingEntries, ...jobEntries, ...profileEntries];
 }

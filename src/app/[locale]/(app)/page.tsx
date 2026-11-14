@@ -1,4 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import type { Metadata } from 'next';
+import { env } from '@/lib/env';
 import {
   ShieldCheck,
   Briefcase,
@@ -36,6 +38,42 @@ import { getCurrentUser } from '@/lib/auth';
 import { getFeatureFlags } from '@/lib/feature-flags';
 import { CommunitySection } from '@/components/landing/community-section';
 import { WhatsAppHelpBanner } from '@/components/support/whatsapp-support';
+
+const BASE = env.NEXT_PUBLIC_APP_URL;
+const LOCALES = ['en', 'rw', 'fr'] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const title = 'Zenova Rwanda | Buy & Sell — Online Marketplace, Services & Jobs';
+  const description =
+    'Shop thousands of listings or sell your items on Zenova Rwanda — Rwanda\'s trusted online marketplace for products, services, and jobs. Verified sellers, secure payments, available in Kinyarwanda, English & French.';
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE}/en`,
+      languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE}/${l}`])),
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/${params.locale}`,
+      siteName: 'Zenova Rwanda | Buy & Sell',
+      images: [{ url: `${BASE}/og-default.png`, width: 1200, height: 630, alt: 'Zenova Rwanda — Buy & Sell Marketplace' }],
+      type: 'website',
+      locale: params.locale,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${BASE}/og-default.png`],
+    },
+  };
+}
 
 export default async function HomePage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
