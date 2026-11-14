@@ -102,6 +102,7 @@ export function AddProductWizard({
   const [loaded, setLoaded] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [duplicate, setDuplicate] = useState<{ id: string; title: string } | null>(null);
+  const [publishError, setPublishError] = useState<string | null>(null);
 
   // Load an existing draft to resume where the seller left off.
   useEffect(() => {
@@ -112,10 +113,15 @@ export function AddProductWizard({
           const d = j.draft.data;
           // The URL intent (product vs service) wins over whatever the draft had.
           // Fall back to the seller's saved location when the draft has none.
+          // Clear categoryId if the draft was saved for a different kind — the
+          // category list is filtered by kind, so a cross-kind id would be invisible
+          // in the picker and cause silent publish failures.
+          const draftKindMatches = !d.kind || d.kind === kind;
           setData({
             ...EMPTY,
             ...d,
             kind,
+            categoryId: draftKindMatches ? (d.categoryId ?? '') : '',
             location: d.location || defLoc,
             latitude: d.latitude ?? defLat,
             longitude: d.longitude ?? defLng,
@@ -141,7 +147,10 @@ export function AddProductWizard({
     }, 700);
   }, [data, step, loaded]);
 
-  const set = <K extends keyof Data>(k: K, v: Data[K]) => setData((d) => ({ ...d, [k]: v }));
+  const set = <K extends keyof Data>(k: K, v: Data[K]) => {
+    if (publishError) setPublishError(null);
+    setData((d) => ({ ...d, [k]: v }));
+  };
 
   const selectedCategory = cats.find((c) => c.id === data.categoryId);
   const categoryName = selectedCategory?.name;
@@ -149,6 +158,7 @@ export function AddProductWizard({
   async function publish(force = false) {
     setPublishing(true);
     setDuplicate(null);
+    setPublishError(null);
     try {
       const cleanPrice =
         data.price === '' || data.price === null || data.price === undefined
@@ -182,7 +192,25 @@ export function AddProductWizard({
         }),
       });
       const j = await res.json();
-      if (!res.ok) throw new Error(j.error?.message ?? 'error');
+      // Subscription gate: redirect to subscription page instead of a cryptic error.
+      if (res.status === 402 && j.requiresSubscription) {
+        router.push('/dashboard/subscription');
+        return;
+      }
+      if (!res.ok) {
+        // Build a helpful message: combine the top-level message with any field errors.
+        const fieldErrors = j.error?.fields
+          ? Object.entries(j.error.fields as Record<string, string>)
+              .map(([, msg]) => msg)
+              .join(', ')
+          : null;
+        const msg = fieldErrors
+          ? `${j.error?.message ?? 'Please fix the following'}: ${fieldErrors}`
+          : (j.error?.message ?? 'Could not publish. Please check all fields and try again.');
+        setPublishError(msg);
+        toast(msg, 'error');
+        return;
+      }
       if (j.duplicate) {
         setDuplicate(j.duplicate);
         return;
@@ -190,7 +218,9 @@ export function AddProductWizard({
       toast(t('published'), 'success');
       router.push(`/marketplace/${j.id}`);
     } catch (e) {
-      toast(e instanceof Error ? e.message : 'error', 'error');
+      const msg = e instanceof Error ? e.message : 'Could not publish. Please try again.';
+      setPublishError(msg);
+      toast(msg, 'error');
     } finally {
       setPublishing(false);
     }
@@ -208,7 +238,8 @@ export function AddProductWizard({
     (step === 1 && data.images.length > 0) ||
     (step === 2 && data.title.trim().length >= 3) ||
     (step === 3 && !!data.categoryId) ||
-    step === 4 ||
+    // Description must be at least 10 chars to pass backend validation.
+    (step === 4 && data.description.trim().length >= 10) ||
     (step === 5 && data.location.trim().length >= 2) ||
     step === 6;
 
@@ -356,7 +387,16 @@ export function AddProductWizard({
             placeholder={isService ? t('serviceDescriptionPlaceholder') : t('descriptionPlaceholder')}
             rows={5}
           />
-          <p className="text-xs text-muted-foreground">{t('charCount', { count: data.description.length })}</p>
+          <p className={cn(
+            'text-xs',
+            data.description.trim().length < 10 && data.description.length > 0
+              ? 'text-destructive'
+              : 'text-muted-foreground'
+          )}>
+            {data.description.trim().length < 10
+              ? `${t('charCount', { count: data.description.length })} — at least 10 characters required`
+              : t('charCount', { count: data.description.length })}
+          </p>
         </Step>
       )}
 
@@ -400,6 +440,12 @@ export function AddProductWizard({
           hint={isService ? t('service6Hint') : t('step6Hint')}
         >
           <Review data={data} categoryName={categoryName} locale={locale} isService={isService} conditionLabel={(c) => tc(`condition.${c}`)} />
+          {publishError && (
+            <div className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+              <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+              <p>{publishError}</p>
+            </div>
+          )}
           {duplicate && (
             <div className="flex items-start gap-2 rounded-lg border border-accent/40 bg-accent/5 p-3 text-sm">
               <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
