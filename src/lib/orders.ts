@@ -41,7 +41,6 @@ export async function createOrder(params: {
       title: true,
       price: true,
       status: true,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore — stockQty added in migration; present after prisma generate
       stockQty: true,
       seller: { select: { paymentNumber: true, paymentProvider: true } },
