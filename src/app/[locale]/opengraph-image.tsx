@@ -76,7 +76,7 @@ export default function DefaultOgImage() {
             textAlign: 'center',
           }}
         >
-          Rwanda's trusted online marketplace · zenova.rw
+          {"Rwanda's trusted online marketplace · zenova.rw"}
         </div>
 
         {/* Category pills */}
