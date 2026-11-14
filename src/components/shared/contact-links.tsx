@@ -27,9 +27,10 @@ export function ContactLinks({ contact }: { contact: ContactChannels | null }) {
           key={href}
           href={href}
           {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-secondary/50"
+          className="inline-flex min-w-0 items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-secondary/50"
         >
-          <Icon className={cn('h-4 w-4', cls)} /> {label}
+          <Icon className={cn('h-4 w-4 shrink-0', cls)} />
+          <span className="truncate">{label}</span>
         </a>
       ))}
     </div>

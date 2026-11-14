@@ -17,7 +17,7 @@ export function ImageGallery({ images, alt }: { images: { url: string }[]; alt: 
   }
 
   return (
-    <div className="space-y-3">
+    <div className="min-w-0 space-y-3">
       <div className="relative aspect-square overflow-hidden rounded-xl border border-border bg-muted">
         <Image
           src={images[active]!.url}

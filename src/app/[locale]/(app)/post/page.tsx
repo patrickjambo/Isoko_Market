@@ -14,7 +14,7 @@ export default async function PostPage({ params }: { params: { locale: string } 
   const options = [
     { href: '/dashboard/sell', icon: Store, label: t('nav.postItem'), tone: 'primary' as const },
     {
-      href: '/dashboard/sell',
+      href: '/dashboard/sell?kind=service',
       icon: Wrench,
       label: t('nav.postService'),
       tone: 'primary' as const,
