@@ -12,15 +12,16 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function formatRWF(minorUnits: number, locale = 'rw'): string {
   const francs = Math.round(minorUnits / 100);
-  const intlLocale = locale === 'rw' ? 'rw-RW' : locale === 'fr' ? 'fr-RW' : 'en-RW';
+  // Use en-RW locale for consistent number grouping, then append RWF suffix.
+  // Avoids locale-specific currency prefixes like "RF" (rw-RW) or "FRw" (fr-RW).
   try {
-    return new Intl.NumberFormat(intlLocale, {
-      style: 'currency',
-      currency: 'RWF',
+    const formatted = new Intl.NumberFormat('en-RW', {
+      minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(francs);
+    return `${formatted} RWF`;
   } catch {
-    return `RWF ${francs.toLocaleString()}`;
+    return `${francs.toLocaleString()} RWF`;
   }
 }
 

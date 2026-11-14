@@ -13,7 +13,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { ImageUploader } from '@/components/shared/image-uploader';
 import { useToast } from '@/components/ui/toast';
 import { apiFetch } from '@/lib/admin-client';
 
@@ -33,7 +32,6 @@ export function OrderActions({
   const [busy, setBusy] = useState<string | null>(null);
   const [disputeOpen, setDisputeOpen] = useState(false);
   const [reason, setReason] = useState('');
-  const [proof, setProof] = useState<string[]>([]);
 
   async function act(action: string, extra?: Record<string, unknown>) {
     setBusy(action);
@@ -57,24 +55,17 @@ export function OrderActions({
 
   return (
     <div className="space-y-3">
-      {/* Buyer: confirm they've sent the money (with an optional proof screenshot). */}
+      {/* Buyer: confirm they've sent the money — simple two-button row, no proof upload. */}
       {role === 'buyer' && status === 'PENDING_PAYMENT' && (
-        <div className="space-y-3 rounded-xl border border-border bg-card p-4">
-          <div className="space-y-1.5">
-            <p className="text-sm font-medium">{t('proofLabel')}</p>
-            <p className="text-xs text-muted-foreground">{t('proofHint')}</p>
-            <ImageUploader value={proof} onChange={setProof} max={1} />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => act('mark_paid', { proofUrl: proof[0] })} disabled={busy !== null}>
-              {busy === 'mark_paid' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              {t('markPaid')}
-            </Button>
-            <Button variant="outline" onClick={() => act('cancel')} disabled={busy !== null}>
-              {busy === 'cancel' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />}
-              {t('cancel')}
-            </Button>
-          </div>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => act('mark_paid')} disabled={busy !== null}>
+            {busy === 'mark_paid' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {t('markPaid')}
+          </Button>
+          <Button variant="outline" onClick={() => act('cancel')} disabled={busy !== null}>
+            {busy === 'cancel' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />}
+            {t('cancel')}
+          </Button>
         </div>
       )}
 
