@@ -146,7 +146,9 @@ export default async function LocaleLayout({
                   contactType: 'customer support',
                   availableLanguage: ['English', 'Kinyarwanda', 'French'],
                 },
-                sameAs: [],
+                sameAs: [
+                  'https://www.instagram.com/zenovarwanda',
+                ],
               },
               {
                 '@context': 'https://schema.org',

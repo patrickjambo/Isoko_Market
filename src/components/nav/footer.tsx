@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { Logo } from '@/components/brand/logo';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Instagram } from 'lucide-react';
 import { WhatsAppIcon } from '@/components/icons/whatsapp-icon';
 
 export async function Footer() {
@@ -39,6 +39,15 @@ export async function Footer() {
           >
             <WhatsAppIcon className="h-4 w-4 text-[#25D366]" />
             <span>WhatsApp Support</span>
+          </a>
+          <a
+            href="https://www.instagram.com/zenovarwanda"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="col-span-2 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Instagram className="h-4 w-4 text-[#E1306C]" />
+            <span>Instagram @zenovarwanda</span>
           </a>
         </nav>
       </div>
