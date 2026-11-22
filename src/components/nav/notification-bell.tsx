@@ -20,6 +20,8 @@ import { useRealtime } from '@/hooks/use-realtime';
 export function NotificationBell({ initialUnread }: { initialUnread: number }) {
   const t = useTranslations('nav');
   const { toast } = useToast();
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
   const [unread, setUnread] = useState(initialUnread);
   const unreadRef = useRef(initialUnread);
   unreadRef.current = unread;
@@ -27,7 +29,12 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
   useRealtime((event) => {
     if (event.type === 'notification') {
       setUnread((n) => n + 1);
-      toast(event.notification.title, 'info');
+      // Show the actual notification title/body so the user knows what happened
+      // without having to open the notifications page.
+      const preview = event.notification.body
+        ? `${event.notification.title}: ${event.notification.body}`
+        : event.notification.title;
+      toastRef.current(preview, 'info');
     }
   });
 
@@ -44,7 +51,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
         const next = Number(data?.unread ?? 0);
         // Surface a toast only when the poll discovers a NEW one (the SSE path
         // already toasts locally; on Vercel it won't, so this covers it).
-        if (next > unreadRef.current) toast(t('notifications'), 'info');
+        if (next > unreadRef.current) toastRef.current(t('notifications'), 'info');
         setUnread(next);
       } catch {
         /* transient — try again next tick */
@@ -72,7 +79,8 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
       stop();
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [toast, t]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // stable: refs keep values current without re-creating the interval
 
   return (
     <Button variant="ghost" size="icon" asChild aria-label={t('notifications')}>

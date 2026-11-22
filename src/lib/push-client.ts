@@ -17,11 +17,31 @@ export function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 /**
- * Check if the current browser / device supports Web Push notifications.
+ * Returns true when the device supports Web Push. Accounts for iOS Safari
+ * which only added full PWA push support in iOS 16.4+ — earlier versions have
+ * the APIs but throw at subscribe() time.
  */
 export function isPushNotificationSupported(): boolean {
   if (typeof window === 'undefined') return false;
-  return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+    return false;
+  }
+  // iOS Safari < 16.4 has Notification but no push support in standalone mode.
+  // We detect it by checking for the absence of pushManager on a registration
+  // — but that's async. A synchronous heuristic: if the user agent looks like
+  // iOS and the platform is not macOS we fall back to checking the iOS version.
+  const ua = navigator.userAgent;
+  const isIOS = /iP(hone|od|ad)/.test(ua);
+  if (isIOS) {
+    const match = ua.match(/OS (\d+)_(\d+)/);
+    if (match) {
+      const major = parseInt(match[1] ?? '0', 10);
+      const minor = parseInt(match[2] ?? '0', 10);
+      // iOS 16.4+ required for Web Push in home-screen PWA
+      if (major < 16 || (major === 16 && minor < 4)) return false;
+    }
+  }
+  return true;
 }
 
 /**
@@ -33,16 +53,40 @@ export function getNotificationPermissionState(): NotificationPermission | 'unsu
 }
 
 /**
- * Ensure the service worker is registered and ready.
+ * Ensure the service worker is registered and its active worker is ready.
+ * Waits up to 10 s for an installing worker to become active before giving up.
  */
 export async function getReadyServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!isPushNotificationSupported()) return null;
 
   try {
-    let reg = await navigator.serviceWorker.getRegistration();
+    let reg = await navigator.serviceWorker.getRegistration('/sw.js');
     if (!reg) {
       reg = await navigator.serviceWorker.register('/sw.js');
     }
+
+    // Wait for the service worker to be active (handles the "installing" state
+    // that causes pushManager.subscribe() to fail on first-ever page load).
+    if (!reg.active) {
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('SW activation timeout')), 10_000);
+        const worker = reg!.installing ?? reg!.waiting;
+        if (!worker) {
+          clearTimeout(timeout);
+          resolve();
+          return;
+        }
+        worker.addEventListener('statechange', function onState() {
+          if (worker.state === 'activated' || worker.state === 'redundant') {
+            clearTimeout(timeout);
+            worker.removeEventListener('statechange', onState);
+            if (worker.state === 'activated') resolve();
+            else reject(new Error('SW became redundant'));
+          }
+        });
+      });
+    }
+
     return reg;
   } catch (error) {
     console.error('Failed to get service worker registration:', error);
@@ -92,7 +136,7 @@ export async function subscribeToPushNotifications(): Promise<{
     return { success: false, error: 'VAPID public key is missing.' };
   }
 
-  // 3. Ensure service worker registration is active
+  // 3. Ensure service worker registration is active (waits for installing→active)
   const reg = await getReadyServiceWorker();
   if (!reg) {
     return { success: false, error: 'Service worker is not active on this device.' };
@@ -158,7 +202,7 @@ export async function unsubscribeFromPushNotifications(): Promise<{ success: boo
     return { success: true };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    return { success: false, error: message };
+    return { success: false, error: message }; 
   }
 }
 

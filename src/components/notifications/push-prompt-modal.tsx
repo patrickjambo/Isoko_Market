@@ -98,8 +98,17 @@ export function PushPromptModal() {
       if (permission === 'granted') {
         toast(t('promptSuccess'), 'success');
 
-        // Complete the service worker and server push registration in the background
-        subscribeToPushNotifications().catch(() => {});
+        // Complete the SW registration and server subscription in the background.
+        // We skip the requestPermission() call inside subscribeToPushNotifications()
+        // because we just got it above — the function handles 'granted' fast-path.
+        subscribeToPushNotifications()
+          .then((res) => {
+            if (!res.success && res.error) {
+              // Log silently — the user already tapped Allow so don't show another toast
+              console.warn('[Push] Background subscription failed:', res.error);
+            }
+          })
+          .catch(() => {});
       } else {
         snooze();
       }

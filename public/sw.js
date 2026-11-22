@@ -18,7 +18,7 @@
  *
  * Bump VERSION on each deploy that changes precached assets to drop old caches.
  */
-const VERSION = 'v4';
+const VERSION = 'v5';
 const STATIC_CACHE = `zenova-static-${VERSION}`;
 const PRECACHE = [
   '/offline.html',
@@ -115,6 +115,7 @@ self.addEventListener('push', (event) => {
   }
 
   const title = payload.title || 'Zenova';
+  const isHighPriority = ['MESSAGE', 'PAYMENT', 'LISTING_SOLD'].includes(payload.type || '');
   const options = {
     body: payload.body || '',
     icon: payload.icon || '/icon-192.png',
@@ -122,9 +123,13 @@ self.addEventListener('push', (event) => {
     image: payload.image,
     tag: payload.tag || 'zenova-alert',
     renotify: true,
-    vibrate: [120, 60, 120, 60, 200],
+    // Keep high-priority alerts (messages, payments) on screen until dismissed.
+    requireInteraction: isHighPriority,
+    // Vibrate: short–pause–short for messages; triple pulse for payments.
+    vibrate: isHighPriority ? [200, 100, 200, 100, 400] : [120, 60, 120],
     data: {
       url: payload.url || (payload.data && payload.data.url) || '/',
+      type: payload.type || null,
       timestamp: Date.now(),
     },
     actions: [
@@ -175,18 +180,43 @@ self.addEventListener('notificationclick', (event) => {
 // Automatic token resync if browser rotates push subscription credentials
 self.addEventListener('pushsubscriptionchange', (event) => {
   event.waitUntil(
-    self.registration.pushManager
-      .subscribe(event.oldSubscription ? event.oldSubscription.options : { userVisibleOnly: true })
-      .then((subscription) => {
-        return fetch('/api/push/subscribe', {
+    (async () => {
+      try {
+        // Retrieve the stored VAPID public key so the new subscription uses
+        // the same application server key — required by Chrome 90+.
+        const reg = event.target || self.registration;
+        const oldOptions = event.oldSubscription ? event.oldSubscription.options : null;
+        const applicationServerKey = oldOptions?.applicationServerKey ?? null;
+
+        const subscribeOptions = {
+          userVisibleOnly: true,
+          ...(applicationServerKey ? { applicationServerKey } : {}),
+        };
+
+        const newSubscription = await reg.pushManager.subscribe(subscribeOptions);
+
+        await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(subscription.toJSON()),
+          body: JSON.stringify(newSubscription.toJSON()),
         });
-      })
-      .catch(() => {
-        /* best-effort resync */
-      })
+      } catch {
+        /* best-effort resync — user will be re-prompted on next visit */
+      }
+    })()
   );
+});
+
+// Record when a notification is dismissed so we can track engagement.
+self.addEventListener('notificationclose', (event) => {
+  // Best-effort analytics ping — do not block anything.
+  const type = event.notification?.data?.type;
+  if (type) {
+    fetch('/api/push/dismissed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, timestamp: Date.now() }),
+    }).catch(() => {});
+  }
 });
 
