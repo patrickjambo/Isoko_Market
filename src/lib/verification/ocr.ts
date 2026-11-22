@@ -201,6 +201,7 @@ export async function extractIdDocumentData(options: {
   fallbackText?: string;
 }): Promise<IdExtractionResult> {
   const { imageBuffer, mimeType = 'image/jpeg', userFullName, fallbackText } = options;
+  const apiErrors: string[] = [];
 
   // ── 1. Google Gemini Vision (FREE — 1,500 req/day) ──────────────────────
   const geminiKey = env.GEMINI_API_KEY;
@@ -222,10 +223,14 @@ export async function extractIdDocumentData(options: {
       generationConfig: { temperature: 0, maxOutputTokens: 600 },
     };
 
-    // Try latest Gemini Flash models in order of preference.
-    // gemini-3.8-flash is the current recommended model (as of Nov 2026).
-    // Falls back to older stable models if the latest is unavailable or overloaded.
-    const geminiModels = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-flash'];
+    // Tested active multimodal models (in order of latency and availability):
+    // gemini-3.5-flash-lite is lightning fast and handles vision reliably.
+    const geminiModels = [
+      'gemini-3.5-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-flash-lite-latest',
+      'gemini-3.8-flash',
+    ];
     for (const model of geminiModels) {
       try {
         const cleanKey = geminiKey.trim();
@@ -238,7 +243,7 @@ export async function extractIdDocumentData(options: {
               'x-goog-api-key': cleanKey,
             },
             body: JSON.stringify(body),
-            signal: AbortSignal.timeout(20000),
+            signal: AbortSignal.timeout(15000),
           }
         );
 
@@ -257,9 +262,11 @@ export async function extractIdDocumentData(options: {
         } else {
           const errText = await res.text();
           console.error(`[ocr] Gemini Vision (${model}) error:`, res.status, errText.slice(0, 200));
+          apiErrors.push(`${model} (HTTP ${res.status})`);
         }
       } catch (err) {
         console.error(`[ocr] Gemini Vision (${model}) request error:`, err);
+        apiErrors.push(`${model} (${err instanceof Error ? err.message : 'timeout'})`);
       }
     }
   }
@@ -364,9 +371,10 @@ export async function extractIdDocumentData(options: {
     return parseIdTextHeuristically(fallbackText, userFullName);
   }
 
-  // ── 5. No vision API configured — flag for manual admin review ──────────
+  // ── 5. Fallback — flag for manual admin review ──────────
   // We do NOT parse raw binary image bytes as UTF-8 (produces garbage).
   // Admin must manually enter the correct information from the document.
+  const isApiConfigured = Boolean(env.GEMINI_API_KEY || env.ANTHROPIC_API_KEY || env.GOOGLE_VISION_API_KEY);
   return {
     fullName: null,
     idNumber: null,
@@ -374,10 +382,16 @@ export async function extractIdDocumentData(options: {
     confidence: 0,
     rawText: '',
     needsManualReview: true,
-    reviewReasons: [
-      'No OCR API configured — add GEMINI_API_KEY (free) to Vercel environment variables',
-      'Visit https://aistudio.google.com/app/apikey to get a free Gemini API key',
-      'Admin must manually verify and enter the name and ID number from the document',
-    ],
+    reviewReasons: isApiConfigured
+      ? [
+          'OCR engine could not read document clearly or experienced temporary load',
+          ...(apiErrors.length > 0 ? [`Errors: ${apiErrors.join(', ')}`] : []),
+          'Admin must manually verify and enter the name and ID number from the document',
+        ]
+      : [
+          'No OCR API configured — add GEMINI_API_KEY (free) to Vercel environment variables',
+          'Visit https://aistudio.google.com/app/apikey to get a free Gemini API key',
+          'Admin must manually verify and enter the name and ID number from the document',
+        ],
   };
 }
