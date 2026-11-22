@@ -247,11 +247,12 @@ export default async function HomePage({ params }: { params: { locale: string } 
         if (items.length === 0) return null;
         return (
           <section className="border-b border-border bg-card">
-            <div className="container grid grid-cols-2 gap-6 py-10 sm:grid-cols-4">
+            <div className="container py-10">
+              <div className="mx-auto flex flex-wrap justify-center gap-6 sm:gap-10">
               {items.map((s) => {
                 const Icon = s.icon;
                 return (
-                  <div key={s.label} className="flex flex-col items-center text-center">
+                  <div key={s.label} className="flex w-36 flex-col items-center text-center sm:w-40">
                     <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary">
                       <Icon className="h-6 w-6" />
                     </div>
@@ -262,6 +263,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
                   </div>
                 );
               })}
+              </div>
             </div>
           </section>
         );
