@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Loader2, Star, Trash2, StarOff, ChevronLeft, ChevronRight, PackageSearch } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Select } from '@/components/ui/select';
@@ -31,8 +31,10 @@ const statusVariant: Record<string, 'success' | 'muted' | 'destructive' | 'secon
 export function AdminListings({ locale }: { locale: string }) {
   const t = useTranslations('admin');
   const { toast } = useToast();
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
   const can = useCan();
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState('ACTIVE');
   const [page, setPage] = useState(1);
   const [listings, setListings] = useState<Listing[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -53,11 +55,11 @@ export function AdminListings({ locale }: { locale: string }) {
       setPageSize((meta?.pageSize as number) ?? 20);
       setSelected(new Set());
     } catch (e) {
-      toast(e instanceof Error ? e.message : 'error', 'error');
+      toastRef.current(e instanceof Error ? e.message : 'error', 'error');
     } finally {
       setLoading(false);
     }
-  }, [status, page, toast]);
+  }, [status, page]); // toast removed — accessed via stable ref
 
   useEffect(() => {
     load();
@@ -80,10 +82,10 @@ export function AdminListings({ locale }: { locale: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, ids: [...selected] }),
       });
-      toast(`${t('actionLogged')} (${data.count})`, 'success');
+      toastRef.current(`${t('actionLogged')} (${data.count})`, 'success');
       await load();
     } catch (e) {
-      toast(e instanceof Error ? e.message : 'error', 'error');
+      toastRef.current(e instanceof Error ? e.message : 'error', 'error');
     } finally {
       setBusy(false);
     }
