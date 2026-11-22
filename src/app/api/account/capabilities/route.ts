@@ -24,9 +24,11 @@ const schema = z.object({
  */
 export const GET = route(async () => {
   const user = await requireUser();
-  // capabilities field added by migration 20261122140000_add_user_capabilities
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return jsonOk({ capabilities: (user as any).capabilities ?? [] });
+  const full = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { capabilities: true },
+  });
+  return jsonOk({ capabilities: full?.capabilities ?? [] });
 });
 
 /**
@@ -61,18 +63,20 @@ export const POST = route(async (req: NextRequest) => {
     throw new ApiError('FORBIDDEN', 'Job seeking is currently disabled.');
   }
 
-  // Merge new capabilities with existing ones (additive — never remove)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const existing: string[] = Array.isArray((user as any).capabilities) ? (user as any).capabilities as string[] : [];
-  const merged = Array.from(new Set([...existing, ...capabilities]));
+  // Fetch existing capabilities from DB, then merge (additive — never remove)
+  const existing = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { capabilities: true },
+  });
+  const merged = Array.from(
+    new Set([...(existing?.capabilities ?? []), ...capabilities])
+  );
 
   const updated = await prisma.user.update({
     where: { id: user.id },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: { capabilities: merged } as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    select: { capabilities: true } as any,
+    data: { capabilities: merged },
+    select: { capabilities: true },
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return jsonOk({ capabilities: (updated as any).capabilities });
+
+  return jsonOk({ capabilities: updated.capabilities });
 });
