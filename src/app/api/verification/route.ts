@@ -19,14 +19,21 @@ async function getWaitUntil(): Promise<((p: Promise<unknown>) => void) | null> {
 }
 
 /**
- * GET /api/verification — get the current user's verification status.
+ * GET /api/verification — get the current user's verification status and review note.
  */
 export const GET = route(async () => {
   const user = await requireUser();
+  // Also fetch review note from the VerificationRequest so the UI can show
+  // the admin's reason for rejection or resubmission request.
+  const request = await prisma.verificationRequest.findUnique({
+    where: { userId: user.id },
+    select: { reviewNote: true },
+  });
   return jsonOk({
     status: user.verificationStatus,
     isVerified: user.isVerified,
     hasIdDocument: Boolean(user.idDocumentUrl),
+    reviewNote: request?.reviewNote ?? null,
   });
 });
 

@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { useRealtime } from '@/hooks/use-realtime';
 
-type VerificationStatus = 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
+type VerificationStatus = 'UNVERIFIED' | 'PENDING' | 'UNDER_REVIEW' | 'VERIFIED' | 'REJECTED' | 'RESUBMISSION_REQUIRED';
 
 const SESSION_KEY = 'zenova_verify_nudge_dismissed';
 

@@ -765,7 +765,18 @@
     "verifyNow": "Vérifier mon identité maintenant",
     "modalBenefit1": "Badge vérifié sur votre profil et vos annonces",
     "modalBenefit2": "Meilleure visibilité et contacts plus rapides",
-    "modalBenefit3": "Stockage sécurisé, privé et chiffré de votre pièce d'identité"
+    "modalBenefit3": "Stockage sécurisé, privé et chiffré de votre pièce d'identité",
+    "statusUnderReview": "Votre document est en cours d'examen.",
+    "statusResubmissionRequired": "Veuillez soumettre à nouveau votre document.",
+    "resubmissionRequiredTitle": "Nouveau téléchargement requis",
+    "resubmissionRequiredNotice": "Notre équipe a besoin d'un document plus clair.",
+    "adminReasonLabel": "Note de l'équipe",
+    "documentTypeLabel": "Type de document",
+    "documentTypeNationalId": "Carte d'identité nationale",
+    "documentTypePassport": "Passeport",
+    "documentTypeDriversLicense": "Permis de conduire",
+    "documentTypeOther": "Autre pièce d'identité",
+    "consentLabel": "J'accepte que Zenova collecte et traite mon document d'identité conformément à la loi rwandaise n° 058/2021."
   },
   "wallet": {
     "title": "Portefeuille",
@@ -1397,7 +1408,9 @@
     "cta_find_work": "Créer mon CV",
     "cta_hire": "Publier une offre",
     "cta_browse": "Commencer à explorer",
-    "dismiss": "Fermer"
+    "dismiss": "Fermer",
+    "googleWelcomeTitle": "Bienvenue sur Zenova 🎉",
+    "googleWelcomeSubtitle": "Comment souhaitez-vous utiliser Zenova?"
   },
   "safety": {
     "title": "Est-ce sûr ?",

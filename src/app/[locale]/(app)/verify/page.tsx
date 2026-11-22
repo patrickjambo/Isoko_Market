@@ -22,6 +22,19 @@ export default async function VerifyPage({
   const [t, flags] = await Promise.all([getTranslations('verification'), getFeatureFlags()]);
   const jobsAny = flags.jobsEnabled || flags.hiringEnabled || flags.cvBuilderEnabled;
 
+  // Fetch the user's current verification request (for reviewNote on rejection)
+  const verificationRequest = await (async () => {
+    try {
+      const { prisma } = await import('@/lib/prisma');
+      return await prisma.verificationRequest.findUnique({
+        where: { userId: user.id },
+        select: { reviewNote: true },
+      });
+    } catch {
+      return null;
+    }
+  })();
+
   // Sanitize returnTo: only allow relative paths to prevent open redirects.
   const rawReturnTo = searchParams?.returnTo ?? '';
   const returnTo = rawReturnTo.startsWith('/') ? rawReturnTo : '/';
@@ -41,7 +54,7 @@ export default async function VerifyPage({
       <p className="mb-6 text-sm text-muted-foreground">
         {jobsAny ? t('subtitle') : t('subtitleNoJobs')}
       </p>
-      <VerifyForm status={user.verificationStatus} returnTo={returnTo} />
+      <VerifyForm status={user.verificationStatus} reviewNote={verificationRequest?.reviewNote ?? null} returnTo={returnTo} />
       {/* Plain-language "why we ask for ID / is it safe" — Visitor spec §7 */}
       <Link
         href="/safety"

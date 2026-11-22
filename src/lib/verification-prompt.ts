@@ -1,7 +1,7 @@
 export const VERIFY_SNOOZE_KEY = 'zenova_verify_snoozed_until';
 export const VERIFY_SNOOZE_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
-export type VerificationStatus = 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
+export type VerificationStatus = 'UNVERIFIED' | 'PENDING' | 'UNDER_REVIEW' | 'VERIFIED' | 'REJECTED' | 'RESUBMISSION_REQUIRED';
 
 /**
  * Returns true if the user should be prompted with the verification reminder modal.

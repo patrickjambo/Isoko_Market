@@ -8,6 +8,7 @@ import { ensureStaffRole } from '@/lib/staff';
 import { emitAdmin } from '@/lib/admin-realtime';
 import { landingFor } from '@/lib/onboarding';
 import { env } from '@/lib/env';
+import { getFeatureFlags } from '@/lib/feature-flags';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -107,9 +108,10 @@ export async function GET(req: NextRequest) {
         locale: 'en', // sensible default; user can change in settings
         referralCode: await uniqueReferralCode(),
         lastActiveAt: new Date(),
-        // Email is proven by Google — mark as verified so they can trade immediately
-        isVerified: true,
-        verificationStatus: 'VERIFIED',
+        // NOTE: Google email_verified proves email ownership ONLY — it does NOT
+        // constitute national identity verification. isVerified and verificationStatus
+        // remain at their DB defaults (false / UNVERIFIED) until an admin approves
+        // a submitted ID document. Never set isVerified=true here.
       },
     });
 
@@ -148,11 +150,12 @@ export async function GET(req: NextRequest) {
   user = await ensureStaffRole(user);
 
   // Determine the destination BEFORE we build the response (we need to redirect)
+  const flags = await getFeatureFlags();
   const dest = returnTo !== '/'
     ? returnTo
     : isNew
-      ? '/'   // new Google users start on the personalized home
-      : landingFor(user);
+      ? '/welcome?from=google'   // new Google users → capability selector
+      : landingFor(user, flags);
 
   // Write session cookie directly on the redirect response.
   // NOTE: we MUST use writeSessionCookie here (not createSession), because

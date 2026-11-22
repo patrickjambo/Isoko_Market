@@ -293,6 +293,10 @@ model User {
   // visitor chose so we can show the right first screen — but NEVER restricts API
   // access; every account can use marketplace and jobs (Visitor spec §8).
   preferredRole      String?
+  // Array of capability keys the user has explicitly activated, e.g.
+  // ["BUYER","SELLER","SERVICE_PROVIDER","HIRER","JOB_SEEKER"]. Additive — never
+  // automatically removed. Feature-flag gated capabilities are blocked server-side.
+  capabilities       String[]           @default([])
   isVerified         Boolean            @default(false)
   verificationStatus VerificationStatus @default(UNVERIFIED)
   idDocumentUrl      String? // encrypted-at-rest object key; served via signed URL

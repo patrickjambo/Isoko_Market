@@ -765,7 +765,18 @@
     "verifyNow": "Verify ID Now",
     "modalBenefit1": "Verified trust badge on your profile & listings",
     "modalBenefit2": "Higher reach and faster buyer connections",
-    "modalBenefit3": "Safe, private & encrypted ID storage"
+    "modalBenefit3": "Safe, private & encrypted ID storage",
+    "statusUnderReview": "Your document is currently being reviewed by our team.",
+    "statusResubmissionRequired": "Please re-upload your document.",
+    "resubmissionRequiredTitle": "Re-upload Required",
+    "resubmissionRequiredNotice": "Our verification team has reviewed your submission and needs a clearer document.",
+    "adminReasonLabel": "Team note",
+    "documentTypeLabel": "Document type",
+    "documentTypeNationalId": "National ID Card",
+    "documentTypePassport": "Passport",
+    "documentTypeDriversLicense": "Driver's License",
+    "documentTypeOther": "Other Government ID",
+    "consentLabel": "I consent to Zenova collecting and processing my identification document for identity verification purposes in accordance with Rwanda Law No. 058/2021. Documents are stored securely and accessed only by authorised verification staff."
   },
   "wallet": {
     "title": "Wallet",
@@ -1397,7 +1408,9 @@
     "cta_find_work": "Build my CV",
     "cta_hire": "Post a job",
     "cta_browse": "Start exploring",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "googleWelcomeTitle": "Welcome to Zenova 🎉",
+    "googleWelcomeSubtitle": "How would you like to use Zenova? You can do everything — pick your first focus."
   },
   "safety": {
     "title": "Is this safe?",
