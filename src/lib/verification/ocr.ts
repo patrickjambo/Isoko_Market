@@ -222,8 +222,10 @@ export async function extractIdDocumentData(options: {
       generationConfig: { temperature: 0, maxOutputTokens: 600 },
     };
 
-    // Try Gemini 1.5 Flash (v1beta stable) first, then Gemini 2.0 Flash
-    const geminiModels = ['gemini-1.5-flash', 'gemini-2.0-flash'];
+    // Try latest Gemini Flash models in order of preference.
+    // gemini-3.8-flash is the current recommended model (as of Nov 2026).
+    // Falls back to older stable models if the latest is unavailable or overloaded.
+    const geminiModels = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-flash'];
     for (const model of geminiModels) {
       try {
         const cleanKey = geminiKey.trim();

@@ -125,6 +125,7 @@ export function VerificationReviewModal({
         idNumber?: string | null;
         country?: string | null;
         needsManualReview?: boolean;
+        reviewReasons?: string[];
       } | undefined;
 
       if (ocr) {
@@ -132,12 +133,20 @@ export function VerificationReviewModal({
         if (ocr.idNumber) setVerifiedIdNum(ocr.idNumber);
         if (ocr.country) setVerifiedCountry(ocr.country);
         const gotUsefulData = Boolean(ocr.fullName || ocr.idNumber);
-        toast(
-          gotUsefulData
-            ? 'ID details extracted — review and confirm below'
-            : 'OCR ran but could not read the document clearly — enter details manually',
-          gotUsefulData ? 'success' : 'info'
-        );
+        if (gotUsefulData) {
+          toast('ID details extracted — review and confirm below', 'success');
+        } else {
+          // Show the first meaningful review reason from OCR engine, or generic fallback
+          const reason = ocr.reviewReasons?.find(
+            (r) => !r.startsWith('Visit ') && !r.startsWith('Admin must')
+          );
+          toast(
+            reason
+              ? `OCR: ${reason}`
+              : 'OCR could not read the document — enter details manually',
+            'info'
+          );
+        }
       } else {
         toast('OCR returned no data — enter details manually', 'info');
       }
