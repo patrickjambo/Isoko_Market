@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { Input } from '@/components/ui/input';
 import { useFeatureFlags } from '@/components/providers';
+import { VisualSearchButton } from '@/components/marketplace/visual-search-button';
 
 /**
  * Global search — reachable within one tap from any screen (Section 8.2), with
@@ -52,44 +53,47 @@ export function SearchBar({ className }: { className?: string }) {
 
   return (
     <div className={className} role="search">
-      <form onSubmit={(e) => { e.preventDefault(); go(q); }} className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          type="search"
-          value={q}
-          onChange={(e) => {
-            setQ(e.target.value);
-            search(e.target.value);
-          }}
-          onFocus={() => suggestions.length && setOpen(true)}
-          onBlur={() => setTimeout(() => setOpen(false), 150)}
-          placeholder={jobsAny ? t('searchPlaceholder') : t('searchPlaceholderNoJobs')}
-          aria-label={t('search')}
-          className="pl-9"
-        />
-        {open && suggestions.length > 0 && (
-          <ul className="absolute z-30 mt-1 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-md">
-            {suggestions.map((s) => (
-              <li key={s.value + s.type}>
-                <button
-                  type="button"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    go(s.value);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-secondary"
-                >
-                  {s.type === 'category' ? (
-                    <Tag className="h-3.5 w-3.5 text-primary" />
-                  ) : (
-                    <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
-                  )}
-                  {s.value}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+      <form onSubmit={(e) => { e.preventDefault(); go(q); }} className="relative flex items-center gap-1.5">
+        <div className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="search"
+            value={q}
+            onChange={(e) => {
+              setQ(e.target.value);
+              search(e.target.value);
+            }}
+            onFocus={() => suggestions.length && setOpen(true)}
+            onBlur={() => setTimeout(() => setOpen(false), 150)}
+            placeholder={jobsAny ? t('searchPlaceholder') : t('searchPlaceholderNoJobs')}
+            aria-label={t('search')}
+            className="pl-9"
+          />
+          {open && suggestions.length > 0 && (
+            <ul className="absolute z-30 mt-1 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-md">
+              {suggestions.map((s) => (
+                <li key={s.value + s.type}>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      go(s.value);
+                    }}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-secondary"
+                  >
+                    {s.type === 'category' ? (
+                      <Tag className="h-3.5 w-3.5 text-primary" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
+                    )}
+                    {s.value}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <VisualSearchButton />
       </form>
     </div>
   );

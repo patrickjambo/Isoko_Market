@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { useFeatureFlags } from '@/components/providers';
+import { VisualSearchButton } from '@/components/marketplace/visual-search-button';
 
 /** Prominent hero search — routes into the marketplace with the typed query. */
 export function HeroSearch() {
@@ -32,6 +33,10 @@ export function HeroSearch() {
           aria-label={tc('search')}
           className="h-12 w-full rounded-xl border border-white/30 bg-white/95 pl-11 pr-4 text-foreground shadow-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
         />
+      </div>
+      {/* Visual / camera search */}
+      <div className="flex shrink-0 items-center">
+        <VisualSearchButton hero />
       </div>
       <button
         type="submit"

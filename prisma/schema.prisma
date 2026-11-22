@@ -471,16 +471,21 @@ model Listing {
 }
 
 model ListingImage {
-  id        String   @id @default(cuid())
-  listingId String
-  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  url       String
-  width     Int?
-  height    Int?
-  position  Int      @default(0)
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  listingId     String
+  listing       Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url           String
+  width         Int?
+  height        Int?
+  position      Int      @default(0)
+  // AI-generated visual description and search tags (populated asynchronously
+  // by Gemini vision after listing creation — powers visual product search).
+  aiDescription String?
+  aiTags        String?
+  createdAt     DateTime @default(now())
 
   @@index([listingId])
+  @@index([aiTags])
 }
 
 // Autosaved in-progress "Add Product" draft — one per seller (Section 3).

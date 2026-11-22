@@ -10,6 +10,7 @@ import { publish, publishTopic } from '@/lib/realtime';
 import { createListingSchema } from '@/lib/validators/listing';
 import { cleanContact } from '@/lib/contact';
 import { francsToMinor } from '@/lib/utils';
+import { queueListingImageIndexing } from '@/lib/index-listing-images';
 
 const patchSchema = z.object({
   status: z.enum(['ACTIVE', 'SOLD', 'REMOVED', 'PAUSED']),
@@ -73,6 +74,10 @@ export const PUT = route(async (req: NextRequest, ctx: { params: { id: string } 
     status: 'ACTIVE',
     reason: 'edited',
   });
+
+  // Re-index images if they were replaced (images always replaced wholesale on PUT)
+  queueListingImageIndexing(ctx.params.id);
+
   return jsonOk({ id: ctx.params.id });
 });
 

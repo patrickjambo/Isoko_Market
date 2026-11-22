@@ -10,6 +10,7 @@ import { searchListings } from '@/lib/queries';
 import { emitAdmin } from '@/lib/admin-realtime';
 import { notifyMatchingListingAlerts } from '@/lib/listing-alert';
 import { rateLimit } from '@/lib/rate-limit';
+import { queueListingImageIndexing } from '@/lib/index-listing-images';
 
 /** GET /api/listings — public, filtered search (also used by the mobile app). */
 export const GET = route(async (req: NextRequest) => {
@@ -65,6 +66,9 @@ export const POST = route(async (req: NextRequest) => {
   } catch (err) {
     console.error('[listings] Failed to emit admin or notify alerts:', err);
   }
+
+  // Queue AI visual description generation in background (powers visual search)
+  queueListingImageIndexing(listing.id);
 
   return jsonOk({ id: listing.id }, { status: 201 });
 });
