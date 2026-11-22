@@ -72,6 +72,16 @@ export const POST = adminRoute(
         verificationStatus: true,
         createdAt: true,
         nationalId: true,
+        // Pull OCR-extracted fields from their verification request as a fallback
+        // when nationalId is not yet written (pending verification).
+        verificationRequest: {
+          select: {
+            extractedFullName: true,
+            extractedIdNumber: true,
+            extractedCountry: true,
+            ocrConfidence: true,
+          },
+        },
       },
     });
 
@@ -83,9 +93,18 @@ export const POST = adminRoute(
       return true;
     });
 
-    const excelBuffer = exportUsersToExcelBuffer(uniqueUsers, {
-      includeNationalId: includeSensitiveId,
-    });
+    const excelBuffer = exportUsersToExcelBuffer(
+      uniqueUsers.map((u) => ({
+        ...u,
+        // Prefer the verified nationalId written at approval time.
+        // Fall back to the OCR-extracted ID from the pending verification request.
+        nationalId: u.nationalId ?? u.verificationRequest?.extractedIdNumber ?? null,
+        ocrExtractedName: u.verificationRequest?.extractedFullName ?? null,
+        ocrExtractedId: u.verificationRequest?.extractedIdNumber ?? null,
+        ocrConfidence: u.verificationRequest?.ocrConfidence ?? null,
+      })),
+      { includeNationalId: includeSensitiveId }
+    );
 
     // Audit log the export event
     await audit({

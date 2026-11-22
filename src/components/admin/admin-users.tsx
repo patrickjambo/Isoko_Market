@@ -881,10 +881,10 @@ export function AdminUsers({ locale }: { locale: string }) {
                   />
                   <div>
                     <span className="font-semibold text-amber-900 flex items-center gap-1">
-                      <Lock className="h-3 w-3" /> Include Verified National ID Numbers (Column 8)
+                      <Lock className="h-3 w-3" /> Include National ID & OCR Data (Columns 8–10)
                     </span>
                     <span className="block text-[11px] text-amber-700 leading-tight">
-                      Authorized compliance export. This action will be recorded in the security audit log.
+                      Adds: National ID Number · OCR Extracted Name · OCR Confidence %. Authorized compliance export — recorded in the security audit log.
                     </span>
                   </div>
                 </label>

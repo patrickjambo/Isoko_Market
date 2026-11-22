@@ -22,6 +22,10 @@ export interface ExportableUserRow {
   verificationStatus: string;
   createdAt: Date | string;
   nationalId?: string | null;
+  // OCR-extracted fields (from VerificationRequest — present even before admin approves)
+  ocrExtractedName?: string | null;
+  ocrExtractedId?: string | null;
+  ocrConfidence?: number | null;
 }
 
 /**
@@ -293,7 +297,10 @@ export function generateExcelWorkbook(options: ExcelSheetOptions): Buffer {
  * 5. Account Status
  * 6. Verification Status
  * 7. Registration Date
- * (Optional 8: National ID Number for authorized staff)
+ * (Optional columns when includeSensitiveId=true:)
+ *   8. National ID Number  — verified value written at approval (or OCR fallback)
+ *   9. OCR Extracted Name  — name as read from the ID card photo
+ *  10. OCR Confidence      — 0–100% confidence score of the extraction
  */
 export function exportUsersToExcelBuffer(
   users: ExportableUserRow[],
@@ -312,7 +319,11 @@ export function exportUsersToExcelBuffer(
   ];
 
   if (includeId) {
-    columns.push({ header: 'National ID Number', key: 'nationalId', width: 24 });
+    columns.push(
+      { header: 'National ID Number', key: 'nationalId', width: 24 },
+      { header: 'OCR Extracted Name', key: 'ocrExtractedName', width: 26 },
+      { header: 'OCR Confidence (%)', key: 'ocrConfidence', width: 18 }
+    );
   }
 
   const rows = users.map((u) => {
@@ -322,7 +333,7 @@ export function exportUsersToExcelBuffer(
       regDate = !isNaN(d.getTime()) ? d.toISOString().replace('T', ' ').slice(0, 19) : String(u.createdAt);
     }
 
-    const rowObj: Record<string, any> = {
+    const rowObj: Record<string, unknown> = {
       fullName: u.fullName || 'N/A',
       email: u.email || 'N/A',
       country: u.country || 'Rwanda',
@@ -333,7 +344,15 @@ export function exportUsersToExcelBuffer(
     };
 
     if (includeId) {
-      rowObj.nationalId = u.nationalId || 'N/A';
+      // National ID: use verified value first, then OCR fallback
+      rowObj.nationalId = u.nationalId || u.ocrExtractedId || 'Not extracted';
+      // OCR name from the ID card (may differ from account name)
+      rowObj.ocrExtractedName = u.ocrExtractedName || 'N/A';
+      // Confidence as a percentage string
+      rowObj.ocrConfidence =
+        typeof u.ocrConfidence === 'number'
+          ? `${Math.round(u.ocrConfidence * 100)}%`
+          : 'N/A';
     }
 
     return rowObj;
