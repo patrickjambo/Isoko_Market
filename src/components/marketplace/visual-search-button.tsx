@@ -87,7 +87,33 @@ export function VisualSearchButton({ hero = false }: { hero?: boolean }) {
       const form = new FormData();
       form.append('image', file);
 
-      const res = await fetch('/api/visual-search', { method: 'POST', body: form });
+      // 35-second client-side timeout — slightly longer than the server's maxDuration
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 35_000);
+
+      let res: Response;
+      try {
+        res = await fetch('/api/visual-search', {
+          method: 'POST',
+          body: form,
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      // Guard against non-JSON responses (e.g. 500 HTML error page)
+      const contentType = res.headers.get('content-type') ?? '';
+      if (!contentType.includes('application/json')) {
+        setState({
+          phase: 'error',
+          file,
+          previewUrl,
+          message: `Server error (${res.status}). Please try again.`,
+        });
+        return;
+      }
+
       const json = (await res.json()) as { data?: VisualSearchResult; error?: string };
 
       if (!res.ok) {
@@ -102,12 +128,15 @@ export function VisualSearchButton({ hero = false }: { hero?: boolean }) {
 
       const result = json.data as VisualSearchResult;
       setState({ phase: 'results', file, previewUrl, result });
-    } catch {
+    } catch (err) {
+      const isAbort = err instanceof DOMException && err.name === 'AbortError';
       setState({
         phase: 'error',
         file,
         previewUrl,
-        message: 'Connection error. Please check your connection and try again.',
+        message: isAbort
+          ? 'Search timed out. Please try with a smaller image.'
+          : 'Connection error. Please check your connection and try again.',
       });
     }
   }
@@ -168,36 +197,36 @@ export function VisualSearchButton({ hero = false }: { hero?: boolean }) {
       {/* Visual search dialog */}
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="w-[calc(100%-1rem)] max-w-lg rounded-2xl p-0 overflow-hidden">
-          <DialogHeader className="px-5 pt-5 pb-3 border-b border-border">
-            <DialogTitle className="flex items-center gap-2 text-base font-semibold">
+          <DialogHeader className="px-4 pt-4 pb-3 border-b border-border sm:px-5 sm:pt-5">
+            <DialogTitle className="flex items-center gap-2 text-sm font-semibold sm:text-base">
               <Camera className="h-4 w-4 text-primary" />
               Search by Photo
             </DialogTitle>
           </DialogHeader>
 
-          <div className="overflow-y-auto max-h-[80vh] p-5 space-y-4">
+          <div className="overflow-y-auto max-h-[75vh] p-4 space-y-3 sm:p-5 sm:space-y-4">
             {/* Phase: idle — show options to take or upload photo */}
             {state.phase === 'idle' && (
               <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground sm:text-sm">
                   Take or upload a photo of a product to find similar items on Zenova.
                 </p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <button
                     type="button"
                     onClick={() => cameraRef.current?.click()}
-                    className="flex flex-col items-center gap-2.5 rounded-xl border-2 border-dashed border-border bg-muted/30 p-6 text-sm font-medium transition-colors hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+                    className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-dashed border-border bg-muted/30 p-4 text-xs font-medium transition-colors hover:border-primary/50 hover:bg-primary/5 hover:text-primary sm:gap-2.5 sm:p-6 sm:text-sm"
                   >
-                    <Camera className="h-7 w-7 text-primary" />
+                    <Camera className="h-6 w-6 text-primary sm:h-7 sm:w-7" />
                     Take Photo
                     <span className="text-xs font-normal text-muted-foreground">Use your camera</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => galleryRef.current?.click()}
-                    className="flex flex-col items-center gap-2.5 rounded-xl border-2 border-dashed border-border bg-muted/30 p-6 text-sm font-medium transition-colors hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+                    className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-dashed border-border bg-muted/30 p-4 text-xs font-medium transition-colors hover:border-primary/50 hover:bg-primary/5 hover:text-primary sm:gap-2.5 sm:p-6 sm:text-sm"
                   >
-                    <Upload className="h-7 w-7 text-primary" />
+                    <Upload className="h-6 w-6 text-primary sm:h-7 sm:w-7" />
                     Upload Photo
                     <span className="text-xs font-normal text-muted-foreground">From your gallery</span>
                   </button>

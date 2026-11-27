@@ -46,7 +46,11 @@ export const POST = route(async (req: NextRequest) => {
     );
   }
 
-  const user = await getCurrentUser();
+  // Auth is optional for visual search — anonymous users may search freely.
+  // Wrap in try/catch so a DB migration lag (e.g. missing column) never blocks search.
+  let user: Awaited<ReturnType<typeof getCurrentUser>> = null;
+  try { user = await getCurrentUser(); } catch { /* treat as anonymous */ }
+
   const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'anon';
   const limitKey = user ? `visual:${user.id}` : `visual:${clientIp}`;
   const limit = rateLimit(limitKey, 10, 60 * 60 * 1000);
