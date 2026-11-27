@@ -11,6 +11,7 @@ import { SellerListingActions } from '@/components/seller/seller-listing-actions
 import { requireWorkspace } from '@/lib/workspace-guard';
 import { prisma } from '@/lib/prisma';
 import { formatRWF } from '@/lib/utils';
+import { isDiscountActive } from '@/lib/discount';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +36,7 @@ export default async function MyListingsPage({ params }: { params: { locale: str
       images: { take: 1, orderBy: { position: 'asc' }, select: { url: true } },
       _count: { select: { conversations: true, favorites: true } },
     },
+    // discountPrice and discountEndsAt are included automatically via include
   });
 
   return (
@@ -80,6 +82,7 @@ export default async function MyListingsPage({ params }: { params: { locale: str
                 <div className="flex items-center gap-2">
                   <p className="truncate font-medium">{l.title}</p>
                   <Badge variant={statusVariant[l.status]}>{t(`status_${l.status}`)}</Badge>
+                  {isDiscountActive(l) && <Badge variant="destructive">🏷️ SALE</Badge>}
                 </div>
                 <p className="text-sm font-semibold text-primary">{formatRWF(l.price, params.locale)}</p>
                 <p className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -92,7 +95,14 @@ export default async function MyListingsPage({ params }: { params: { locale: str
                   {l.isFeatured && <Badge variant="accent">{tm('featured')}</Badge>}
                 </p>
               </div>
-              <SellerListingActions listingId={l.id} status={l.status} isFeatured={l.isFeatured} />
+              <SellerListingActions
+                listingId={l.id}
+                status={l.status}
+                isFeatured={l.isFeatured}
+                price={l.price}
+                discountPrice={l.discountPrice}
+                discountEndsAt={l.discountEndsAt?.toISOString() ?? null}
+              />
             </li>
           ))}
         </ul>

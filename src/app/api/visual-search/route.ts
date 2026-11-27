@@ -15,6 +15,8 @@ const cardSelect = {
   id: true,
   title: true,
   price: true,
+  discountPrice: true,
+  discountEndsAt: true,
   location: true,
   status: true,
   isFeatured: true,

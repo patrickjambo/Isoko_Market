@@ -25,6 +25,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { suggestPrice } from '@/lib/suggestions';
 import { formatRWF, timeAgo, initials, cn } from '@/lib/utils';
+import { isDiscountActive, discountPercent } from '@/lib/discount';
 import { Star } from 'lucide-react';
 import { StarRating } from '@/components/trust/star-rating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -338,9 +339,31 @@ export default async function ListingDetailPage({
                 );
               })()}
             </div>
-            <p className="text-3xl font-extrabold text-primary">
-              {listing.price > 0 ? formatRWF(listing.price, params.locale) : '—'}
-            </p>
+            {(() => {
+              const saleActive = isDiscountActive(listing);
+              const pct = saleActive ? discountPercent(listing.price, listing.discountPrice!) : 0;
+              return (
+                <>
+                  {saleActive ? (
+                    <div className="flex flex-wrap items-baseline gap-2">
+                      <p className="text-3xl font-extrabold text-destructive">
+                        {formatRWF(listing.discountPrice!, params.locale)}
+                      </p>
+                      <p className="text-lg text-muted-foreground line-through">
+                        {formatRWF(listing.price, params.locale)}
+                      </p>
+                      <Badge variant="destructive" className="text-xs">
+                        -{pct}% OFF
+                      </Badge>
+                    </div>
+                  ) : (
+                    <p className="text-3xl font-extrabold text-primary">
+                      {listing.price > 0 ? formatRWF(listing.price, params.locale) : '—'}
+                    </p>
+                  )}
+                </>
+              );
+            })()}
             {priceContext && (
               <p
                 className={cn(

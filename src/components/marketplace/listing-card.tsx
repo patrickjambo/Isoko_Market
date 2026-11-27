@@ -7,6 +7,7 @@ import { TrustBadge } from '@/components/trust/trust-badge';
 import { FavoriteHeart } from '@/components/marketplace/favorite-heart';
 import { formatRWF, cn, formatDistance } from '@/lib/utils';
 import { listingCover } from '@/lib/listing-image';
+import { isDiscountActive, discountPercent } from '@/lib/discount';
 
 export type ListingCardData = {
   id: string;
@@ -23,12 +24,14 @@ export type ListingCardData = {
   category?: { slug: string } | null;
   seller: { fullName: string; isVerified: boolean; verificationStatus: string };
   favorited?: boolean;
+  discountPrice?: number | null;
+  discountEndsAt?: string | Date | null;
 };
 
 export function ListingCard({
   listing,
   variant = 'grid',
-  showFavorite = false,
+  showFavorite = true,
 }: {
   listing: ListingCardData;
   variant?: 'grid' | 'list';
@@ -37,10 +40,23 @@ export function ListingCard({
   const t = useTranslations('marketplace');
   const tt = useTranslations('trust');
   const locale = useLocale();
-  // First uploaded photo, else a category-representative fallback (never broken).
   const cover = listingCover(listing.images, listing.category?.slug);
 
-  // Compact horizontal row for the list view (Section 8.3).
+  const activeDiscount = isDiscountActive(listing);
+  const salePrice = activeDiscount ? listing.discountPrice! : null;
+  const pctOff = salePrice ? discountPercent(listing.price, salePrice) : 0;
+
+  // Countdown — only shown server-side for deals ending within 24h
+  const countdownLabel = (() => {
+    if (!activeDiscount || !listing.discountEndsAt) return null;
+    const ms = new Date(listing.discountEndsAt).getTime() - Date.now();
+    if (ms <= 0 || ms > 24 * 60 * 60 * 1000) return null;
+    const h = Math.floor(ms / 3_600_000);
+    const m = Math.floor((ms % 3_600_000) / 60_000);
+    return `Ends in ${h}h ${m}m`;
+  })();
+
+  // ── List variant ───────────────────────────────────────────────────────────
   if (variant === 'list') {
     return (
       <Link
@@ -58,12 +74,24 @@ export function ListingCard({
               listing.status === 'SOLD' && 'opacity-60 grayscale'
             )}
           />
+          {activeDiscount && salePrice && (
+            <span className="absolute left-1 top-1 rounded bg-destructive px-1 py-0.5 text-[9px] font-bold text-destructive-foreground">
+              -{pctOff}%
+            </span>
+          )}
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1 py-1">
-          <div className="flex items-center gap-2">
-            <p className="text-base font-bold text-primary">
-              {listing.price > 0 ? formatRWF(listing.price, locale) : '—'}
-            </p>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {salePrice ? (
+              <>
+                <p className="text-base font-bold text-primary">{formatRWF(salePrice, locale)}</p>
+                <p className="text-xs text-muted-foreground line-through">{formatRWF(listing.price, locale)}</p>
+              </>
+            ) : (
+              <p className="text-base font-bold text-primary">
+                {listing.price > 0 ? formatRWF(listing.price, locale) : '—'}
+              </p>
+            )}
             {listing.kind === 'SERVICE' && <Badge variant="outline">{t('serviceBadge')}</Badge>}
             {listing.isFeatured && listing.status === 'ACTIVE' && (
               <Badge variant="accent">{t('featured')}</Badge>
@@ -94,6 +122,7 @@ export function ListingCard({
     );
   }
 
+  // ── Grid variant (default) ─────────────────────────────────────────────────
   return (
     <Link
       href={`/marketplace/${listing.id}`}
@@ -107,13 +136,19 @@ export function ListingCard({
           src={cover}
           alt={listing.title}
           fill
-          sizes="(max-width: 768px) 50vw, 25vw"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 16vw"
           className={cn(
             'object-cover transition-transform duration-500 ease-out group-hover:scale-110',
             listing.status === 'SOLD' && 'opacity-60 grayscale'
           )}
         />
-        {listing.isFeatured && listing.status === 'ACTIVE' && (
+        {/* Discount badge — top-left (doesn't overlap heart at top-right) */}
+        {activeDiscount && salePrice && (
+          <span className="absolute left-2 top-2 z-10 rounded bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground shadow">
+            -{pctOff}%
+          </span>
+        )}
+        {listing.isFeatured && listing.status === 'ACTIVE' && !activeDiscount && (
           <Badge variant="accent" className="absolute left-2 top-2 shadow">
             {t('featured')}
           </Badge>
@@ -123,16 +158,30 @@ export function ListingCard({
             {t('sold')}
           </Badge>
         )}
-        {listing.kind === 'SERVICE' && listing.status === 'ACTIVE' && !listing.isFeatured && (
+        {listing.kind === 'SERVICE' && listing.status === 'ACTIVE' && !listing.isFeatured && !activeDiscount && (
           <Badge variant="outline" className="absolute left-2 top-2 bg-card/90 shadow">
             {t('serviceBadge')}
           </Badge>
         )}
       </div>
       <div className="flex flex-1 flex-col gap-1.5 p-3">
-        <p className="text-base font-bold text-primary">
-          {listing.price > 0 ? formatRWF(listing.price, locale) : '—'}
-        </p>
+        {/* Price row with discount */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {salePrice ? (
+            <>
+              <p className="text-base font-bold text-primary">{formatRWF(salePrice, locale)}</p>
+              <p className="text-xs text-muted-foreground line-through">{formatRWF(listing.price, locale)}</p>
+            </>
+          ) : (
+            <p className="text-base font-bold text-primary">
+              {listing.price > 0 ? formatRWF(listing.price, locale) : '—'}
+            </p>
+          )}
+        </div>
+        {/* Urgency countdown */}
+        {countdownLabel && (
+          <p className="text-[10px] font-medium text-destructive">⏱ {countdownLabel}</p>
+        )}
         <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground">
           {listing.title}
         </h3>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MoreVertical, Pencil, Pause, Play, CheckCircle2, Rocket, Trash2, Loader2 } from 'lucide-react';
+import { MoreVertical, Pencil, Pause, Play, CheckCircle2, Rocket, Trash2, Loader2, Tag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import {
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/components/ui/toast';
+import { SetDiscountModal } from '@/components/seller/set-discount-modal';
 import { PRICING, FEATURE_DURATION_DAYS } from '@/lib/pricing';
 
 /** Inline quick actions per listing (Section 6) — no separate page needed. */
@@ -19,10 +20,16 @@ export function SellerListingActions({
   listingId,
   status,
   isFeatured,
+  price,
+  discountPrice,
+  discountEndsAt,
 }: {
   listingId: string;
   status: string;
   isFeatured: boolean;
+  price: number;
+  discountPrice?: number | null;
+  discountEndsAt?: string | null;
 }) {
   const t = useTranslations('seller');
   const tm = useTranslations('marketplace');
@@ -30,6 +37,7 @@ export function SellerListingActions({
   const router = useRouter();
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);
+  const [discountOpen, setDiscountOpen] = useState(false);
 
   async function patch(next: string) {
     setBusy(true);
@@ -88,44 +96,62 @@ export function SellerListingActions({
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-secondary" aria-label={t('actions')}>
-        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem asChild>
-          <Link href={`/marketplace/${listingId}`}>
-            <Pencil /> {t('edit')}
-          </Link>
-        </DropdownMenuItem>
-
-        {status === 'ACTIVE' && (
-          <>
-            {!isFeatured && (
-              <DropdownMenuItem onSelect={boost}>
-                <Rocket className="text-accent" /> {t('boostDays', { days: FEATURE_DURATION_DAYS })}
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem onSelect={() => patch('PAUSED')}>
-              <Pause /> {t('pause')}
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => patch('SOLD')}>
-              <CheckCircle2 /> {tm('markAsSold')}
-            </DropdownMenuItem>
-          </>
-        )}
-
-        {(status === 'PAUSED' || status === 'SOLD') && (
-          <DropdownMenuItem onSelect={() => patch('ACTIVE')}>
-            <Play /> {t('relist')}
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-secondary"
+          aria-label={t('actions')}
+        >
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link href={`/marketplace/${listingId}`}>
+              <Pencil /> {t('edit')}
+            </Link>
           </DropdownMenuItem>
-        )}
 
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={remove} className="text-destructive focus:text-destructive">
-          <Trash2 /> {t('delete')}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          {status === 'ACTIVE' && (
+            <>
+              <DropdownMenuItem onSelect={() => setDiscountOpen(true)}>
+                <Tag className="text-destructive" />
+                {discountPrice ? 'Edit Discount' : 'Set Discount'}
+              </DropdownMenuItem>
+              {!isFeatured && (
+                <DropdownMenuItem onSelect={boost}>
+                  <Rocket className="text-accent" /> {t('boostDays', { days: FEATURE_DURATION_DAYS })}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onSelect={() => patch('PAUSED')}>
+                <Pause /> {t('pause')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => patch('SOLD')}>
+                <CheckCircle2 /> {tm('markAsSold')}
+              </DropdownMenuItem>
+            </>
+          )}
+
+          {(status === 'PAUSED' || status === 'SOLD') && (
+            <DropdownMenuItem onSelect={() => patch('ACTIVE')}>
+              <Play /> {t('relist')}
+            </DropdownMenuItem>
+          )}
+
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={remove} className="text-destructive focus:text-destructive">
+            <Trash2 /> {t('delete')}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <SetDiscountModal
+        listingId={listingId}
+        price={price}
+        discountPrice={discountPrice}
+        discountEndsAt={discountEndsAt}
+        open={discountOpen}
+        onClose={() => setDiscountOpen(false)}
+      />
+    </>
   );
 }

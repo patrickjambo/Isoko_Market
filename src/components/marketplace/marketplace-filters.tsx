@@ -70,6 +70,29 @@ export function MarketplaceFilters({
 
   return (
     <div className="flex items-center gap-2">
+      {/* Hot Deals quick-filter chip */}
+      <button
+        onClick={() => {
+          const sp = new URLSearchParams(
+            Object.entries(current).filter(([k, v]) => v && k !== 'hotDeals') as [string, string][],
+          );
+          if (current.hotDeals === '1') {
+            sp.delete('hotDeals');
+          } else {
+            sp.set('hotDeals', '1');
+          }
+          router.push(`/marketplace?${sp.toString()}`);
+        }}
+        className={[
+          'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+          current.hotDeals === '1'
+            ? 'border-destructive bg-destructive text-destructive-foreground'
+            : 'border-border bg-card text-foreground hover:border-destructive/60 hover:bg-destructive/10',
+        ].join(' ')}
+        aria-pressed={current.hotDeals === '1'}
+      >
+        🔥 {t('hotDeals')}
+      </button>
       <Select
         value={state.sort}
         onChange={(e) => {

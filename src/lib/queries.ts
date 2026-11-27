@@ -20,6 +20,8 @@ const listingCardSelect = {
   longitude: true,
   ratingAvg: true,
   ratingCount: true,
+  discountPrice: true,
+  discountEndsAt: true,
   images: { orderBy: { position: 'asc' }, take: 1, select: { url: true } },
   category: { select: { slug: true } },
   seller: { select: { fullName: true, isVerified: true, verificationStatus: true } },
@@ -67,6 +69,26 @@ export const getLatestServices = unstable_cache(
     }),
   ['home-latest-services'],
   { revalidate: 30 }
+);
+
+/** Active discounted listings for the homepage Hot Deals strip. */
+export const getHotDeals = unstable_cache(
+  async (take = 8) =>
+    prisma.listing.findMany({
+      where: {
+        status: 'ACTIVE',
+        discountPrice: { not: null },
+        OR: [
+          { discountEndsAt: null },
+          { discountEndsAt: { gt: new Date() } },
+        ],
+      },
+      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+      take,
+      select: listingCardSelect,
+    }),
+  ['home-hot-deals'],
+  { revalidate: 60 }
 );
 
 /** Parse the `specs` URL param (JSON array of [label, value] tuples) safely. */
@@ -171,6 +193,16 @@ export async function searchListings(filter: ListingFilter) {
     where.price = {};
     if (filter.minPrice != null) where.price.gte = filter.minPrice * 100;
     if (filter.maxPrice != null) where.price.lte = filter.maxPrice * 100;
+  }
+  if (filter.hotDeals) {
+    // Active-discount filter — correctness never depends on a background cleanup job
+    where.discountPrice = { not: null };
+    const hotDealsOr: Prisma.ListingWhereInput = {
+      OR: [{ discountEndsAt: null }, { discountEndsAt: { gt: new Date() } }],
+    };
+    where.AND = Array.isArray(where.AND)
+      ? [...(where.AND as Prisma.ListingWhereInput[]), hotDealsOr]
+      : [hotDealsOr];
   }
 
   // "Near me": sort by actual distance and attach it. The bounding box already

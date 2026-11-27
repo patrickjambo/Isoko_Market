@@ -11,8 +11,14 @@ const config: Config = {
   theme: {
     container: {
       center: true,
-      padding: '1rem',
-      screens: { '2xl': '1200px' },
+      padding: {
+        DEFAULT: '1rem',
+        sm: '1.5rem',
+        lg: '2rem',
+        xl: '2.5rem',
+        '2xl': '3rem',
+      },
+      screens: { '2xl': '1536px' },
     },
     extend: {
       colors: {

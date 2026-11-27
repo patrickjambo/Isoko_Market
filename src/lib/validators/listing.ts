@@ -116,6 +116,7 @@ export const listingFilterSchema = z.object({
   verifiedOnly: z.coerce.boolean().optional(),
   sort: z.enum(['newest', 'price_asc', 'price_desc']).default('newest'),
   page: z.coerce.number().int().min(1).default(1),
+  hotDeals: z.coerce.boolean().optional(),
 });
 
 /** A marketplace "notify me" alert — the buyer-side twin of savedSearchSchema. */

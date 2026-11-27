@@ -33,6 +33,7 @@ import {
   getLatestServices,
   getPlatformStats,
   getLandingFeedbacks,
+  getHotDeals,
 } from '@/lib/queries';
 import { getCurrentUser } from '@/lib/auth';
 import { getFeatureFlags } from '@/lib/feature-flags';
@@ -85,7 +86,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
   // `getPlatformSettings` is wrapped with React `cache()` so all these calls
   // that go through `getFeatureFlags()` → `getPlatformSettings()` share a
   // single DB round-trip with the root layout and app-shell layout fetches.
-  const [flags, listings, services, stats, user, jobs, feedbacks] = await Promise.all([
+  const [flags, listings, services, stats, user, jobs, feedbacks, hotDeals] = await Promise.all([
     getFeatureFlags(),
     getFeaturedListings(8),
     getLatestServices(4),
@@ -93,6 +94,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
     getCurrentUser(),
     getLatestJobs(6),
     getLandingFeedbacks(),
+    getHotDeals(8),
   ]);
 
   // Filter out jobs if the feature is disabled — the fetch already returned
@@ -248,7 +250,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
         return (
           <section className="border-b border-border bg-card">
             <div className="container py-10">
-              <div className="mx-auto flex flex-wrap justify-center gap-6 sm:gap-10">
+              <div className="mx-auto flex w-full flex-wrap justify-center gap-6 sm:gap-10">
               {items.map((s) => {
                 const Icon = s.icon;
                 return (
@@ -269,6 +271,30 @@ export default async function HomePage({ params }: { params: { locale: string } 
         );
       })()}
 
+      {/* Hot Deals — active discounts (guests only, only when deals exist) */}
+      {!user && hotDeals.length > 0 && (
+        <section className="container py-8">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="rounded bg-destructive px-2 py-0.5 text-xs font-bold text-destructive-foreground">
+                🔥 HOT DEALS
+              </span>
+              <h2 className="text-xl font-bold tracking-tight">Active Discounts</h2>
+            </div>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/marketplace?hotDeals=1">
+                View All Deals <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {hotDeals.map((l) => (
+              <ListingCard key={l.id} listing={l} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Pillars — "why choose us" (guests only: it's a conversion pitch) */}
       {!user && (
       <section className="container py-14">
@@ -279,7 +305,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
             {jobsAny ? t('pillarsSubtitle') : t('pillarsSubtitleNoJobs')}
           </p>
         </div>
-        <div className="mx-auto flex flex-wrap justify-center gap-4">
+        <div className="mx-auto flex w-full max-w-5xl flex-wrap justify-center gap-4">
           {pillars.map((p) => {
             const Icon = p.icon;
             return (
@@ -303,7 +329,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
       {listings.length > 0 && (
         <section className="container py-6">
           <SectionHeader title={t('featuredListings')} href="/marketplace" live={t('live')} />
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {listings.map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}
@@ -315,7 +341,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
       {services.length > 0 && (
         <section className="container py-6">
           <SectionHeader title={t('services')} href="/marketplace?kind=SERVICE" live={t('live')} />
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {services.map((s) => (
               <ListingCard key={s.id} listing={s} />
             ))}
