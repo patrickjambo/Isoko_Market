@@ -26,9 +26,9 @@ const config = {
   webDir: 'out',
 
   server: {
-    // Load the live production site inside the native WebView.
+    // Load the live canonical production site inside the native WebView (avoids 308 redirect from apex domain).
     // Change to 'http://10.0.2.2:3000' for local Android emulator testing.
-    url: 'https://zenova.rw',
+    url: 'https://www.zenova.rw',
     cleartext: false, // HTTPS only in production
   },
 
