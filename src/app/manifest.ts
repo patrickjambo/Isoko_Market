@@ -8,16 +8,21 @@ import type { MetadataRoute } from 'next';
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    // id must match the TWA package name used in assetlinks.json
+    id: 'rw.zenova.app',
     name: 'Zenova Rwanda | Buy & Sell',
     short_name: 'Zenova',
     description: 'Rwanda\'s trusted marketplace — buy, sell, find services and jobs near you.',
-    start_url: '/',
+    start_url: '/?source=pwa',
     scope: '/',
     display: 'standalone',
     orientation: 'portrait',
     background_color: '#ffffff',
     theme_color: '#0b6b62',
     categories: ['shopping', 'business'],
+    lang: 'en',
+    dir: 'ltr',
+    prefer_related_applications: false,
     // The Zenova logo in standard PWA sizes (192, 512, 1024) for both any
     // and maskable displays — required by Android Chrome to generate home-screen WebAPKs.
     icons: [
@@ -28,5 +33,9 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: '/icon.png?v=2', sizes: '1024x1024', type: 'image/png', purpose: 'any' },
       { src: '/icon.png?v=2', sizes: '1024x1024', type: 'image/png', purpose: 'maskable' },
     ],
+    // Related Android app — once published, fill in the Play Store URL.
+    // related_applications: [
+    //   { platform: 'play', url: 'https://play.google.com/store/apps/details?id=rw.zenova.app', id: 'rw.zenova.app' },
+    // ],
   };
 }
