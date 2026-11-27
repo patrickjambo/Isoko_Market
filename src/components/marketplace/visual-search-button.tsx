@@ -26,9 +26,9 @@ type VisualSearchResult = {
 type State =
   | { phase: 'idle' }
   | { phase: 'preview'; file: File; previewUrl: string }
-  | { phase: 'searching'; previewUrl: string }
-  | { phase: 'results'; previewUrl: string; result: VisualSearchResult }
-  | { phase: 'error'; previewUrl: string; message: string };
+  | { phase: 'searching'; file: File; previewUrl: string }
+  | { phase: 'results'; file: File; previewUrl: string; result: VisualSearchResult }
+  | { phase: 'error'; file: File; previewUrl: string; message: string };
 
 /**
  * Visual search button — adds a camera/lens icon beside Zenova's search bar.
@@ -78,10 +78,10 @@ export function VisualSearchButton({ hero = false }: { hero?: boolean }) {
   }
 
   async function handleSearch() {
-    if (state.phase !== 'preview') return;
+    if (state.phase !== 'preview' && state.phase !== 'error') return;
     const { file, previewUrl } = state;
 
-    setState({ phase: 'searching', previewUrl });
+    setState({ phase: 'searching', file, previewUrl });
 
     try {
       const form = new FormData();
@@ -93,6 +93,7 @@ export function VisualSearchButton({ hero = false }: { hero?: boolean }) {
       if (!res.ok) {
         setState({
           phase: 'error',
+          file,
           previewUrl,
           message: json.error ?? 'Visual search failed. Please try again.',
         });
@@ -100,10 +101,11 @@ export function VisualSearchButton({ hero = false }: { hero?: boolean }) {
       }
 
       const result = json.data as VisualSearchResult;
-      setState({ phase: 'results', previewUrl, result });
+      setState({ phase: 'results', file, previewUrl, result });
     } catch {
       setState({
         phase: 'error',
+        file,
         previewUrl,
         message: 'Connection error. Please check your connection and try again.',
       });

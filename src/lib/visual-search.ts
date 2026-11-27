@@ -3,9 +3,10 @@ import { env } from './env';
 import { prisma } from './prisma';
 
 const GEMINI_MODELS = [
-  'gemini-3.5-flash-lite',
-  'gemini-3.5-flash',
-  'gemini-flash-lite-latest',
+  'gemini-2.0-flash-lite',
+  'gemini-2.0-flash',
+  'gemini-1.5-flash-8b',
+  'gemini-1.5-flash',
 ];
 
 const VISION_PROMPT = `You are a product search assistant for Zenova, an African marketplace.
@@ -20,9 +21,12 @@ Be specific about visual characteristics. Never invent brand names. If unsure ab
 
 /**
  * Use Gemini vision to generate a text description and search tags for a product image.
+ * Accepts either a public image URL or raw bytes + mimeType.
  * Returns null if Gemini is not configured or the call fails.
  */
-export async function describeImageForSearch(imageUrl: string): Promise<{
+export async function describeImageForSearch(
+  input: string | { bytes: ArrayBuffer; mimeType: string },
+): Promise<{
   description: string;
   tags: string;
 } | null> {
@@ -31,12 +35,21 @@ export async function describeImageForSearch(imageUrl: string): Promise<{
 
   for (const model of GEMINI_MODELS) {
     try {
-      // Fetch image bytes and convert to base64 for the Gemini inline_data format
-      const imgRes = await fetch(imageUrl, { signal: AbortSignal.timeout(10_000) });
-      if (!imgRes.ok) continue;
-      const imgBuffer = await imgRes.arrayBuffer();
-      const base64 = Buffer.from(imgBuffer).toString('base64');
-      const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0];
+      let base64: string;
+      let mimeType: string;
+
+      if (typeof input === 'string') {
+        // URL path: fetch image bytes
+        const imgRes = await fetch(input, { signal: AbortSignal.timeout(10_000) });
+        if (!imgRes.ok) continue;
+        const imgBuffer = await imgRes.arrayBuffer();
+        base64 = Buffer.from(imgBuffer).toString('base64');
+        mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0]!;
+      } else {
+        // Raw bytes path: no extra network hop
+        base64 = Buffer.from(input.bytes).toString('base64');
+        mimeType = input.mimeType;
+      }
 
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -91,12 +104,14 @@ export async function describeImageForSearch(imageUrl: string): Promise<{
  * 3. Fall back to title/description full-text search for unlabelled listings.
  * Returns up to 24 listing IDs sorted by relevance score.
  */
-export async function visualSearchListings(imageUrl: string): Promise<{
+export async function visualSearchListings(
+  input: string | { bytes: ArrayBuffer; mimeType: string },
+): Promise<{
   listingIds: string[];
   queryDescription: string;
   queryTags: string;
 } | null> {
-  const result = await describeImageForSearch(imageUrl);
+  const result = await describeImageForSearch(input);
   if (!result) return null;
 
   const { description, tags } = result;
