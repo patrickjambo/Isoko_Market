@@ -347,7 +347,7 @@ export function VisualSearchButton({ hero = false }: { hero?: boolean }) {
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent
           className={cn(
-            'flex max-h-[84dvh] flex-col gap-0 overflow-hidden rounded-2xl p-0',
+            'gap-0 overflow-visible rounded-2xl p-0',
             isResults
               ? 'w-[calc(100%-1.5rem)] max-w-md sm:max-w-lg'
               : 'w-[calc(100%-2.5rem)] max-w-[320px] sm:max-w-sm',
@@ -360,7 +360,7 @@ export function VisualSearchButton({ hero = false }: { hero?: boolean }) {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto p-3.5 sm:p-4">
+          <div className="max-h-[70svh] overflow-y-auto p-3.5 sm:p-4">
             {/* Phase: idle */}
             {state.phase === 'idle' && (
               <div className="space-y-2.5">
